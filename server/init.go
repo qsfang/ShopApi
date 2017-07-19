@@ -35,8 +35,9 @@ import (
 	"github.com/labstack/echo"
 	_ "github.com/go-sql-driver/mysql"
 
-	"ShopApi/server/initorm"
+	"ShopApi/orm"
 	"ShopApi/server/router"
+	"ShopApi/log"
 )
 
 var (
@@ -47,7 +48,8 @@ func startServer() {
 	server = echo.New()
 
 	router.InitRouter(server)
-	server.Start(configuration.address)
+	log.Logger.Debug("Router init :%v")
+	log.Logger.Fatal(server.Start(configuration.address))
 }
 
 func init() {
@@ -62,9 +64,8 @@ func initMysql() {
 	url := configuration.mysqlHost
 	port := configuration.mysqlPort
 	sqlName := configuration.mysqlDb
-	size := configuration.mysqlSize
 
 	conf := fmt.Sprintf(user + ":" + pass + "@" + "tcp(" + url + port + ")/" + sqlName + "?charset=utf8")
 
-	initorm.InitOrm(conf, size)
+	orm.InitOrm(conf)
 }

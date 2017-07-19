@@ -36,22 +36,20 @@ import (
 	"github.com/labstack/echo"
 	"ShopApi/log"
 	"ShopApi/general"
-	"ShopApi/orm"
 	"ShopApi/general/errcode"
-	"ShopApi/models/user"
+	"ShopApi/models"
 	"ShopApi/utility"
 )
 
-type create struct {
+type Register struct {
 	Mobile 		*string 		`json:"mobile" validate:"required,alphanum,min=6,max=30"`
-	Pass 		*string
+	Pass 		*string         `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
 
 func Create(c echo.Context) error {
 	var (
 		err 		error
-		u 			create
-		conn 		orm.Connection
+		u 			Register
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -60,12 +58,8 @@ func Create(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = connectMysql()
-	if err != nil {
-		return err
-	}
-
-	err = user.UserService.Create(conn, u.Mobile, u.Pass)
+	log.Logger.Debug("user Bind: %v", u)
+	err = models.UserService.Create(u.Mobile, u.Pass)
 	if err != nil {
 		log.Logger.Error("create creash with error:", err)
 
@@ -78,9 +72,7 @@ func Create(c echo.Context) error {
 func Login(c echo.Context) error {
 	var (
 		err 		error
-		u 			create
-		conn 		orm.Connection
-		flag		bool
+		u 			Register
 		userID		uint64
 		sess		session.Session
 	)
@@ -91,12 +83,7 @@ func Login(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = connectMysql()
-	if err != nil {
-		return err
-	}
-
-	flag, userID, err = user.UserService.Login(conn, u.Mobile, u.Pass)
+	flag, userID, err := models.UserService.Login(u.Mobile, u.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 
@@ -118,5 +105,19 @@ func Login(c echo.Context) error {
 	sess = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	sess.Set(general.SessionUserID, userID)
 
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+func Logout(c echo.Context) error {
+	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	err := sess.Delete(general.SessionUserID)
+
+	if err != nil {
+		log.Logger.Error("Logout with error", err)
+
+		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
+	}
+
+	log.Logger.Debug("i got here")
 	return c.JSON(errcode.ErrSucceed, nil)
 }
