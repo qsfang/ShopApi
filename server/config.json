@@ -13,7 +13,6 @@
     "port" : ":3307",
     "user" : "root",
     "pass" : "shopapimysql",
-    "db" : "shop",
-    "size" : 50
+    "db" : "shop"
   }
 }

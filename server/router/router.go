@@ -41,5 +41,5 @@ func InitRouter(server *echo.Echo) {
 	}
 
 	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/suer/login", handler.Login)
+	server.POST("/api/v1/user/login", handler.Login)
 }

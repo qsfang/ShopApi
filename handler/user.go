@@ -37,7 +37,6 @@ import (
 
 	"ShopApi/log"
 	"ShopApi/general"
-	"ShopApi/orm"
 	"ShopApi/general/errcode"
 	"ShopApi/models/user"
 	"ShopApi/utility"
@@ -52,7 +51,6 @@ func Create(c echo.Context) error {
 	var (
 		err 		error
 		u 			create
-		conn 		orm.Connection
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -61,12 +59,7 @@ func Create(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = connectMysql()
-	if err != nil {
-		return err
-	}
-
-	err = user.UserService.Create(conn, u.Mobile, u.Pass)
+	err = user.UserService.Create(u.Mobile, u.Pass)
 	if err != nil {
 		log.Logger.Error("create creash with error:", err)
 
@@ -80,7 +73,6 @@ func Login(c echo.Context) error {
 	var (
 		err 		error
 		u 			create
-		conn 		orm.Connection
 		flag		bool
 		userID		uint64
 		sess		session.Session
@@ -92,12 +84,7 @@ func Login(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = connectMysql()
-	if err != nil {
-		return err
-	}
-
-	flag, userID, err = user.UserService.Login(conn, u.Mobile, u.Pass)
+	flag, userID, err = user.UserService.Login(u.Mobile, u.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 

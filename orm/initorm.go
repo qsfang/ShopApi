@@ -29,6 +29,25 @@
 
 package orm
 
-type Connection interface {
-	Close() error
+import (
+	"github.com/jinzhu/gorm"
+	"ShopApi/log"
+)
+
+const sql = "mysql"
+
+var (
+	Conn *gorm.DB
+	err	error
+)
+
+func InitOrm(url string) {
+	Conn, err = gorm.Open(sql, url)
+
+	if err != nil {
+		panic(err)
+	}
+
+	log.Logger.Debug("DB Connected to %s", sql)
+
 }

@@ -33,7 +33,6 @@ package user
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
 
 	"ShopApi/orm"
 	"ShopApi/utility"
@@ -59,7 +58,7 @@ func (User) TableName() string {
 	return "user"
 }
 
-func (us *UserServiceProvider) Create(conn orm.Connection, name, pass *string) error {
+func (us *UserServiceProvider) Create(name, pass *string) error {
 	hashedPass, err := utility.GenerateHash(*pass)
 	if err != nil {
 		return err
@@ -73,7 +72,7 @@ func (us *UserServiceProvider) Create(conn orm.Connection, name, pass *string) e
 		Created:	time.Now(),
 	}
 
-	db := conn.(*gorm.DB)
+	db := orm.Conn
 
 	err = db.Create(&u).Error
 	if err != nil {
@@ -83,10 +82,10 @@ func (us *UserServiceProvider) Create(conn orm.Connection, name, pass *string) e
 	return nil
 }
 
-func (us *UserServiceProvider) Login(conn orm.Connection, name, pass *string) (bool, uint64, error) {
+func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	var user User
 
-	db := conn.(*gorm.DB)
+	db := orm.Conn
 
 	err := db.Where("name = ?", name).First(&user).Error
 	if err == nil {
