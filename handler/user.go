@@ -42,15 +42,15 @@ import (
 	"ShopApi/utility"
 )
 
-type create struct {
+type Register struct {
 	Mobile 		*string 		`json:"mobile" validate:"required,alphanum,min=6,max=30"`
-	Pass 		*string
+	Pass 		*string         `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
 
 func Create(c echo.Context) error {
 	var (
 		err 		error
-		u 			create
+		u 			Register
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -59,6 +59,7 @@ func Create(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+	log.Logger.Debug("user Bind: %v", u)
 	err = models.UserService.Create(u.Mobile, u.Pass)
 	if err != nil {
 		log.Logger.Error("create creash with error:", err)
@@ -72,8 +73,7 @@ func Create(c echo.Context) error {
 func Login(c echo.Context) error {
 	var (
 		err 		error
-		u 			create
-		flag		bool
+		u 			Register
 		userID		uint64
 		sess		session.Session
 	)
@@ -84,7 +84,7 @@ func Login(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	flag, userID, err = models.UserService.Login(u.Mobile, u.Pass)
+	flag, userID, err := models.UserService.Login(u.Mobile, u.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 
