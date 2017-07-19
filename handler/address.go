@@ -36,7 +36,6 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models/address"
-	"ShopApi/orm"
 )
 
 type addr struct {
@@ -69,7 +68,7 @@ func Add(c echo.Context) error {
 	//}
 	//defer initorm.MysqlPool.ReleaseConnection(conn)
 
-	err = address.AddressService.AddAddress(conn, addr.Name, addr.Province, addr.City, addr.Street, addr.Address, addr.Phone, addr.IsDefault)
+	err = address.AddressService.AddAddress(addr.Name, addr.Province, addr.City, addr.Street, addr.Address, addr.Phone, addr.IsDefault)
 	if err != nil {
 		log.Logger.Error("Add address with error:", err)
 
