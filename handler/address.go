@@ -41,13 +41,13 @@ import (
 )
 
 type addr struct {
-	name      *string `json:"name"`
-	phone     *uint64 `json:"phone validate:"required,alphanum,min=6,max=30""`
-	province  *string `json:"province"`
-	city      *string `json:"city"`
-	street    *string `json:"street"`
-	address   *string `json:"address"`
-	isDefault bool   `json:"is_default"`
+	Name      *string `json:"name"`
+	Phone     *uint64 `json:"phone" validate:"required,alphanum,min=6,max=30"`
+	Province  *string `json:"province"`
+	City      *string `json:"city"`
+	Street    *string `json:"street"`
+	Address   *string `json:"address"`
+	IsDefault bool   `json:"is_default"`
 }
 
 func Add(c echo.Context) error {
@@ -71,7 +71,7 @@ func Add(c echo.Context) error {
 	}
 	defer initorm.MysqlPool.ReleaseConnection(conn)
 
-	err = address.AddressService.AddAddress(conn, addr.name, addr.province, addr.city, addr.street, addr.address, addr.phone, addr.isDefault)
+	err = address.AddressService.AddAddress(conn, addr.Name, addr.Province, addr.City, addr.Street, addr.Address, addr.Phone, addr.IsDefault)
 	if err != nil {
 		log.Logger.Error("Add address with error:", err)
 
