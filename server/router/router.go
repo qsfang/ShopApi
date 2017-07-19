@@ -40,6 +40,6 @@ func InitRouter(server *echo.Echo) {
 		panic("[InitRouter], server couldn't be nil")
 	}
 
-	server.POST("/api/v1/user/login", handler.Create)
-
+	server.POST("/api/v1/user/create", handler.Create)
+	server.POST("/api/v1/suer/login", handler.Login)
 }

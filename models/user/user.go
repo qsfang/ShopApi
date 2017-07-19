@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
+ *     Modify: 2017/07/19		  Sun Anxiang 登录检查
  */
 
 package user
@@ -80,4 +81,20 @@ func (us *UserServiceProvider) Create(conn orm.Connection, name, pass *string) e
 	}
 
 	return nil
+}
+
+func (us *UserServiceProvider) Login(conn orm.Connection, name, pass *string) (bool, uint64, error) {
+	var user User
+
+	db := conn.(*gorm.DB)
+
+	err := db.Where("name = ?", name).First(&user).Error
+	if err == nil {
+		if !utility.CompareHash([]byte(user.Pass), *pass){
+			return false, 0, nil
+		}
+		return true, user.UserID, nil
+	}
+
+	return false, 0, err
 }

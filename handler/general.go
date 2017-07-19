@@ -24,20 +24,26 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Yusan Kurban
+ *     Initial: 2017/07/19        Sun Anxiang
  */
 
-package general
+package handler
 
-const (
-	// User Type
-	PhoneUser 	= 0xff
-	WechatUser	= 0xfe
-
-	// User Status
-	UserActive 		= 0xf0
-	UserInactive	= 0xf1
-
-	// Login session
-	SessionUserID = "userid"
+import (
+	"ShopApi/log"
+	"ShopApi/general"
+	"ShopApi/server/initorm"
+	"ShopApi/general/errcode"
 )
+
+func connectMysql() error {
+	conn, err := initorm.MysqlPool.GetConnection()
+	if err != nil {
+		log.Logger.Error("Get connection crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrNoConnection, err.Error())
+	}
+	defer initorm.MysqlPool.ReleaseConnection(conn)
+
+	return nil
+}

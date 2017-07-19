@@ -25,21 +25,23 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
+ *	   Modify: 2017/07/19         Sun Anxiang 添加用户登录
  */
 
 package handler
 
 import (
+	"github.com/astaxie/session"
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
 	"ShopApi/log"
 	"ShopApi/general"
 	"ShopApi/orm"
 	"ShopApi/general/errcode"
-	"ShopApi/server/initorm"
 	"ShopApi/models/user"
+	"ShopApi/utility"
 )
-
 
 type create struct {
 	Mobile 		*string 		`json:"mobile" validate:"required,alphanum,min=6,max=30"`
@@ -59,13 +61,10 @@ func Create(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	conn, err = initorm.MysqlPool.GetConnection()
+	err = connectMysql()
 	if err != nil {
-		log.Logger.Error("Get connection crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrNoConnection, err.Error())
+		return err
 	}
-	defer initorm.MysqlPool.ReleaseConnection(conn)
 
 	err = user.UserService.Create(conn, u.Mobile, u.Pass)
 	if err != nil {
@@ -73,6 +72,52 @@ func Create(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+func Login(c echo.Context) error {
+	var (
+		err 		error
+		u 			create
+		conn 		orm.Connection
+		flag		bool
+		userID		uint64
+		sess		session.Session
+	)
+
+	if err = c.Bind(&u); err != nil {
+		log.Logger.Error("Bind error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = connectMysql()
+	if err != nil {
+		return err
+	}
+
+	flag, userID, err = user.UserService.Login(conn, u.Mobile, u.Pass)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+
+			log.Logger.Error("User not found:", err)
+		} else {
+
+			log.Logger.Error("Mysql error:", err)
+		}
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	} else {
+		if flag == false {
+			log.Logger.Error("Name and pass don't match:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrLoginRequired, err.Error())
+		}
+	}
+
+	sess = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	sess.Set(general.SessionUserID, userID)
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
