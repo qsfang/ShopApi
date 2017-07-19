@@ -37,7 +37,6 @@ import (
 	"ShopApi/log"
 	"ShopApi/models/address"
 	"ShopApi/orm"
-	"ShopApi/server/initorm"
 )
 
 type addr struct {
@@ -54,7 +53,6 @@ func Add(c echo.Context) error {
 	var (
 		err  error
 		addr addr
-		conn orm.Connection
 	)
 
 	if err = c.Bind(&addr); err != nil {
@@ -63,13 +61,13 @@ func Add(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	conn, err = initorm.MysqlPool.GetConnection()
-	if err != nil {
-		log.Logger.Error("Get connection crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrNoConnection, err.Error())
-	}
-	defer initorm.MysqlPool.ReleaseConnection(conn)
+	//conn, err = initorm.MysqlPool.GetConnection()
+	//if err != nil {
+	//	log.Logger.Error("Get connection crash with error:", err)
+	//
+	//	return general.NewErrorWithMessage(errcode.ErrNoConnection, err.Error())
+	//}
+	//defer initorm.MysqlPool.ReleaseConnection(conn)
 
 	err = address.AddressService.AddAddress(conn, addr.Name, addr.Province, addr.City, addr.Street, addr.Address, addr.Phone, addr.IsDefault)
 	if err != nil {

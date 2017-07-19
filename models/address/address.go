@@ -32,8 +32,6 @@ package address
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
-
 	"ShopApi/orm"
 	"ShopApi/log"
 )
@@ -56,7 +54,7 @@ type AddressServiceProvider struct {
 
 var AddressService *AddressServiceProvider = &AddressServiceProvider{}
 
-func (as *AddressServiceProvider) AddAddress(conn orm.Connection, name *string, province *string, city *string, street *string, address *string, phone *uint64, isDefault bool) error {
+func (as *AddressServiceProvider) AddAddress(name *string, province *string, city *string, street *string, address *string, phone *uint64, isDefault bool) error {
 	log.Logger.Debug("name :%s, province :%s, city :%s, street :%s, address :%s, phone :%d, isDefault :%v", *name, *province, *city, *street, *address, *phone, isDefault)
 	addr := &Address{
 		Name:      *name,
@@ -70,7 +68,7 @@ func (as *AddressServiceProvider) AddAddress(conn orm.Connection, name *string, 
 		IsDefault: isDefault,
 	}
 
-	db := conn.(*gorm.DB)
+	db := orm.Conn
 
 	err := db.Create(&addr).Error
 	if err != nil {

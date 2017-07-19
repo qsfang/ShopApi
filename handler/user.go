@@ -50,12 +50,7 @@ type Register struct {
 func Create(c echo.Context) error {
 	var (
 		err 		error
-<<<<<<< HEAD
 		u 			Register
-		conn 		orm.Connection
-=======
-		u 			create
->>>>>>> 37c5aef49c41d6ed2313d3c330f764665aabbbe0
 	)
 	log.Logger.Debug("req: %v", *c.Request())
 	if err = c.Bind(&u); err != nil {
@@ -78,7 +73,6 @@ func Login(c echo.Context) error {
 	var (
 		err 		error
 		u 			Register
-		conn 		orm.Connection
 		userID		uint64
 		sess		session.Session
 	)
