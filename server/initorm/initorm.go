@@ -24,7 +24,21 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/19        Yusan Kurban
  */
 
-package models
+package initorm
+
+import (
+	"ShopApi/orm/mysql"
+)
+
+var MysqlPool *mysql.Pool
+
+func InitOrm(url string, size int) {
+	MysqlPool = mysql.NewPool(url, size)
+
+	if MysqlPool == nil {
+		panic("mysql connection error")
+	}
+}

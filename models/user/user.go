@@ -24,21 +24,60 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Feng Yifei
+ *     Initial: 2017/07/18        Yusan Kurban
  */
 
-package errcode
+package user
 
-const (
-	ErrSucceed				= 0x0
-	ErrInvalidParams		= 0x1
-	ErrMysql 				= 0x2
+import (
+	"time"
 
-	// 需要登录
-	ErrLoginRequired		= 0x800
-	ErrPermissionDenied		= 0x801
+	"github.com/jinzhu/gorm"
 
-	// 严重错误
-	ErrNoConnection			= 0x1000
-	ErrDBOperationFailed	= 0x1001
+	"ShopApi/orm"
+	"ShopApi/utility"
+	"ShopApi/general"
 )
+
+type UserServiceProvider struct{
+}
+
+var UserService *UserServiceProvider = &UserServiceProvider{}
+
+type User struct {
+	UserID 		uint64		`orm:"pk;column(id)"  json:"userid"`
+	OpenID 		string		`orm:"column(openid)" json:"openid"`
+	Name 		string		`json:"name"`
+	Pass 		string		`json:"pass"`
+	Status		uint16		`json:"status"`
+	Type		uint16		`json:"type"`
+	Created 	time.Time	`json:"created"`
+}
+
+func (User) TableName() string {
+	return "user"
+}
+
+func (us *UserServiceProvider) Create(conn orm.Connection, name, pass *string) error {
+	hashedPass, err := utility.GenerateHash(*pass)
+	if err != nil {
+		return err
+	}
+
+	u := User{
+		Name: 		*name,
+		Pass:		string(hashedPass),
+		Status:		general.UserActive,
+		Type: 		general.PhoneUser,
+		Created:	time.Now(),
+	}
+
+	db := conn.(*gorm.DB)
+
+	err = db.Create(&u).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

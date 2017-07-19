@@ -35,13 +35,11 @@ import (
 	"ShopApi/handler"
 )
 
-func InitRouter(server *echo.Echo, tokenkey string) {
+func InitRouter(server *echo.Echo) {
 	if server == nil {
 		panic("[InitRouter], server couldn't be nil")
 	}
 
-	handler.TokenHMACKey = tokenkey
-
-	server.POST()
+	server.POST("/api/v1/user/login", handler.Create)
 
 }

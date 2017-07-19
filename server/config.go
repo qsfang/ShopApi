@@ -39,12 +39,11 @@ type shopServerConfig struct {
 	corsHosts []string
 	tokenKey  string
 	mysqlHost string
-	mysqlPort int
+	mysqlPort string
 	mysqlUser string
 	mysqlPass string
 	mysqlDb   string
-	idle      int
-	conn      int
+	mysqlSize int
 }
 
 var (
@@ -65,11 +64,10 @@ func readConfiguration() {
 		corsHosts: viper.GetStringSlice("middleware.cors.hosts"),
 		tokenKey:  viper.GetString("middleware.jwt.tokenkey"),
 		mysqlHost: viper.GetString("mysql.host"),
-		mysqlPort: viper.GetInt("mysql.port"),
+		mysqlPort: viper.GetString("mysql.port"),
 		mysqlUser: viper.GetString("mysql.user"),
 		mysqlPass: viper.GetString("mysql.pass"),
 		mysqlDb:   viper.GetString("mysql.db"),
-		idle:      viper.GetInt("mysql.idle"),
-		conn:      viper.GetInt("mysql.conn"),
+		mysqlSize: viper.GetInt("mysql.size"),
 	}
 }

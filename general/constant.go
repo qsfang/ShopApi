@@ -24,21 +24,17 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Feng Yifei
+ *     Initial: 2017/07/19        Yusan Kurban
  */
 
-package errcode
+package general
 
 const (
-	ErrSucceed				= 0x0
-	ErrInvalidParams		= 0x1
-	ErrMysql 				= 0x2
+	// User Type
+	PhoneUser 	= 0xff
+	WechatUser	= 0xfe
 
-	// 需要登录
-	ErrLoginRequired		= 0x800
-	ErrPermissionDenied		= 0x801
-
-	// 严重错误
-	ErrNoConnection			= 0x1000
-	ErrDBOperationFailed	= 0x1001
+	// User Status
+	UserActive 		= 0xf0
+	UserInactive	= 0xf1
 )

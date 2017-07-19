@@ -24,21 +24,19 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Feng Yifei
+ *     Initial: 2017/07/19        Yusan Kurban
  */
 
-package errcode
+package utility
 
-const (
-	ErrSucceed				= 0x0
-	ErrInvalidParams		= 0x1
-	ErrMysql 				= 0x2
-
-	// 需要登录
-	ErrLoginRequired		= 0x800
-	ErrPermissionDenied		= 0x801
-
-	// 严重错误
-	ErrNoConnection			= 0x1000
-	ErrDBOperationFailed	= 0x1001
+import (
+	"github.com/astaxie/session"
+	_ "github.com/astaxie/session/providers/memory"
 )
+
+var GlobalSessions *session.Manager
+
+func init() {
+	GlobalSessions, _ = session.NewManager("memory", "gosessionid", 3600)
+	go GlobalSessions.GC()
+}

@@ -33,8 +33,10 @@ import (
 	"fmt"
 
 	"github.com/labstack/echo"
-	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
+
+	"ShopApi/server/initorm"
+	"ShopApi/server/router"
 )
 
 var (
@@ -44,6 +46,7 @@ var (
 func startServer() {
 	server = echo.New()
 
+	router.InitRouter(server)
 	server.Start(configuration.address)
 }
 
@@ -54,17 +57,14 @@ func init() {
 }
 
 func initMysql() {
-	host := configuration.mysqlHost
-	port:= configuration.mysqlHost
 	user := configuration.mysqlUser
 	pass := configuration.mysqlPass
-	db := configuration.mysqlDb
-	maxIdle := configuration.idle
-	maxConn := configuration.conn
+	url := configuration.mysqlHost
+	port := configuration.mysqlPort
+	sqlName := configuration.mysqlDb
+	size := configuration.mysqlSize
 
+	conf := fmt.Sprintf(user + ":" + pass + "@" + "tcp(" + url + port + ")/" + sqlName + "?charset=utf8")
 
-	orm.RegisterDriver("mysql", orm.DRMySQL)
-	orm.RegisterDataBase("default", "mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", user, pass, host, port, db), maxIdle, maxConn)
-	orm.RegisterDataBase(db, "mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", user, pass, host, port, db), maxIdle, maxConn)
-
+	initorm.InitOrm(conf, size)
 }

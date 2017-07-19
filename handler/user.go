@@ -29,15 +29,50 @@
 
 package handler
 
-const (
-	tokenExpireInHour = 48
+import (
+	"github.com/labstack/echo"
 
-	jwtClaimUid = "uid"
-	jwtClaimExpire = "exp"
-
-	respTokenKey = "token"
+	"ShopApi/log"
+	"ShopApi/general"
+	"ShopApi/orm"
+	"ShopApi/general/errcode"
+	"ShopApi/server/initorm"
+	"ShopApi/models/user"
 )
 
-var (
-	TokenHMACKey string
-)
+
+type create struct {
+	Mobile 		*string 		`json:"mobile" validate:"required,alphanum,min=6,max=30"`
+	Pass 		*string
+}
+
+func Create(c echo.Context) error {
+	var (
+		err 		error
+		u 			create
+		conn 		orm.Connection
+	)
+
+	if err = c.Bind(&u); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	conn, err = initorm.MysqlPool.GetConnection()
+	if err != nil {
+		log.Logger.Error("Get connection crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrNoConnection, err.Error())
+	}
+	defer initorm.MysqlPool.ReleaseConnection(conn)
+
+	err = user.UserService.Create(conn, u.Mobile, u.Pass)
+	if err != nil {
+		log.Logger.Error("create creash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}

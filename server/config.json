@@ -10,11 +10,10 @@
   },
   "mysql": {
     "host" : "10.0.0.253",
-    "port" : 3306,
+    "port" : ":3306",
     "user" : "root",
     "pass" : "shopmysql",
     "db" : "shop",
-    "idle" : 20,
-    "conn" : 40
+    "size" : 50
   }
 }

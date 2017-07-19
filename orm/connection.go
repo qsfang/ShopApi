@@ -24,38 +24,11 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Liu Jiachang
+ *     Initial: 2017/07/19        Yusan Kurban
  */
 
-package jwt
+package orm
 
-import (
-	"github.com/labstack/echo/middleware"
-	"github.com/labstack/echo"
-)
-
-var urlMap map[string]struct{}
-
-func CustomJWT(tokenkey string) echo.MiddlewareFunc {
-	jwtconf := middleware.JWTConfig {
-		Skipper:     CustomSkipper,
-		SigningKey:  []byte(tokenkey),
-	}
-
-	return middleware.JWTWithConfig(jwtconf)
-}
-
-func CustomSkipper(c echo.Context) bool {
-	if _, ok := urlMap[c.Request().RequestURI]; ok {
-		return true
-	}
-
-	return false
-}
-
-func init() {
-	urlMap = make(map[string]struct{})
-
-	urlMap["/login"] = struct{}{}
-	urlMap["/metrics"] = struct{}{}
+type Connection interface {
+	Close() error
 }
