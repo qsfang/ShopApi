@@ -45,8 +45,8 @@ type UserServiceProvider struct{
 var UserService *UserServiceProvider = &UserServiceProvider{}
 
 type User struct {
-	UserID 		uint64		`orm:"pk;column(id)"  json:"userid"`
-	OpenID 		string		`orm:"column(openid)" json:"openid"`
+	UserID 		uint64		`sql:"auto_increment;primary_key;" gorm:"column:id" json:"userid"`
+	OpenID 		string		`gorm:"column:openid" json:"openid"`
 	Name 		string		`json:"name"`
 	Pass 		string		`json:"pass"`
 	Status		uint16		`json:"status"`
