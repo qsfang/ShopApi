@@ -1,6 +1,10 @@
-hash: 32582f8c7ddec02318f704bf25a872ac054186b447db2cfed7c6fc37b4984401
-updated: 2017-07-19T14:48:06.408392678+08:00
+hash: 9214e6fefd652fb17f0216a7957861d162389d8e185b1516a8ec123e59761725
+updated: 2017-07-19T16:51:59.385674561+08:00
 imports:
+- name: github.com/astaxie/beego
+  version: cab8458c1c4a5a3b4bf5192922be620e6dede15b
+  subpackages:
+  - cache
 - name: github.com/astaxie/session
   version: 95d7fe18579cfbdd564189bd3ccc30b17aa06d35
   subpackages:
