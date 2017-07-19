@@ -75,17 +75,19 @@ func NewPool(db string, size int) *Pool {
 		conn.Value, err = gorm.Open(dialect, db)
 
 		if err != nil {
+			log.Logger.Error("connection error:", err)
 			continue
 		}
 
 		pool.pool.Link(conn)
 	}
 
-	pool.size = pool.pool.Len()
+	pool.size = pool.pool.Len() - 1
 	if pool.size != size {
-		log.Logger.Debug("New pool not enough!")
+		log.Logger.Debug("New pool not enough! %d : %d ", size, pool.size)
 	}
 
+	log.Logger.Debug("DataBase Connected to %s", dialect)
 	return pool
 }
 
