@@ -34,7 +34,6 @@ import (
 	"github.com/astaxie/session"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-
 	"ShopApi/log"
 	"ShopApi/general"
 	"ShopApi/orm"

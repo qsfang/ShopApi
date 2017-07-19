@@ -37,8 +37,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 
-	"ShopApi/log"
-	"ShopApi/orm"
+	"github.com/ShopApi/log"
+	"github.com/ShopApi/orm"
 )
 
 const (

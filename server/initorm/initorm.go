@@ -30,7 +30,7 @@
 package initorm
 
 import (
-	"ShopApi/orm/mysql"
+	"github.com/ShopApi/orm/mysql"
 )
 
 var MysqlPool *mysql.Pool
