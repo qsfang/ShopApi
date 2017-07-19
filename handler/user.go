@@ -59,7 +59,6 @@ func Create(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	log.Logger.Debug("user Bind: %v", u)
 	err = models.UserService.Create(u.Mobile, u.Pass)
 	if err != nil {
 		log.Logger.Error("create creash with error:", err)

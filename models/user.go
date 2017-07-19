@@ -33,11 +33,9 @@ package models
 import (
 	"time"
 
-
 	"ShopApi/orm"
 	"ShopApi/utility"
 	"ShopApi/general"
-	"ShopApi/log"
 )
 
 type UserServiceProvider struct{
@@ -60,7 +58,6 @@ func (User) TableName() string {
 }
 
 func (us *UserServiceProvider) Create(name, pass *string) error {
-	log.Logger.Debug("user", *name, *pass)
 	hashedPass, err := utility.GenerateHash(*pass)
 	if err != nil {
 		return err
@@ -68,7 +65,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	u := User{
 		Name: 		*name,
-		Password:		string(hashedPass),
+		Password:	string(hashedPass),
 		Status:		general.UserActive,
 		Type: 		general.PhoneUser,
 		Created:	time.Now(),
