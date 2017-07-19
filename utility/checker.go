@@ -30,3 +30,13 @@
 package utility
 
 // TODO:对账号和密码的格式长度进行判断
+
+import (
+	"regexp"
+)
+
+// 账户名是否合法
+func IsValidAccount(name string) bool {
+	match, _ := regexp.MatchString("^[\\w]{6,127}$", name)
+	return match
+}
