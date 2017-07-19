@@ -37,6 +37,7 @@ import (
 
 	"ShopApi/server/initorm"
 	"ShopApi/server/router"
+	"ShopApi/log"
 )
 
 var (
@@ -47,7 +48,8 @@ func startServer() {
 	server = echo.New()
 
 	router.InitRouter(server)
-	server.Start(configuration.address)
+	log.Logger.Debug("Router init :%v")
+	log.Logger.Fatal(server.Start(configuration.address))
 }
 
 func init() {

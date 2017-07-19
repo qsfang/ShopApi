@@ -70,7 +70,7 @@ func NewPool(db string, size int) *Pool {
 
 	pool.pool = ring.New(1)
 
-	for i := 0; i < size; i++ {
+	for i := 0; i < 1; i++ {
 		conn = ring.New(1)
 		conn.Value, err = gorm.Open(dialect, db)
 

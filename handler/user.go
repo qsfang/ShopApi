@@ -43,7 +43,7 @@ import (
 	"ShopApi/utility"
 )
 
-type create struct {
+type Register struct {
 	Mobile 		*string 		`json:"mobile" validate:"required,alphanum,min=6,max=30"`
 	Pass 		*string
 }
@@ -51,10 +51,10 @@ type create struct {
 func Create(c echo.Context) error {
 	var (
 		err 		error
-		u 			create
+		u 			Register
 		conn 		orm.Connection
 	)
-
+	log.Logger.Debug("req: %v", *c.Request())
 	if err = c.Bind(&u); err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
@@ -79,7 +79,7 @@ func Create(c echo.Context) error {
 func Login(c echo.Context) error {
 	var (
 		err 		error
-		u 			create
+		u 			Register
 		conn 		orm.Connection
 		flag		bool
 		userID		uint64
