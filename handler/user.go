@@ -37,9 +37,8 @@ import (
 
 	"ShopApi/log"
 	"ShopApi/general"
-	"ShopApi/orm"
 	"ShopApi/general/errcode"
-	"ShopApi/models/user"
+	"ShopApi/models"
 	"ShopApi/utility"
 )
 
@@ -51,8 +50,12 @@ type Register struct {
 func Create(c echo.Context) error {
 	var (
 		err 		error
+<<<<<<< HEAD
 		u 			Register
 		conn 		orm.Connection
+=======
+		u 			create
+>>>>>>> 37c5aef49c41d6ed2313d3c330f764665aabbbe0
 	)
 	log.Logger.Debug("req: %v", *c.Request())
 	if err = c.Bind(&u); err != nil {
@@ -61,12 +64,7 @@ func Create(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = connectMysql()
-	if err != nil {
-		return err
-	}
-
-	err = user.UserService.Create(conn, u.Mobile, u.Pass)
+	err = models.UserService.Create(u.Mobile, u.Pass)
 	if err != nil {
 		log.Logger.Error("create creash with error:", err)
 
@@ -81,7 +79,6 @@ func Login(c echo.Context) error {
 		err 		error
 		u 			Register
 		conn 		orm.Connection
-		flag		bool
 		userID		uint64
 		sess		session.Session
 	)
@@ -92,12 +89,7 @@ func Login(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = connectMysql()
-	if err != nil {
-		return err
-	}
-
-	flag, userID, err = user.UserService.Login(conn, u.Mobile, u.Pass)
+	flag, userID, err = models.UserService.Login(u.Mobile, u.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 
