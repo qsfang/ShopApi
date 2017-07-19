@@ -48,7 +48,7 @@ func CreateCode(phone string) error {
 	return err
 }
 
-func ModifyCode(phone, code string) bool {
+func VerifyCode(phone, code string) bool {
 	codeSaved := initcache.Bm.Get(phone)
 
 	return code == codeSaved
