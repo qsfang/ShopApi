@@ -28,7 +28,7 @@
  *     Modify: 2017/07/19		  Sun Anxiang 登录检查
  */
 
-package user
+package models
 
 import (
 	"time"
@@ -55,7 +55,7 @@ type User struct {
 }
 
 func (User) TableName() string {
-	return "user"
+	return "users"
 }
 
 func (us *UserServiceProvider) Create(name, pass *string) error {

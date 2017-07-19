@@ -38,7 +38,7 @@ import (
 	"ShopApi/log"
 	"ShopApi/general"
 	"ShopApi/general/errcode"
-	"ShopApi/models/user"
+	"ShopApi/models"
 	"ShopApi/utility"
 )
 
@@ -59,7 +59,7 @@ func Create(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = user.UserService.Create(u.Mobile, u.Pass)
+	err = models.UserService.Create(u.Mobile, u.Pass)
 	if err != nil {
 		log.Logger.Error("create creash with error:", err)
 
@@ -84,7 +84,7 @@ func Login(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	flag, userID, err = user.UserService.Login(u.Mobile, u.Pass)
+	flag, userID, err = models.UserService.Login(u.Mobile, u.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 
