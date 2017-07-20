@@ -24,7 +24,9 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Yu yi, Li Zebang, Yang Zhengtian
+ *     Initial: 2017/07/19       Li Zebang
+ *     Modify: 2017/07/20        Yu Yi
+ *     Modify: 2017/07/20        Yang Zhengtian
  */
 
 package handler
@@ -101,12 +103,11 @@ func ChangeAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-// todo: 代码规范
 func GetAddress(c echo.Context) error {
 	var (
 		err 		error
 		userid		uint64
-		list         	[]models.Addressget
+		list        	[]models.Addressget
 	)
 	
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
