@@ -38,6 +38,7 @@ import (
 	"ShopApi/general"
 )
 
+
 type UserServiceProvider struct{
 }
 
@@ -95,4 +96,19 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	}
 
 	return false, 0, err
+}
+
+func GetInfo(id uint64) (User, error) {
+	var (
+		err  error
+		s    User
+	)
+
+	db := orm.Conn
+	err = db.Where("id = ?", id).Find(&s).Error
+	if err != nil {
+		return s, err
+	}
+
+	return s, nil
 }
