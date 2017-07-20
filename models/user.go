@@ -54,8 +54,21 @@ type User struct {
 	Created 	time.Time	`json:"created"`
 }
 
+type UserInfo struct {
+	UserID 		uint64		`sql:"primary_key" gorm:"column:userid" json:"userid"`
+	Avatar 		string		`json:"avatar"`
+	Nickname 	string		`json:"nickname"`
+	Email 		string		`json:"email"`
+	Phone 		string		`json:"phone"`
+	Sex 		uint8		`json:"sex"`
+}
+
 func (User) TableName() string {
 	return "users"
+}
+
+func (UserInfo) TableName() string {
+	return "userinfo"
 }
 
 func (us *UserServiceProvider) Create(name, pass *string) error {
@@ -74,7 +87,33 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	db := orm.Conn
 
-	err = db.Create(&u).Error
+	tx := db.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+
+	err = tx.Create(&u).Error
+	if err != nil {
+		return err
+	}
+
+	info := UserInfo{
+		UserID: 	u.UserID,
+		Phone: 		*name,
+		Sex: 		general.Man,
+	}
+
+	err = tx.Create(&info).Error
+	if err != nil {
+		return nil
+	}
+
+	err = tx.Commit().Error
 	if err != nil {
 		return err
 	}
