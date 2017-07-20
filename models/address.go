@@ -24,8 +24,9 @@
 
 /*
  * Revision History:
- // TODO:自己看着办
- *     Initial: 2017/07/18        Yu yi, Li Zebang, Yang Zhengtian
+ *     Initial: 2017/07/18        Li Zebang
+ *     Modify: 2017/07/20        Yu Yi
+ *     Modify: 2017/07/20        Yang Zhengtian
  */
 
 package models
@@ -48,6 +49,12 @@ type Contact struct {
 	Created   time.Time `json:"created"`
 	// todo: uint8
 	IsDefault  int8      `gorm:"column:isdefault" json:"isdefault"`
+}
+type Addressget struct {
+	Province string 	`json:"province"`
+	City     string		`json:"city"`
+	Street   string		`json:"street"`
+	Address  string 	`json:"address"`
 }
 
 type ContactServiceProvider struct {
@@ -97,13 +104,7 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 
 	return nil
 }
-// todo: 放到文件顶部
-type Addressget struct {
-	Province string 	`json:"province"`
-	City     string		`json:"city"`
-	Street   string		`json:"street"`
-	Address  string 	`json:"address"`
-}
+
 func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error) {
 	var (
 		cont  Contact
