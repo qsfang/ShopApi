@@ -27,7 +27,7 @@
  *     Initial: 2017/07/18        Yusan Kurban
  */
 
-package address
+package models
 
 import (
 	"time"
@@ -35,46 +35,35 @@ import (
 	"ShopApi/orm"
 )
 
-type DBAddress struct {
-	ID        uint64    `sql:"auto_increment;primary_key;" json:"id"`
-	Name      string    `json:"name"`
-	Phone     string    `json:"phone"`
-	Province  string    `json:"province"`
-	City      string    `json:"city"`
-	Street    string    `json:"street"`
-	Address   string    `json:"address"`
-	UserID    uint64    `gorm:"column:userid" json:"userid"`
-	Created   time.Time `json:"created"`
-	IsDefault bool      `gorm:"column:isdefault" json:"isdefault"`
+type ContactServiceProvider struct {
 }
 
-type AddressServiceProvider struct {
+var ContactService *ContactServiceProvider = &ContactServiceProvider{}
+
+type Contact struct {
+	ID        	uint64      `sql:"auto_increment;primary_key;" json:"id"`
+	OpenID    	string      `gorm:"column:openid" json:"openid"`
+	Name      	string      `json:"name"`
+	Phone     	string      `json:"phone"`
+	Province  	string      `json:"province"`
+	City      	string      `json:"city"`
+	Street    	string      `json:"street"`
+	Address   	string      `json:"address"`
+	Created   	time.Time   `json:"created"`
+	Isdefault 	bool        `json:"isdefault"`
 }
 
-var AddressService *AddressServiceProvider = &AddressServiceProvider{}
-
-func (DBAddress) TableName() string {
+func (Contact) TableName() string {
 	return "contact"
 }
 
-func (as *AddressServiceProvider) AddAddress(name, phone , province , city , street , address *string, userID *uint64, isDefault bool) error {
+func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, address *string) error {
 
-
-	addr := &DBAddress{
-		Name:      *name,
-		Phone:     *phone,
-		Province:  *province,
-		City:      *city,
-		Street:    *street,
-		Address:   *address,
-		UserID:    *userID,
-		Created:   time.Now(),
-		IsDefault: isDefault,
-	}
+	changmap := map[string]interface{}{"province": *province, "city": *city, "street": *street, "address": *address}
 
 	db := orm.Conn
+	err := db.Model(&Contact{}).Where(&Contact{Name: *name}).Updates(changmap).Error
 
-	err := db.Create(&addr).Error
 	if err != nil {
 		return err
 	}

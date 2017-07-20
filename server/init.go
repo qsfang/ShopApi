@@ -48,7 +48,7 @@ func startServer() {
 	server = echo.New()
 
 	router.InitRouter(server)
-	log.Logger.Debug("Router init :%v")
+	log.Logger.Debug("Router already init")
 	log.Logger.Fatal(server.Start(configuration.address))
 }
 

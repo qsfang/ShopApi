@@ -24,60 +24,38 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/18        Yusan Kurban,YY
  */
 
-package address
+package handler
 
 import (
-	"time"
+	"github.com/labstack/echo"
 
-	"ShopApi/orm"
+	"ShopApi/log"
+	"ShopApi/general"
+	"ShopApi/general/errcode"
+	"ShopApi/models"
 )
 
-type DBAddress struct {
-	ID        uint64    `sql:"auto_increment;primary_key;" json:"id"`
-	Name      string    `json:"name"`
-	Phone     string    `json:"phone"`
-	Province  string    `json:"province"`
-	City      string    `json:"city"`
-	Street    string    `json:"street"`
-	Address   string    `json:"address"`
-	UserID    uint64    `gorm:"column:userid" json:"userid"`
-	Created   time.Time `json:"created"`
-	IsDefault bool      `gorm:"column:isdefault" json:"isdefault"`
-}
+func ChangeAddress(c echo.Context) error {
+	var (
+		err   error
+		m     Address
+	)
 
-type AddressServiceProvider struct {
-}
+	if err = c.Bind(&m); err != nil {
+		log.Logger.Error("Create crash with error:", err)
 
-var AddressService *AddressServiceProvider = &AddressServiceProvider{}
-
-func (DBAddress) TableName() string {
-	return "contact"
-}
-
-func (as *AddressServiceProvider) AddAddress(name, phone , province , city , street , address *string, userID *uint64, isDefault bool) error {
-
-
-	addr := &DBAddress{
-		Name:      *name,
-		Phone:     *phone,
-		Province:  *province,
-		City:      *city,
-		Street:    *street,
-		Address:   *address,
-		UserID:    *userID,
-		Created:   time.Now(),
-		IsDefault: isDefault,
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	db := orm.Conn
-
-	err := db.Create(&addr).Error
+	err = models.ContactService.ChangeAddress(m.Name, m.Province, m.City, m.Street, m.Address)
 	if err != nil {
-		return err
+		log.Logger.Error("create creash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return nil
+	return c.JSON(errcode.ErrSucceed, nil)
 }

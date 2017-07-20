@@ -33,7 +33,6 @@ package models
 import (
 	"time"
 
-
 	"ShopApi/orm"
 	"ShopApi/utility"
 	"ShopApi/general"
@@ -62,7 +61,6 @@ func (User) TableName() string {
 }
 
 func (us *UserServiceProvider) Create(name, pass *string) error {
-	log.Logger.Debug("user", *name, *pass)
 	hashedPass, err := utility.GenerateHash(*pass)
 	if err != nil {
 		return err
@@ -70,7 +68,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	u := User{
 		Name: 		*name,
-		Password:		string(hashedPass),
+		Password:	string(hashedPass),
 		Status:		general.UserActive,
 		Type: 		general.PhoneUser,
 		Created:	time.Now(),
@@ -107,6 +105,7 @@ func (us *UserServiceProvider)Login(name,pass *string)(bool,uint64,error) {
 		u   User
 		err error
 	)
+
 	db := orm.Conn
 	err = db.Where("name = ?", *name).First(&u).Error
 
