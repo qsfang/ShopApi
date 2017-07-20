@@ -33,13 +33,12 @@ import (
 	"time"
 
 	"ShopApi/orm"
-	"ShopApi/log"
 )
 
-type Address struct {
+type DBAddress struct {
 	ID        uint64    `sql:"auto_increment;primary_key;" json:"id"`
 	Name      string    `json:"name"`
-	Phone     uint64    `json:"phone"`
+	Phone     string    `json:"phone"`
 	Province  string    `json:"province"`
 	City      string    `json:"city"`
 	Street    string    `json:"street"`
@@ -54,16 +53,21 @@ type AddressServiceProvider struct {
 
 var AddressService *AddressServiceProvider = &AddressServiceProvider{}
 
-func (as *AddressServiceProvider) AddAddress(name *string, province *string, city *string, street *string, address *string, phone *uint64, isDefault bool) error {
-	log.Logger.Debug("name :%s, province :%s, city :%s, street :%s, address :%s, phone :%d, isDefault :%v", *name, *province, *city, *street, *address, *phone, isDefault)
-	addr := &Address{
+func (DBAddress) TableName() string {
+	return "contact"
+}
+
+func (as *AddressServiceProvider) AddAddress(name, phone , province , city , street , address *string, userID *uint64, isDefault bool) error {
+
+
+	addr := &DBAddress{
 		Name:      *name,
 		Phone:     *phone,
 		Province:  *province,
 		City:      *city,
 		Street:    *street,
 		Address:   *address,
-		UserID:    1,
+		UserID:    *userID,
 		Created:   time.Now(),
 		IsDefault: isDefault,
 	}

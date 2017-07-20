@@ -36,9 +36,12 @@ import (
 	"ShopApi/orm"
 	"ShopApi/utility"
 	"ShopApi/general"
+<<<<<<< HEAD
 	"ShopApi/log"
 	"ShopApi/general/errcode"
 	"github.com/jinzhu/gorm"
+=======
+>>>>>>> 99e716475adf7685baad3c2c77e18bd34abd4c39
 )
 
 type UserServiceProvider struct{
@@ -61,7 +64,6 @@ func (User) TableName() string {
 }
 
 func (us *UserServiceProvider) Create(name, pass *string) error {
-	log.Logger.Debug("user", *name, *pass)
 	hashedPass, err := utility.GenerateHash(*pass)
 	if err != nil {
 		return err
@@ -69,7 +71,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	u := User{
 		Name: 		*name,
-		Password:		string(hashedPass),
+		Password:	string(hashedPass),
 		Status:		general.UserActive,
 		Type: 		general.PhoneUser,
 		Created:	time.Now(),

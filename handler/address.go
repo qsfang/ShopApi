@@ -36,22 +36,23 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models/address"
+	//"ShopApi/utility"
 )
 
-type addr struct {
+type Address struct {
 	Name      *string `json:"name"`
-	Phone     *uint64 `json:"phone" validate:"required,alphanum,min=6,max=30"`
+	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=30"`
 	Province  *string `json:"province"`
 	City      *string `json:"city"`
 	Street    *string `json:"street"`
 	Address   *string `json:"address"`
-	IsDefault bool   `json:"is_default"`
+	IsDefault bool   `json:"isDefault"`
 }
 
 func Add(c echo.Context) error {
 	var (
 		err  error
-		addr addr
+		addr Address
 	)
 
 	if err = c.Bind(&addr); err != nil {
@@ -60,15 +61,9 @@ func Add(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	//conn, err = initorm.MysqlPool.GetConnection()
-	//if err != nil {
-	//	log.Logger.Error("Get connection crash with error:", err)
-	//
-	//	return general.NewErrorWithMessage(errcode.ErrNoConnection, err.Error())
-	//}
-	//defer initorm.MysqlPool.ReleaseConnection(conn)
-
-	err = address.AddressService.AddAddress(addr.Name, addr.Province, addr.City, addr.Street, addr.Address, addr.Phone, addr.IsDefault)
+	//session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	user := uint64(12616151564)
+	err = address.AddressService.AddAddress(addr.Name, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, &user, addr.IsDefault)
 	if err != nil {
 		log.Logger.Error("Add address with error:", err)
 
