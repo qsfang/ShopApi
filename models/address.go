@@ -58,25 +58,7 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
-<<<<<<< HEAD
 func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault int8) error {
-=======
-func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, province, city, street, address *string) error {
-
-	changmap := map[string]interface{}{"name": *name, "phone": *phone, "province": *province, "city": *city, "street": *street, "address": *address}
-
-	db := orm.Conn
-	err := db.Model(&Contact{}).Where(&Contact{ID: *id}).Updates(changmap).Limit(1).Error
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
->>>>>>> a96214f93b05e8b310e4ad6265f8d4db8e33e3b0
-
-
 	addr := &Contact{
 		Name:      *name,
 		Phone:     *phone,
@@ -88,7 +70,6 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 		Created:   time.Now(),
 		IsDefault: isDefault,
 	}
-	log.Logger.Debug("BDadd :%v", addr)
 
 	db := orm.Conn
 
@@ -100,12 +81,12 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 	return nil
 }
 
-func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, address *string) error {
+func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, province, city, street, address *string) error {
 
-	changmap := map[string]interface{}{"province": *province, "city": *city, "street": *street, "address": *address}
+	changmap := map[string]interface{}{"name": *name, "phone": *phone, "province": *province, "city": *city, "street": *street, "address": *address}
 
 	db := orm.Conn
-	err := db.Model(&Contact{}).Where(&Contact{Name: *name}).Updates(changmap).Error
+	err := db.Model(&Contact{}).Where(&Contact{ID: *id}).Updates(changmap).Limit(1).Error
 
 	if err != nil {
 		return err
