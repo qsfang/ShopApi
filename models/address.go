@@ -24,7 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/18        Yu yi, Li Zebang
  */
 
 package models
@@ -33,6 +33,7 @@ import (
 	"time"
 
 	"ShopApi/orm"
+	"ShopApi/log"
 )
 
 type Contact struct {
@@ -71,3 +72,27 @@ func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, ad
 	return nil
 }
 
+
+func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault *bool) error {
+	addr := &Contact{
+		Name:      *name,
+		Phone:     *phone,
+		Province:  *province,
+		City:      *city,
+		Street:    *street,
+		Address:   *address,
+		UserID:    *userID,
+		Created:   time.Now(),
+		IsDefault: *isDefault,
+	}
+	log.Logger.Debug("BDadd :%v", addr)
+
+	db := orm.Conn
+
+	err := db.Create(&addr).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

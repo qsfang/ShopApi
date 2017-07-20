@@ -24,7 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Li Zebang
+ *     Initial: 2017/07/19        Yu yi, Li Zebang
  */
 
 package handler
@@ -36,7 +36,7 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
-	//"ShopApi/utility"
+	"ShopApi/utility"
 )
 
 type Address struct {
@@ -69,4 +69,30 @@ func ChangeAddress(c echo.Context) error {
 	}
 
 	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+func Add(c echo.Context) error {
+	var (
+		err  error
+		addr Address
+	)
+
+	if err = c.Bind(&addr); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	user := session.Get(general.SessionUserID).(uint64)
+	log.Logger.Debug("session get user ID :%v", user)
+
+	err = models.ContactService.AddAddress(addr.Name, &user, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, addr.IsDefault)
+	if err != nil {
+		log.Logger.Error("Add address with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrAddAdress, nil)
 }
