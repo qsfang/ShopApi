@@ -26,6 +26,7 @@
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
  *	   Modify: 2017/07/19         Sun Anxiang 添加用户登录
+ *	   Modify: 2017/07/19		  Ai Hao 添加用户登出
  */
 
 package handler

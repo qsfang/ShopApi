@@ -46,7 +46,7 @@ type Address struct {
 	City      *string `json:"city"`
 	Street    *string `json:"street"`
 	Address   *string `json:"address"`
-	IsDefault bool   `json:"isDefault"`
+	IsDefault bool    `json:"isDefault"`
 }
 
 func Add(c echo.Context) error {

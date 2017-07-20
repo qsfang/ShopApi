@@ -24,24 +24,38 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/18        Yusan Kurban,YY
  */
 
-package router
+package handler
 
 import (
 	"github.com/labstack/echo"
 
-	"ShopApi/handler"
+	"ShopApi/log"
+	"ShopApi/general"
+	"ShopApi/general/errcode"
+	"ShopApi/models"
 )
 
-func InitRouter(server *echo.Echo) {
-	if server == nil {
-		panic("[InitRouter], server couldn't be nil")
+func ChangeAddress(c echo.Context) error {
+	var (
+		err   error
+		m     Address
+	)
+
+	if err = c.Bind(&m); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
-	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/user/login", handler.Login)
-	server.GET("/api/v1/user/GetInfo"), handler.GetInfo)
-	server.GET("/api/v1/user/logout", handler.Logout)
-	server.POST("/api/v1/user/change",handler.ChangeAddress)
+
+	err = models.ContactService.ChangeAddress(m.Name, m.Province, m.City, m.Street, m.Address)
+	if err != nil {
+		log.Logger.Error("create creash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
 }
