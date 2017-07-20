@@ -24,21 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Yusan Kurban
+ *     Initial: 2017/07/20        Yusan Kurban
  */
 
-package utility
-
-import (
-	"github.com/astaxie/session"
-	_ "github.com/astaxie/session/providers/memory"
-
-	"ShopApi/general"
-)
-
-var GlobalSessions *session.Manager
-
-func init() {
-	GlobalSessions, _ = session.NewManager("memory", general.SessionUserID, 3600)
-	go GlobalSessions.GC()
-}
+package general
