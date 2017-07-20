@@ -124,7 +124,6 @@ func Logout(c echo.Context) error {
 func GetInfo(c echo.Context) error {
 	var (
 		err    error
-		tempo  models.UserInfo
 		Output models.UserInfo
 	)
 
@@ -137,14 +136,7 @@ func GetInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
 	}
 
-	if err = c.Bind(&tempo); err != nil {
-
-		log.Logger.Error("Bind with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	Output, err = models.UserService.GetInfo(tempo.UserID)
+	Output, err = models.UserService.GetInfo(.UserID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User information doesn't exist !", err)
