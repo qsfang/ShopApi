@@ -137,6 +137,7 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return false, 0, err
 }
 
+// TODO: 每个函数都要有接受者
 func GetInfo(UserID uint64) (UserInfo, error) {
 	var (
 		err  error

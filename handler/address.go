@@ -39,6 +39,8 @@ import (
 	"ShopApi/utility"
 )
 
+// todo：放到 model * 去掉 id
+// todo: 数据验证！！！
 type Address struct {
 	ID        *uint64  `sql:"auto_increment; primary_key;" json:"id"`
 	Name      *string  `json:"name"`
@@ -66,6 +68,7 @@ func Add(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
+	// todo: 传入参数
 	err = models.ContactService.AddAddress(addr.Name, &userID, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, addr.IsDefault)
 	if err != nil {
 		log.Logger.Error("Add address with error:", err)
@@ -73,6 +76,7 @@ func Add(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
+	// todo： nil
 	return c.JSON(errcode.ErrSucceed, map[string]int{"status": 0})
 }
 
@@ -98,6 +102,7 @@ func ChangeAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+// todo: 代码规范
 func GetAddress(c echo.Context) error {
 	var (
 		err 		error
