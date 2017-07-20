@@ -36,13 +36,10 @@ import (
 	"ShopApi/orm"
 	"ShopApi/utility"
 	"ShopApi/general"
-<<<<<<< HEAD
-	"ShopApi/log"
 	"ShopApi/general/errcode"
 	"github.com/jinzhu/gorm"
-=======
->>>>>>> 99e716475adf7685baad3c2c77e18bd34abd4c39
 )
+
 
 type UserServiceProvider struct{
 }
@@ -103,22 +100,23 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return false, 0, err
 }
 
+var (
+	err  error
+	s    User
+)
 
-func returnInfo(id uint64) (User, error) {
-	var (
-		err  error
-		u    User
-	)
+
+func GetInfo(id uint64) (User, error) {
 
 	db := orm.Conn
 	err = db.Where("id = ?", id).Find(&u).Error
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return u, general.NewErrorWithMessage(errcode.NoInformation, err.Error())
+			return s, general.NewErrorWithMessage(errcode.NoInformation, err.Error())
 		} else {
-			return u, general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+			return s, general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 		}
 	}
-	return u, nil
+	return s, nil
 }

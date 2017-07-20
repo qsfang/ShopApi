@@ -39,6 +39,7 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/models"
 	"ShopApi/utility"
+	"os/user"
 )
 
 type Register struct {
@@ -119,4 +120,27 @@ func Logout(c echo.Context) error {
 
 	log.Logger.Debug("i got here")
 	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+func GetInfo(c echo.Context) (user.User, error) {
+	var (
+		err error
+		uu  models.User
+	)
+
+	if err = c.Bind(&uu); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return nil, general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+	s, err := models.GetInfo(uu.UserID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("User information doesn't exist !")
+			return s, err
+		} else {
+
+		}
+
+	}
 }

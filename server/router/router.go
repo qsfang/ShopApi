@@ -39,9 +39,9 @@ func InitRouter(server *echo.Echo) {
 	if server == nil {
 		panic("[InitRouter], server couldn't be nil")
 	}
-
 	server.POST("/api/v1/user/create", handler.Create)
 	server.POST("/api/v1/address/add", handler.Add)
 	server.POST("/api/v1/user/login", handler.Login)
+	server.GET("/api/v1/user/GetInfo"), handler.GetInfo)
 	server.GET("/api/v1/user/logout", handler.Logout)
 }
