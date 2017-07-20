@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `products` (
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `openid` text,
-  `name` varchar(100) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL UNIQUE ,
   `password` varchar(128) NOT NULL DEFAULT '',
   `status` int(11) DEFAULT NULL,
   `type` INT(11)  NOT NULL,

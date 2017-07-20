@@ -36,6 +36,7 @@ import (
 	"ShopApi/general"
 	"ShopApi/orm"
 	"ShopApi/utility"
+	"fmt"
 )
 
 type UserServiceProvider struct {
@@ -153,14 +154,17 @@ func (us *UserServiceProvider) Login(name,pass *string)(bool, uint64, error) {
 	return true, u.UserID, err
 }
 
-func GetInfo(id uint64) (User, error) {
+// TODO: 每个函数都要有接受者
+func GetInfo(UserID uint64) (UserInfo, error) {
 	var (
 		err error
 		s   User
+		err  error
+		s    UserInfo
 	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", id).Find(&s).Error
+	err = db.Where("UserID = ?", UserID).Find(&s).Error
 	if err != nil {
 		return s, err
 	}

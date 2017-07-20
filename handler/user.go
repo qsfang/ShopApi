@@ -26,11 +26,8 @@
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
  *	   Modify: 2017/07/19         Sun Anxiang 添加用户登录
-<<<<<<< HEAD
  *	   Modify: 2017/07/19         zhngzizhao  添加用户登录
-=======
  *	   Modify: 2017/07/19		  Ai Hao 添加用户登出
->>>>>>> b81e8614b995a3e391d9e45bd7101fae64ccf91d
 */
 
 package handler
@@ -43,6 +40,7 @@ import (
 	"ShopApi/utility"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
+	"fmt"
 )
 
 type Register struct {
@@ -125,6 +123,7 @@ func LoginHandlerMobilephone(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+	fmt.Println(*user.Mobile,*user.Pass)
 	match := utility.IsValidAccount(*user.Mobile)
 	if match == false {
 		log.Logger.Error("err name format", err)
@@ -171,11 +170,12 @@ func Logout(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+// todo:修改函数逻辑以及变量名
 func GetInfo(c echo.Context) error {
 	var (
 		err error
-		uu  models.User
-		s   models.User
+		uu  models.UserInfo
+		s   models.UserInfo
 	)
 
 	if err = c.Bind(&uu); err != nil {

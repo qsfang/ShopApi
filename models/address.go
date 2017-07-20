@@ -24,7 +24,8 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yu yi, Li Zebang
+ // TODO:自己看着办
+ *     Initial: 2017/07/18        Yu yi, Li Zebang, Yang Zhengtian
  */
 
 package models
@@ -45,7 +46,8 @@ type Contact struct {
 	Street    string    `json:"street"`
 	Address   string    `json:"address"`
 	Created   time.Time `json:"created"`
-	IsDefault int8      `gorm:"column:isdefault" json:"isdefault"`
+	// todo: uint8
+	IsDefault  int8      `gorm:"column:isdefault" json:"isdefault"`
 }
 
 type ContactServiceProvider struct {
@@ -57,7 +59,8 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
-func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone, province, city, street, address *string, isDefault int8) error {
+// todo: 传入参数
+func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault int8) error {
 	addr := &Contact{
 		Name:      *name,
 		Phone:     *phone,
@@ -84,6 +87,7 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 
 	changmap := map[string]interface{}{"name": *name, "phone": *phone, "province": *province, "city": *city, "street": *street, "address": *address}
 
+	// todo: 传入的结构先声明
 	db := orm.Conn
 	err := db.Model(&Contact{}).Where(&Contact{ID: *id}).Updates(changmap).Limit(1).Error
 
@@ -92,4 +96,33 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 	}
 
 	return nil
+}
+// todo: 放到文件顶部
+type Addressget struct {
+	Province string 	`json:"province"`
+	City     string		`json:"city"`
+	Street   string		`json:"street"`
+	Address  string 	`json:"address"`
+}
+func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error) {
+	var (
+		cont  Contact
+		list  []Contact
+		s     []Addressget
+	)
+
+	db := orm.Conn
+	err := db.Model(&cont).Where("userid=?", userid).Find(&list).Error
+	if err != nil {
+		return s, err
+	}
+
+	for i, c := range list{
+		s[i].Province = c.Province
+		s[i].City = c.City
+		s[i].Street = c.Street
+		s[i].Address = c.Address
+	}
+
+	return s, nil
 }

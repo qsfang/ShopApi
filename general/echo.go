@@ -24,27 +24,44 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/20        Yusan Kurban
  */
 
-package router
+package general
 
 import (
+	"net/http"
 	"github.com/labstack/echo"
-
-	"ShopApi/handler"
+	"github.com/labstack/gommon/log"
 )
 
-func InitRouter(server *echo.Echo) {
-	if server == nil {
-		panic("[InitRouter], server couldn't be nil")
+var (
+	code = http.StatusInternalServerError
+	msg  string
+)
+
+func EchoRestfulErrorHandler(err error, c echo.Context) {
+	log.Error(err)
+
+	if resp, ok := err.(*ErrorResp); ok {
+		code = resp.Code
+		msg = resp.Message
+	} else {
+		msg = http.StatusText(code)
 	}
-	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/address/add", handler.Add)
-	server.POST("/api/v1/user/loginmobilephone", handler.LoginHandlerMobilephone)
-	server.GET("/api/v1/user/GetInfo", handler.GetInfo)
-	server.GET("/api/v1/user/logout", handler.Logout)
-	server.POST("/api/v1/contact/add", handler.Add)
-	server.POST("/api/v1/contact/change",handler.ChangeAddress)
-	server.GET("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
+
+	if !c.Response().Committed {
+		if c.Request().Method == echo.HEAD {
+			err := c.NoContent(code)
+			if err != nil {
+				c.Logger().Error(err)
+			}
+		} else {
+			err := c.JSON(code, NewErrorWithMessage(code, msg))
+
+			if err != nil {
+				c.Logger().Error(err)
+			}
+		}
+	}
 }
