@@ -38,7 +38,7 @@ import (
 	"ShopApi/general"
 	"ShopApi/log"
 	"ShopApi/general/errcode"
-
+	"github.com/jinzhu/gorm"
 )
 
 type UserServiceProvider struct{
@@ -106,25 +106,16 @@ func returnInfo(id uint64) (User, error) {
 	var (
 		err  error
 		u    User
-		conn orm.Connection
 	)
 
-
-	if err = c.Bind(&u); err != nil {
-		log.Logger.Error("Create crash with error:", err)
-		return u, err
-		//general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
 	db := orm.Conn
-	err = db.Where("id=?", id).Find(&u).Error
+	err = db.Where("id = ?", id).Find(&u).Error
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return u
+			return u, general.NewErrorWithMessage(errcode.NoInformation, err.Error())
 		} else {
-			return nil
-			println(errors)
+			return u, general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 		}
 	}
 	return u, nil

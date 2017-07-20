@@ -49,5 +49,4 @@ func InitOrm(url string) {
 	}
 
 	log.Logger.Debug("DB Connected to %s", sql)
-
 }
