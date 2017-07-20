@@ -40,7 +40,11 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
+<<<<<<< HEAD
+	"strconv"
+=======
 	"fmt"
+>>>>>>> dc1c03ea3dd66e4f97ed16686d25d5acce2f687c
 )
 
 type Register struct {
@@ -128,29 +132,25 @@ func Logout(c echo.Context) error {
 }
 
 func GetInfo(c echo.Context) error {
+
 	var (
 		err    error
-		tempo  models.UserInfo
 		Output models.UserInfo
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	err = sess.Delete(general.SessionUserID)
 
+	err = sess.Delete(general.SessionUserID)
 	if err != nil {
 		log.Logger.Error("Logout with error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
 	}
 
-	if err = c.Bind(&tempo); err != nil {
+	number := sess.SessionID()
+	ID, _ := strconv.Atoi(number)
+	Output, err = models.UserService.GetInfo(ID)
 
-		log.Logger.Error("Bind with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	Output, err = models.UserService.GetInfo(tempo.UserID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User information doesn't exist !", err)
