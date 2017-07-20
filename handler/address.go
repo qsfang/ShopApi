@@ -24,7 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Li Zebang
+ *     Initial: 2017/07/19        Yu yi, Li Zebang
  */
 
 package handler
@@ -35,8 +35,8 @@ import (
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
-	"ShopApi/models/address"
-	//"ShopApi/utility"
+	"ShopApi/models"
+	"ShopApi/utility"
 )
 
 type Address struct {
@@ -47,6 +47,28 @@ type Address struct {
 	Street    *string `json:"street"`
 	Address   *string `json:"address"`
 	IsDefault bool    `json:"isDefault"`
+}
+
+func ChangeAddress(c echo.Context) error {
+	var (
+		err   error
+		m     Address
+	)
+
+	if err = c.Bind(&m); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.ContactService.ChangeAddress(m.Name, m.Province, m.City, m.Street, m.Address)
+	if err != nil {
+		log.Logger.Error("create creash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
 }
 
 func Add(c echo.Context) error {
@@ -61,9 +83,11 @@ func Add(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	//session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	user := uint64(12616151564)
-	err = address.AddressService.AddAddress(addr.Name, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, &user, addr.IsDefault)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	user := session.Get(general.SessionUserID).(uint64)
+	log.Logger.Debug("session get user ID :%v", user)
+
+	err = models.ContactService.AddAddress(addr.Name, &user, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, addr.IsDefault)
 	if err != nil {
 		log.Logger.Error("Add address with error:", err)
 

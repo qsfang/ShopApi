@@ -24,43 +24,57 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/18        Yu yi, Li Zebang
  */
 
-package address
+package models
 
 import (
 	"time"
 
 	"ShopApi/orm"
+	"ShopApi/log"
 )
 
-type DBAddress struct {
+type Contact struct {
 	ID        uint64    `sql:"auto_increment;primary_key;" json:"id"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Name      string    `json:"name"`
 	Phone     string    `json:"phone"`
 	Province  string    `json:"province"`
 	City      string    `json:"city"`
 	Street    string    `json:"street"`
 	Address   string    `json:"address"`
-	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Created   time.Time `json:"created"`
 	IsDefault bool      `gorm:"column:isdefault" json:"isdefault"`
 }
 
-type AddressServiceProvider struct {
+type ContactServiceProvider struct {
 }
 
-var AddressService *AddressServiceProvider = &AddressServiceProvider{}
+var ContactService *ContactServiceProvider = &ContactServiceProvider{}
 
-func (DBAddress) TableName() string {
+func (Contact) TableName() string {
 	return "contact"
 }
 
-func (as *AddressServiceProvider) AddAddress(name, phone , province , city , street , address *string, userID *uint64, isDefault bool) error {
+func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, address *string) error {
+
+	changmap := map[string]interface{}{"province": *province, "city": *city, "street": *street, "address": *address}
+
+	db := orm.Conn
+	err := db.Model(&Contact{}).Where(&Contact{Name: *name}).Updates(changmap).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 
-	addr := &DBAddress{
+func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault bool) error {
+	addr := &Contact{
 		Name:      *name,
 		Phone:     *phone,
 		Province:  *province,
@@ -71,6 +85,7 @@ func (as *AddressServiceProvider) AddAddress(name, phone , province , city , str
 		Created:   time.Now(),
 		IsDefault: isDefault,
 	}
+	log.Logger.Debug("BDadd :%v", addr)
 
 	db := orm.Conn
 
