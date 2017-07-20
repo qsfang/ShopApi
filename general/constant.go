@@ -44,4 +44,8 @@ const (
 	// sex
 	Man = 0x1
 	Woman = 0x2
+
+	//Address  Default
+	Default		=1
+	Undefault	=0
 )
