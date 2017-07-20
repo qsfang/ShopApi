@@ -25,8 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Li Zebang
- *     Modify: 2017/07/20        Yu Yi
- *     Modify: 2017/07/20        Yang Zhengtian
+ *     Modify: 2017/07/20         Yu Yi
+ *     Modify: 2017/07/20         Yang Zhengtian
  */
 
 package models
@@ -47,14 +47,24 @@ type Contact struct {
 	Street    string    `json:"street"`
 	Address   string    `json:"address"`
 	Created   time.Time `json:"created"`
-	IsDefault  uint8	`gorm:"column:isdefault" json:"isdefault"`
+	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
 }
 
 type Addressget struct {
-	Province string 	`json:"province"`
-	City     string		`json:"city"`
-	Street   string		`json:"street"`
-	Address  string 	`json:"address"`
+	Province string `json:"province"`
+	City     string `json:"city"`
+	Street   string `json:"street"`
+	Address  string `json:"address"`
+}
+
+type Change struct {
+	ID        uint64  `json:"id" validate:"numeric"`
+	Name      *string `json:"name" validate:"required, alphaunicode, min=2,max=18"`
+	Phone     *string `json:"phone" validate:"required, alphanum, min=6,max=30"`
+	Province  *string `json:"province" validate:"required, alphaunicode, min=2,max=30"`
+	City      *string `json:"city" validate:"required, alphaunicode, min=2,max=30"`
+	Street    *string `json:"street" validate:"required, alphaunicode, min=2,max=30"`
+	Address   *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
 }
 
 type ContactServiceProvider struct {
@@ -79,13 +89,22 @@ func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
 	return nil
 }
 
-func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, province, city, street, address *string) error {
+func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
+	var (
+		con Contact
+	)
 
-	changmap := map[string]interface{}{"name": *name, "phone": *phone, "province": *province, "city": *city, "street": *street, "address": *address}
+	changemap := map[string]interface{}{
+		"name":     m.Name,
+		"phone":    m.Phone,
+		"province": m.Province,
+		"city":     m.City,
+		"street":   m.Street,
+		"address":  m.Address,
+	}
 
-	// todo: 传入的结构先声明
 	db := orm.Conn
-	err := db.Model(&Contact{}).Where(&Contact{ID: *id}).Updates(changmap).Limit(1).Error
+	err := db.Model(&con).Where("ID = ?", m.ID).Updates(changemap).Limit(1).Error
 
 	if err != nil {
 		return err
@@ -96,9 +115,9 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 
 func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error) {
 	var (
-		cont  Contact
-		list  []Contact
-		s     []Addressget
+		cont Contact
+		list []Contact
+		s    []Addressget
 	)
 
 	db := orm.Conn
@@ -107,7 +126,7 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 		return s, err
 	}
 
-	for i, c := range list{
+	for i, c := range list {
 		s[i].Province = c.Province
 		s[i].City = c.City
 		s[i].Street = c.Street
