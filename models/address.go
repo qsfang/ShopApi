@@ -33,7 +33,6 @@ import (
 	"time"
 
 	"ShopApi/orm"
-	"ShopApi/log"
 )
 
 type Contact struct {
