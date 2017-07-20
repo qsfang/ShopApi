@@ -47,5 +47,4 @@ func InitRouter(server *echo.Echo) {
 	server.POST("/api/v1/contact/add",handler.AddAddress)
 	server.GET("/api/vl/contact/alter",handler.Alter)
 	server.POST("/api/v1/contact/change",handler.ChangeAddress)
-	server.GET("/api/vl/user/changephone",handler.ChangePhone)
 }
