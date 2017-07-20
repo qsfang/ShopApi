@@ -33,28 +33,41 @@ package models
 import (
 	"time"
 
+	"ShopApi/general"
 	"ShopApi/orm"
 	"ShopApi/utility"
-	"ShopApi/general"
 )
 
-type UserServiceProvider struct{
+type UserServiceProvider struct {
 }
 
 var UserService *UserServiceProvider = &UserServiceProvider{}
 
 type User struct {
-	UserID 		uint64		`sql:"auto_increment;primary_key;" gorm:"column:id" json:"userid"`
-	OpenID 		string		`gorm:"column:openid" json:"openid"`
-	Name 		string		`json:"name"`
-	Password 	string		`json:"password"`
-	Status		uint16		`json:"status"`
-	Type		uint16		`json:"type"`
-	Created 	time.Time	`json:"created"`
+	UserID   uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"userid"`
+	OpenID   string    `gorm:"column:openid" json:"openid"`
+	Name     string    `json:"name"`
+	Password string    `json:"password"`
+	Status   uint16    `json:"status"`
+	Type     uint16    `json:"type"`
+	Created  time.Time `json:"created"`
+}
+
+type UserInfo struct {
+	UserID   uint64 `sql:"primary_key" gorm:"column:userid" json:"userid"`
+	Avatar   string `json:"avatar"`
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Sex      uint8  `json:"sex"`
 }
 
 func (User) TableName() string {
 	return "users"
+}
+
+func (UserInfo) TableName() string {
+	return "userinfo"
 }
 
 func (us *UserServiceProvider) Create(name, pass *string) error {
@@ -64,16 +77,41 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 	}
 
 	u := User{
-		Name: 		*name,
-		Password:	string(hashedPass),
-		Status:		general.UserActive,
-		Type: 		general.PhoneUser,
-		Created:	time.Now(),
+		Name:     *name,
+		Password: string(hashedPass),
+		Status:   general.UserActive,
+		Type:     general.PhoneUser,
+		Created:  time.Now(),
 	}
 
 	db := orm.Conn
 
-	err = db.Create(&u).Error
+	tx := db.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	err = tx.Create(&u).Error
+	if err != nil {
+		return err
+	}
+
+	info := UserInfo{
+		UserID: u.UserID,
+		Phone:  *name,
+		Sex:    general.Man,
+	}
+
+	err = tx.Create(&info).Error
+	if err != nil {
+		return nil
+	}
+
+	err = tx.Commit().Error
 	if err != nil {
 		return err
 	}
@@ -97,7 +135,8 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 	return false, 0, err
 }
 */
-func (us *UserServiceProvider)Login(name,pass *string)(bool,uint64,error) {
+
+func (us *UserServiceProvider) Login(name,pass *string)(bool, uint64, error) {
 	var (
 		u   User
 		err error
@@ -106,9 +145,25 @@ func (us *UserServiceProvider)Login(name,pass *string)(bool,uint64,error) {
 	db := orm.Conn
 	err = db.Where("name = ?", *name).First(&u).Error
 
-	if !utility.CompareHash([]byte(*name), u.Password) {
-		return false,0,nil
+	if utility.CompareHash([]byte(u.Password),*pass)==false {
+
+		return false, 0, nil
 	}
 
-	return true,u.UserID,err
+	return true, u.UserID, err
+}
+
+func GetInfo(id uint64) (User, error) {
+	var (
+		err error
+		s   User
+	)
+
+	db := orm.Conn
+	err = db.Where("id = ?", id).Find(&s).Error
+	if err != nil {
+		return s, err
+	}
+
+	return s, nil
 }

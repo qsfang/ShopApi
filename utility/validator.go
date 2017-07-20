@@ -35,7 +35,7 @@ import (
 )
 
 type EchoValidator struct {
-	validator	*validator.Validate
+	validator *validator.Validate
 }
 
 func (this *EchoValidator) Validate(i interface{}) error {
@@ -44,6 +44,6 @@ func (this *EchoValidator) Validate(i interface{}) error {
 
 func NewEchoValidator() echo.Validator {
 	return &EchoValidator{
-		validator:	validator.New(),
+		validator: validator.New(),
 	}
 }

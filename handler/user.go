@@ -26,21 +26,23 @@
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
  *	   Modify: 2017/07/19         Sun Anxiang 添加用户登录
+<<<<<<< HEAD
  *	   Modify: 2017/07/19         zhngzizhao  添加用户登录
- */
+=======
+ *	   Modify: 2017/07/19		  Ai Hao 添加用户登出
+>>>>>>> b81e8614b995a3e391d9e45bd7101fae64ccf91d
+*/
 
 package handler
 
 import (
-	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo"
-
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-	"fmt"
+	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
 )
 
 type Register struct {
@@ -73,10 +75,10 @@ func Create(c echo.Context) error {
 /*
 func Login(c echo.Context) error {
 	var (
-		err 		error
-		u 			Register
-		userID		uint64
-		sess		session.Session
+		err    error
+		u      Register
+		userID uint64
+		sess   session.Session
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -110,6 +112,7 @@ func Login(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 */
+
 func LoginHandlerMobilephone(c echo.Context) error {
 	var (
 		user Register
@@ -117,15 +120,16 @@ func LoginHandlerMobilephone(c echo.Context) error {
 	)
 
 	if err = c.Bind(&user); err != nil {
+		log.Logger.Error("analysis creash with error:",err)
 
-		return err
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	match:=utility.IsValidAccount(*user.Mobile)
-	if match==false {
-		log.Logger.Error("err name format",err)
-		fmt.Println("hhhhhhhhhhh")
-		return general.NewErrorWithMessage(errcode.ErrNameFormat,err.Error())
+	match := utility.IsValidAccount(*user.Mobile)
+	if match == false {
+		log.Logger.Error("err name format", err)
+
+		return general.NewErrorWithMessage(errcode.ErrNameFormat, err.Error())
 	}
 
 	flag, userID, err := models.UserService.Login(user.Mobile, user.Pass)
@@ -165,4 +169,32 @@ func Logout(c echo.Context) error {
 
 	log.Logger.Debug("i got here")
 	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+func GetInfo(c echo.Context) error {
+	var (
+		err error
+		uu  models.User
+		s   models.User
+	)
+
+	if err = c.Bind(&uu); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	s, err = models.GetInfo(uu.UserID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("User information doesn't exist !", err)
+			return general.NewErrorWithMessage(errcode.NoInformation, err.Error())
+		} else {
+			log.Logger.Error("Getting information exists errors", err)
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		}
+	}
+
+	log.Logger.Debug("have returned UserInformation.")
+	return c.JSON(errcode.ErrSucceed, s)
 }

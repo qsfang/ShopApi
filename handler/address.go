@@ -24,7 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Li Zebang
+ *     Initial: 2017/07/19        Yu yi, Li Zebang
  */
 
 package handler
@@ -35,18 +35,18 @@ import (
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
-	"ShopApi/models/address"
-	//"ShopApi/utility"
+	"ShopApi/models"
 )
 
 type Address struct {
+	ID        *uint64 `sql:"auto_increment; primary_key;" json:"id"`
 	Name      *string `json:"name"`
-	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=30"`
+	Phone     *string `json:"phone"`
 	Province  *string `json:"province"`
 	City      *string `json:"city"`
 	Street    *string `json:"street"`
 	Address   *string `json:"address"`
-	IsDefault bool    `json:"isDefault"`
+	IsDefault int8    `json:"isdefault"`
 }
 
 func Add(c echo.Context) error {
@@ -62,10 +62,35 @@ func Add(c echo.Context) error {
 	}
 
 	//session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	user := uint64(12616151564)
-	err = address.AddressService.AddAddress(addr.Name, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, &user, addr.IsDefault)
+	//user := session.Get(general.SessionUserID).(uint64)
+	user := uint64(166)
+	log.Logger.Debug("session get user ID :%v", user)
+
+	err = models.ContactService.AddAddress(addr.Name, &user, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, addr.IsDefault)
 	if err != nil {
 		log.Logger.Error("Add address with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+func ChangeAddress(c echo.Context) error {
+	var (
+		err error
+		m   Address
+	)
+
+	if err = c.Bind(&m); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.ContactService.ChangeAddress(m.ID, m.Name, m.Phone, m.Province, m.City, m.Street, m.Address)
+	if err != nil {
+		log.Logger.Error("create creash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

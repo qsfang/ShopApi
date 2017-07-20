@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `categories` (
 CREATE TABLE IF NOT EXISTS `contact` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL DEFAULT '',
-  userid int(11) NOT NULL,
+  `userid` int(11) NOT NULL,
   `phone` varchar(20) DEFAULT '',
   `province` varchar(100) NOT NULL,
   `city` varchar(100) NOT NULL,
