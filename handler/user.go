@@ -128,15 +128,16 @@ func GetInfo(c echo.Context) error {
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	err = sess.Delete(general.SessionUserID)
 
+	err = sess.Delete(general.SessionUserID)
 	if err != nil {
 		log.Logger.Error("Logout with error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
 	}
 
-	Output, err = models.UserService.GetInfo(.UserID)
+
+	Output, err = models.UserService.GetInfo(sess.SessionID())
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User information doesn't exist !", err)

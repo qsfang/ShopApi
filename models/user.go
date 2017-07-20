@@ -137,7 +137,7 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return false, 0, err
 }
 
-func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
+func (us *UserServiceProvider) GetInfo(UserID string) (UserInfo, error) {
 
 	var (
 		err  error
