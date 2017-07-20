@@ -24,21 +24,44 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Yusan Kurban
+ *     Initial: 2017/07/20        Yusan Kurban
  */
 
-package utility
+package general
 
 import (
-	"github.com/astaxie/session"
-	_ "github.com/astaxie/session/providers/memory"
-
-	"ShopApi/general"
+	"net/http"
+	"github.com/labstack/echo"
+	"github.com/labstack/gommon/log"
 )
 
-var GlobalSessions *session.Manager
+var (
+	code = http.StatusInternalServerError
+	msg  string
+)
 
-func init() {
-	GlobalSessions, _ = session.NewManager("memory", general.SessionUserID, 3600)
-	go GlobalSessions.GC()
+func EchoRestfulErrorHandler(err error, c echo.Context) {
+	log.Error(err)
+
+	if resp, ok := err.(*ErrorResp); ok {
+		code = resp.Code
+		msg = resp.Message
+	} else {
+		msg = http.StatusText(code)
+	}
+
+	if !c.Response().Committed {
+		if c.Request().Method == echo.HEAD {
+			err := c.NoContent(code)
+			if err != nil {
+				c.Logger().Error(err)
+			}
+		} else {
+			err := c.JSON(code, NewErrorWithMessage(code, msg))
+
+			if err != nil {
+				c.Logger().Error(err)
+			}
+		}
+	}
 }

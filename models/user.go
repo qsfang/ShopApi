@@ -137,7 +137,12 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return false, 0, err
 }
 
+<<<<<<< HEAD
 func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
+=======
+// TODO: 每个函数都要有接受者
+func GetInfo(UserID uint64) (UserInfo, error) {
+>>>>>>> 6b6459de2230a8decc82ac211c98c37fec3d950d
 	var (
 		err  error
 		s    UserInfo
@@ -151,4 +156,7 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	return s, nil
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6b6459de2230a8decc82ac211c98c37fec3d950d

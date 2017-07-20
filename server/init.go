@@ -38,6 +38,7 @@ import (
 	"ShopApi/orm"
 	"ShopApi/server/router"
 	"ShopApi/log"
+	"ShopApi/general"
 )
 
 var (
@@ -46,6 +47,8 @@ var (
 
 func startServer() {
 	server = echo.New()
+
+	server.HTTPErrorHandler = general.EchoRestfulErrorHandler
 
 	router.InitRouter(server)
 	log.Logger.Debug("Router already init")

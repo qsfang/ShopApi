@@ -122,6 +122,7 @@ func Logout(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+// todo:修改函数逻辑以及变量名
 func GetInfo(c echo.Context) error {
 	var (
 		err error
