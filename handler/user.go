@@ -40,6 +40,7 @@ import (
 	"github.com/astaxie/session"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
+	"strconv"
 )
 
 type Register struct {
@@ -117,11 +118,12 @@ func Logout(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
 	}
-	
+
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
 func GetInfo(c echo.Context) error {
+
 	var (
 		err    error
 		Output models.UserInfo
@@ -136,8 +138,10 @@ func GetInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
 	}
 
+	number := sess.SessionID()
+	ID, _ := strconv.Atoi(number)
+	Output, err = models.UserService.GetInfo(ID)
 
-	Output, err = models.UserService.GetInfo(sess.SessionID())
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User information doesn't exist !", err)

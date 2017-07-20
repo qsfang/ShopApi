@@ -87,7 +87,6 @@ func AddAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-
 func ChangeAddress(c echo.Context) error {
 	var (
 		err error
