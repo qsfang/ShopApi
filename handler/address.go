@@ -41,24 +41,20 @@ import (
 	"ShopApi/utility"
 )
 
-// todo：放到 model * 去掉 id
-// todo: 数据验证！！！
-type Address struct {
-	ID        *uint64  `sql:"auto_increment; primary_key;" json:"id"`
-	Name      *string  `json:"name"`
-	Phone     *string  `json:"phone"`
-	Province  *string  `json:"province"`
-	City      *string  `json:"city"`
-	Street    *string  `json:"street"`
-	Address   *string  `json:"address"`
-	IsDefault int8     `json:"isdefault"`
+type AddAddress struct {
+	Name      *string `json:"name"`
+	Phone     *string `json:"phone"`
+	Province  *string `json:"province"`
+	City      *string `json:"city"`
+	Street    *string `json:"street"`
+	Address   *string `json:"address"`
+	IsDefault uint8   `json:"isdefault"`
 }
 
-
-func Add(c echo.Context) error {
+func AddAdress(c echo.Context) error {
 	var (
 		err  error
-		addr Address
+		addr AddAddress
 	)
 
 	if err = c.Bind(&addr); err != nil {
@@ -70,22 +66,31 @@ func Add(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	// todo: 传入参数
-	err = models.ContactService.AddAddress(addr.Name, &userID, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, addr.IsDefault)
+	contact := &models.Contact{
+		UserID:    userID,
+		Name:      *addr.Name,
+		Phone:     *addr.Phone,
+		Province:  *addr.Province,
+		City:      *addr.City,
+		Street:    *addr.Street,
+		Address:   *addr.Address,
+		IsDefault: addr.IsDefault,
+	}
+
+	err = models.ContactService.AddAddress(contact)
 	if err != nil {
 		log.Logger.Error("Add address with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	// todo： nil
-	return c.JSON(errcode.ErrSucceed, map[string]int{"status": 0})
+	return c.JSON(errcode.ErrSucceed, nil)
 }
 
 func ChangeAddress(c echo.Context) error {
 	var (
-		err   error
-		m     Address
+		err error
+		m   Address
 	)
 
 	if err = c.Bind(&m); err != nil {
@@ -106,15 +111,15 @@ func ChangeAddress(c echo.Context) error {
 
 func GetAddress(c echo.Context) error {
 	var (
-		err 		error
-		userid		uint64
-		list        	[]models.Addressget
+		err    error
+		userid uint64
+		list   []models.Addressget
 	)
-	
+
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	s := sess.Get(general.SessionUserID)
 	userid = s.(uint64)
-	list,err = models.ContactService.GetAddress(userid)
+	list, err = models.ContactService.GetAddress(userid)
 	if err != nil {
 		log.Logger.Error("error:", err)
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
