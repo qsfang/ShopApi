@@ -24,7 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yu yi, Li Zebang
+ *     Initial: 2017/07/18        Yu yi, Li Zebang, Yang Zhengtian
  */
 
 package models
@@ -95,10 +95,10 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 }
 
 type Addressget struct {
-	Province string `json:"province"`
-	City     string`json:"city"`
-	Street   string `json:"street"`
-	Address  string `json:"address"`
+	Province string 	`json:"province"`
+	City     string		`json:"city"`
+	Street   string		`json:"street"`
+	Address  string 	`json:"address"`
 }
 func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error) {
 	var (
@@ -122,5 +122,3 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 
 	return s, nil
 }
-
-
