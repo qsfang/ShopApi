@@ -35,7 +35,7 @@ import (
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
-	"ShopApi/models/address"
+	"ShopApi/models"
 	//"ShopApi/utility"
 )
 
@@ -49,23 +49,21 @@ type Address struct {
 	IsDefault bool    `json:"isDefault"`
 }
 
-func Add(c echo.Context) error {
+func ChangeAddress(c echo.Context) error {
 	var (
-		err  error
-		addr Address
+		err   error
+		m     Address
 	)
 
-	if err = c.Bind(&addr); err != nil {
+	if err = c.Bind(&m); err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	//session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	user := uint64(12616151564)
-	err = address.AddressService.AddAddress(addr.Name, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, &user, addr.IsDefault)
+	err = models.ContactService.ChangeAddress(m.Name, m.Province, m.City, m.Street, m.Address)
 	if err != nil {
-		log.Logger.Error("Add address with error:", err)
+		log.Logger.Error("create creash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
