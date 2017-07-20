@@ -28,7 +28,7 @@
  *	   Modify: 2017/07/19         Sun Anxiang 添加用户登录
  *	   Modify: 2017/07/19         zhngzizhao  添加用户登录
  *	   Modify: 2017/07/19		  Ai Hao 添加用户登出
-*/
+ */
 
 package handler
 
@@ -38,9 +38,9 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-	"fmt"
 )
 
 type Register struct {
@@ -118,12 +118,12 @@ func LoginHandlerMobilephone(c echo.Context) error {
 	)
 
 	if err = c.Bind(&user); err != nil {
-		log.Logger.Error("analysis creash with error:",err)
+		log.Logger.Error("analysis creash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	fmt.Println(*user.Mobile,*user.Pass)
+	fmt.Println(*user.Mobile, *user.Pass)
 	match := utility.IsValidAccount(*user.Mobile)
 	if match == false {
 		log.Logger.Error("err name format", err)
@@ -165,7 +165,7 @@ func Logout(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
 	}
-	
+
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 

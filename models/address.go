@@ -38,23 +38,23 @@ import (
 )
 
 type Contact struct {
-	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
-	UserID    uint64    `gorm:"column:userid" json:"userid"`
-	Name      string    `json:"name"`
-	Phone     string    `json:"phone"`
-	Province  string    `json:"province"`
-	City      string    `json:"city"`
-	Street    string    `json:"street"`
-	Address   string    `json:"address"`
-	Created   time.Time `json:"created"`
+	ID       uint64    `sql:"auto_increment; primary_key;" json:"id"`
+	UserID   uint64    `gorm:"column:userid" json:"userid"`
+	Name     string    `json:"name"`
+	Phone    string    `json:"phone"`
+	Province string    `json:"province"`
+	City     string    `json:"city"`
+	Street   string    `json:"street"`
+	Address  string    `json:"address"`
+	Created  time.Time `json:"created"`
 	// todo: uint8
-	IsDefault  int8      `gorm:"column:isdefault" json:"isdefault"`
+	IsDefault int8 `gorm:"column:isdefault" json:"isdefault"`
 }
 type Addressget struct {
-	Province string 	`json:"province"`
-	City     string		`json:"city"`
-	Street   string		`json:"street"`
-	Address  string 	`json:"address"`
+	Province string `json:"province"`
+	City     string `json:"city"`
+	Street   string `json:"street"`
+	Address  string `json:"address"`
 }
 
 type ContactServiceProvider struct {
@@ -67,7 +67,7 @@ func (Contact) TableName() string {
 }
 
 // todo: 传入参数
-func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault int8) error {
+func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone, province, city, street, address *string, isDefault int8) error {
 	addr := &Contact{
 		Name:      *name,
 		Phone:     *phone,
@@ -107,9 +107,9 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 
 func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error) {
 	var (
-		cont  Contact
-		list  []Contact
-		s     []Addressget
+		cont Contact
+		list []Contact
+		s    []Addressget
 	)
 
 	db := orm.Conn
@@ -118,7 +118,7 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 		return s, err
 	}
 
-	for i, c := range list{
+	for i, c := range list {
 		s[i].Province = c.Province
 		s[i].City = c.City
 		s[i].Street = c.Street
