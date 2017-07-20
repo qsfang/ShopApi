@@ -117,8 +117,7 @@ func Logout(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
 	}
-
-	log.Logger.Debug("i got here")
+	
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
