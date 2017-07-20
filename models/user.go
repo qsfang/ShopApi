@@ -38,6 +38,8 @@ import (
 	"ShopApi/utility"
 	"ShopApi/general"
 	"ShopApi/log"
+	"os/user"
+	"ShopApi/general/errcode"
 )
 
 type UserServiceProvider struct{
@@ -84,7 +86,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 	return nil
 }
 
-func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
+/*func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	var user User
 
 	db := orm.Conn
@@ -98,4 +100,19 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	}
 
 	return false, 0, err
+}
+*/
+func (us *UserServiceProvider)Login(name,pass *string)(bool,uint64,error) {
+	var (
+		u   User
+		err error
+	)
+	db := orm.Conn
+	err = db.Where("name = ?", *name).First(&u).Error
+
+	if !utility.CompareHash([]byte(*name), u.Password) {
+		return false,0,nil
+	}
+
+	return true,u.UserID,err
 }

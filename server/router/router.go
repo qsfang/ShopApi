@@ -42,7 +42,7 @@ func InitRouter(server *echo.Echo) {
 
 	server.POST("/api/v1/user/create", handler.Create)
 	server.POST("/api/v1/address/add", handler.Add)
-	server.POST("/api/v1/user/login", handler.Login)
+	//server.POST("/api/v1/user/login", handler.Login)
 	server.POST("/api/v1/user/login_mobilephone", handler.LoginHandlerMobilephone)
 	server.GET("/api/v1/user/logout", handler.Logout)
 }

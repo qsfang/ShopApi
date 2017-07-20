@@ -34,7 +34,9 @@ const (
 	ErrInvalidParams		= 0x1
 	ErrMysql 				= 0x2
 	ErrDelete				= 0x3 //用户登出错误
-	ErrInvalidPass			= 0x4
+	ErrNamefound			= 0x4
+	ErrInvalidPass			= 0x5
+	ErrNameFormat			= 0x6
 
 	// 需要登录
 	ErrLoginRequired		= 0x800

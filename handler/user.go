@@ -35,22 +35,23 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
-	"ShopApi/log"
 	"ShopApi/general"
 	"ShopApi/general/errcode"
+	"ShopApi/log"
 	"ShopApi/models"
+	"ShopApi/orm"
 	"ShopApi/utility"
 )
 
 type Register struct {
-	Mobile 		*string 		`json:"mobile" validate:"required,alphanum,min=6,max=30"`
-	Pass 		*string         `json:"pass" validate:"required,alphanum,min=6,max=30"`
+	Mobile *string `json:"mobile" validate:"required,alphanum,min=6,max=30"`
+	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
 
 func Create(c echo.Context) error {
 	var (
-		err 		error
-		u 			Register
+		err error
+		u   Register
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -70,6 +71,7 @@ func Create(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+/*
 func Login(c echo.Context) error {
 	var (
 		err 		error
@@ -104,6 +106,47 @@ func Login(c echo.Context) error {
 	}
 
 	sess = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	sess.Set(general.SessionUserID, userID)
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+*/
+func LoginHandlerMobilephone(c echo.Context) error {
+	var (
+		user models.User
+		err  error
+	)
+
+	if err = c.Bind(user); err != nil {
+		return err
+	}
+	match := utility.IsValidAccount(user.Name)
+	if match == false {
+		log.Logger.Error("err name format:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrNameFormat, err.Error())
+	}
+
+	flag, userID, err := models.UserService.Login(&user.Name, &user.Password)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("User not found:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
+		} else {
+			log.Logger.Error("Mysql error:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		}
+	} else {
+		if flag == false {
+			log.Logger.Error("Name and pass don't match:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrLoginRequired, err.Error())
+		}
+	}
+
+	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	sess.Set(general.SessionUserID, userID)
 
 	return c.JSON(errcode.ErrSucceed, nil)
