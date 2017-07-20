@@ -124,10 +124,3 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 }
 
 
-type Address struct {
-	Province int `json:"province"`
-	City     int`json:"city"`
-	Street   int `json:"street"`
-	Address  string `json:"address"`
-}
-
