@@ -27,21 +27,57 @@
  *     Initial: 2017/07/18        Yusan Kurban
  */
 
-package router
+package address
 
 import (
-	"github.com/labstack/echo"
+	"time"
 
-	"ShopApi/handler"
+	"ShopApi/orm"
 )
 
-func InitRouter(server *echo.Echo) {
-	if server == nil {
-		panic("[InitRouter], server couldn't be nil")
+type DBAddress struct {
+	ID        uint64    `sql:"auto_increment;primary_key;" json:"id"`
+	Name      string    `json:"name"`
+	Phone     string    `json:"phone"`
+	Province  string    `json:"province"`
+	City      string    `json:"city"`
+	Street    string    `json:"street"`
+	Address   string    `json:"address"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
+	Created   time.Time `json:"created"`
+	IsDefault bool      `gorm:"column:isdefault" json:"isdefault"`
+}
+
+type AddressServiceProvider struct {
+}
+
+var AddressService *AddressServiceProvider = &AddressServiceProvider{}
+
+func (DBAddress) TableName() string {
+	return "contact"
+}
+
+func (as *AddressServiceProvider) AddAddress(name, phone , province , city , street , address *string, userID *uint64, isDefault bool) error {
+
+
+	addr := &DBAddress{
+		Name:      *name,
+		Phone:     *phone,
+		Province:  *province,
+		City:      *city,
+		Street:    *street,
+		Address:   *address,
+		UserID:    *userID,
+		Created:   time.Now(),
+		IsDefault: isDefault,
 	}
 
-	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/address/add", handler.Add)
-	server.POST("/api/v1/user/login", handler.Login)
-	server.GET("/api/v1/user/logout", handler.Logout)
+	db := orm.Conn
+
+	err := db.Create(&addr).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

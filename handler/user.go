@@ -42,15 +42,15 @@ import (
 	"ShopApi/utility"
 )
 
-type create struct {
+type Register struct {
 	Mobile 		*string 		`json:"mobile" validate:"required,alphanum,min=6,max=30"`
-	Pass 		*string
+	Pass 		*string         `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
 
 func Create(c echo.Context) error {
 	var (
 		err 		error
-		u 			create
+		u 			Register
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -72,8 +72,7 @@ func Create(c echo.Context) error {
 func Login(c echo.Context) error {
 	var (
 		err 		error
-		u 			create
-		flag		bool
+		u 			Register
 		userID		uint64
 		sess		session.Session
 	)
@@ -84,7 +83,7 @@ func Login(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	flag, userID, err = models.UserService.Login(u.Mobile, u.Pass)
+	flag, userID, err := models.UserService.Login(u.Mobile, u.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 
@@ -106,5 +105,19 @@ func Login(c echo.Context) error {
 	sess = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	sess.Set(general.SessionUserID, userID)
 
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+func Logout(c echo.Context) error {
+	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	err := sess.Delete(general.SessionUserID)
+
+	if err != nil {
+		log.Logger.Error("Logout with error", err)
+
+		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
+	}
+
+	log.Logger.Debug("i got here")
 	return c.JSON(errcode.ErrSucceed, nil)
 }

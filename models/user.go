@@ -33,7 +33,6 @@ package models
 import (
 	"time"
 
-
 	"ShopApi/orm"
 	"ShopApi/utility"
 	"ShopApi/general"
@@ -48,7 +47,7 @@ type User struct {
 	UserID 		uint64		`sql:"auto_increment;primary_key;" gorm:"column:id" json:"userid"`
 	OpenID 		string		`gorm:"column:openid" json:"openid"`
 	Name 		string		`json:"name"`
-	Pass 		string		`json:"pass"`
+	Password 	string		`json:"password"`
 	Status		uint16		`json:"status"`
 	Type		uint16		`json:"type"`
 	Created 	time.Time	`json:"created"`
@@ -66,7 +65,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	u := User{
 		Name: 		*name,
-		Pass:		string(hashedPass),
+		Password:	string(hashedPass),
 		Status:		general.UserActive,
 		Type: 		general.PhoneUser,
 		Created:	time.Now(),
@@ -89,7 +88,7 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 
 	err := db.Where("name = ?", name).First(&user).Error
 	if err == nil {
-		if !utility.CompareHash([]byte(user.Pass), *pass){
+		if !utility.CompareHash([]byte(user.Password), *pass){
 			return false, 0, nil
 		}
 		return true, user.UserID, nil

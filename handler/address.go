@@ -24,24 +24,51 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/19        Li Zebang
  */
 
-package router
+package handler
 
 import (
 	"github.com/labstack/echo"
 
-	"ShopApi/handler"
+	"ShopApi/general"
+	"ShopApi/general/errcode"
+	"ShopApi/log"
+	"ShopApi/models/address"
+	//"ShopApi/utility"
 )
 
-func InitRouter(server *echo.Echo) {
-	if server == nil {
-		panic("[InitRouter], server couldn't be nil")
+type Address struct {
+	Name      *string `json:"name"`
+	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=30"`
+	Province  *string `json:"province"`
+	City      *string `json:"city"`
+	Street    *string `json:"street"`
+	Address   *string `json:"address"`
+	IsDefault bool   `json:"isDefault"`
+}
+
+func Add(c echo.Context) error {
+	var (
+		err  error
+		addr Address
+	)
+
+	if err = c.Bind(&addr); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/address/add", handler.Add)
-	server.POST("/api/v1/user/login", handler.Login)
-	server.GET("/api/v1/user/logout", handler.Logout)
+	//session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	user := uint64(12616151564)
+	err = address.AddressService.AddAddress(addr.Name, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, &user, addr.IsDefault)
+	if err != nil {
+		log.Logger.Error("Add address with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
 }
