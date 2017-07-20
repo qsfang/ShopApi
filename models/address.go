@@ -35,6 +35,7 @@ import (
 	"time"
 
 	"ShopApi/orm"
+	"fmt"
 )
 
 type Contact struct {
@@ -115,4 +116,27 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 	}
 
 	return s, nil
+}
+
+func(us *ContactServiceProvider) AlterDefalt(id uint64) error{
+	var(
+		s	Contact
+		a	int8
+		con	Contact
+	)
+	db := orm.Conn
+	err := db.Where("id=?",id).Find(&s).Error
+	if err != nil {
+	return err
+	}
+	if s.IsDefault == 0{
+		a = 1
+	}
+	updater := map[string]interface{}{"isdefault": a}
+	err = db.Model(&con).Where("id=?",id).Update(updater).Limit(1).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
