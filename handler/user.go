@@ -169,31 +169,44 @@ func Logout(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-// todo:修改函数逻辑以及变量名
 func GetInfo(c echo.Context) error {
 	var (
-		err error
-		uu  models.UserInfo
-		s   models.UserInfo
+		err    error
+		tempo  models.UserInfo
+		Output models.UserInfo
 	)
 
-	if err = c.Bind(&uu); err != nil {
-		log.Logger.Error("Create crash with error:", err)
+	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	err = sess.Delete(general.SessionUserID)
+
+	if err != nil {
+		log.Logger.Error("Logout with error", err)
+
+		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
+	}
+
+	if err = c.Bind(&tempo); err != nil {
+
+		log.Logger.Error("Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	s, err = models.GetInfo(uu.UserID)
+	Output, err = models.UserService.GetInfo(tempo.UserID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User information doesn't exist !", err)
+
 			return general.NewErrorWithMessage(errcode.NoInformation, err.Error())
-		} else {
-			log.Logger.Error("Getting information exists errors", err)
-			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 		}
+
+		log.Logger.Error("Getting information exists errors", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+
 	}
 
 	log.Logger.Debug("have returned UserInformation.")
-	return c.JSON(errcode.ErrSucceed, s)
+
+	return c.JSON(errcode.ErrSucceed, Output)
 }

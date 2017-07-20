@@ -157,18 +157,20 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return true, u.UserID, err
 }
 
-// TODO: 每个函数都要有接受者
-func GetInfo(UserID uint64) (UserInfo, error) {
+func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
+
 	var (
 		err error
 		s   UserInfo
 	)
 
 	db := orm.Conn
-	err = db.Where("UserID = ?", UserID).Find(&s).Error
+	err = db.Where("UserID = ?", UserID).First(&s).Error
 	if err != nil {
 		return s, err
 	}
 
 	return s, nil
 }
+
+

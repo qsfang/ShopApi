@@ -38,18 +38,19 @@ import (
 )
 
 type Contact struct {
-	ID       uint64    `sql:"auto_increment; primary_key;" json:"id"`
-	UserID   uint64    `gorm:"column:userid" json:"userid"`
-	Name     string    `json:"name"`
-	Phone    string    `json:"phone"`
-	Province string    `json:"province"`
-	City     string    `json:"city"`
-	Street   string    `json:"street"`
-	Address  string    `json:"address"`
-	Created  time.Time `json:"created"`
 	// todo: uint8
-	IsDefault int8 `gorm:"column:isdefault" json:"isdefault"`
+	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
+	Name      string    `json:"name"`
+	Phone     string    `json:"phone"`
+	Province  string    `json:"province"`
+	City      string    `json:"city"`
+	Street    string    `json:"street"`
+	Address   string    `json:"address"`
+	Created   time.Time `json:"created"`
+	IsDefault  uint8	`gorm:"column:isdefault" json:"isdefault"`
 }
+
 type Addressget struct {
 	Province string `json:"province"`
 	City     string `json:"city"`
@@ -79,10 +80,13 @@ func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone
 		Created:   time.Now(),
 		IsDefault: isDefault,
 	}
+}
+func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
+	contact.Created = time.Now()
 
 	db := orm.Conn
 
-	err := db.Create(&addr).Error
+	err := db.Create(contact).Error
 	if err != nil {
 		return err
 	}
