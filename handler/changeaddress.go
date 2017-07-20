@@ -24,7 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Li Zebang
+ *     Initial: 2017/07/18        Yusan Kurban,YY
  */
 
 package handler
@@ -32,43 +32,30 @@ package handler
 import (
 	"github.com/labstack/echo"
 
+	"ShopApi/log"
 	"ShopApi/general"
 	"ShopApi/general/errcode"
-	"ShopApi/log"
-	"ShopApi/models/address"
-	//"ShopApi/utility"
+	"ShopApi/models"
 )
 
-type Address struct {
-	Name      *string `json:"name"`
-	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=30"`
-	Province  *string `json:"province"`
-	City      *string `json:"city"`
-	Street    *string `json:"street"`
-	Address   *string `json:"address"`
-	IsDefault bool    `json:"isDefault"`
-}
-
-func Add(c echo.Context) error {
+func ChangeAddress(c echo.Context) error {
 	var (
 		err  error
-		addr Address
+		m    Address
 	)
 
-	if err = c.Bind(&addr); err != nil {
+	if err = c.Bind(&m); err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	//session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	user := uint64(12616151564)
-	err = address.AddressService.AddAddress(addr.Name, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, &user, addr.IsDefault)
+	err = models.ContactService.ChangeAddress( m.Name, m.Province, m.City, m.Street, m.Address)
 	if err != nil {
-		log.Logger.Error("Add address with error:", err)
+		log.Logger.Error("create creash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, nil)
+	return c.JSON(errcode.ErrSucceed, "Succeed")
 }

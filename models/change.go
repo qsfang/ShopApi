@@ -24,51 +24,52 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Li Zebang
+ *     Initial: 2017/07/18        Yusan Kurban
  */
 
-package handler
+package models
 
 import (
-	"github.com/labstack/echo"
+	"time"
 
-	"ShopApi/general"
-	"ShopApi/general/errcode"
-	"ShopApi/log"
-	"ShopApi/models/address"
-	//"ShopApi/utility"
+	"ShopApi/orm"
+
 )
 
-type Address struct {
-	Name      *string `json:"name"`
-	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=30"`
-	Province  *string `json:"province"`
-	City      *string `json:"city"`
-	Street    *string `json:"street"`
-	Address   *string `json:"address"`
-	IsDefault bool    `json:"isDefault"`
+type ContactServiceProvider struct{
 }
 
-func Add(c echo.Context) error {
-	var (
-		err  error
-		addr Address
-	)
+var ContactService *ContactServiceProvider = &ContactServiceProvider{}
 
-	if err = c.Bind(&addr); err != nil {
-		log.Logger.Error("Create crash with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
+type Contact struct {
+	ID          uint64      `sql:"auto_increment;primary_key;" json:"id"`
+	OpenID 		string		`gorm:"column:openid" json:"openid"`
+	Name 		string		`json:"name"`
+	Phone       string      `json:"phone"`
+	Province    string    	`json:"province"`
+	City        string	    `json:"city"`
+	Street      string	    `json:"street"`
+	Address     string 	    `json:"address"`
+	Created 	time.Time	`json:"created"`
+	Isdefault   bool        `json:"isdefault"`
 
-	//session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	user := uint64(12616151564)
-	err = address.AddressService.AddAddress(addr.Name, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, &user, addr.IsDefault)
+}
+
+func (Contact) TableName() string {
+	return "contact"
+}
+
+func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, address *string) error{
+
+	changmap := map[string]interface{}{"province": *province, "city": *city, "street": *street, "address": *address}
+
+	db := orm.Conn
+	err := db.Table("contact").Where(&Contact{Name: *name}).Updates(changmap).Error
+
 	if err != nil {
-		log.Logger.Error("Add address with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		return err
 	}
 
-	return c.JSON(errcode.ErrSucceed, nil)
+	return nil
 }
