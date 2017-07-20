@@ -40,8 +40,8 @@ import (
 
 func ChangeAddress(c echo.Context) error {
 	var (
-		err  error
-		m    Address
+		err   error
+		m     Address
 	)
 
 	if err = c.Bind(&m); err != nil {
@@ -50,12 +50,12 @@ func ChangeAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ContactService.ChangeAddress( m.Name, m.Province, m.City, m.Street, m.Address)
+	err = models.ContactService.ChangeAddress(m.Name, m.Province, m.City, m.Street, m.Address)
 	if err != nil {
 		log.Logger.Error("create creash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, "Succeed")
+	return c.JSON(errcode.ErrSucceed, nil)
 }
