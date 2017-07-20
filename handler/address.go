@@ -94,5 +94,5 @@ func Add(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrAddAddress, nil)
+	return c.JSON(errcode.ErrSucceed, nil)
 }

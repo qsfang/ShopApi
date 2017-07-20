@@ -73,7 +73,7 @@ func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, ad
 }
 
 
-func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault *bool) error {
+func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault bool) error {
 	addr := &Contact{
 		Name:      *name,
 		Phone:     *phone,
@@ -83,7 +83,7 @@ func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone
 		Address:   *address,
 		UserID:    *userID,
 		Created:   time.Now(),
-		IsDefault: *isDefault,
+		IsDefault: isDefault,
 	}
 	log.Logger.Debug("BDadd :%v", addr)
 
