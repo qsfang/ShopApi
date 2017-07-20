@@ -25,8 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *	   Modify: 2017/07/19         Sun Anxiang 添加用户登录
- *	   Modify: 2017/07/19		  Ai Hao 添加用户登出
+ *	   Modify: 2017/07/19		  Ai Hao         添加用户登出
+ *	   Modify: 2017/07/20         Zhang Zizhao   添加用户登录
  */
 
 package handler
@@ -37,9 +37,10 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-	"github.com/astaxie/session"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
+	"fmt"
 )
 
 type Register struct {
@@ -69,31 +70,36 @@ func Create(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func Login(c echo.Context) error {
+func LoginwithMobile(c echo.Context) error {
 	var (
-		err    error
-		u      Register
-		userID uint64
-		sess   session.Session
+		user Register
+		err  error
 	)
 
-	if err = c.Bind(&u); err != nil {
-		log.Logger.Error("Bind error:", err)
+	if err = c.Bind(&user); err != nil {
+		log.Logger.Error("analysis creash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	flag, userID, err := models.UserService.Login(u.Mobile, u.Pass)
+	match := utility.IsValidAccount(*user.Mobile)
+	if match == false {
+		log.Logger.Error("err name format", err)
+
+		return general.NewErrorWithMessage(errcode.ErrNameFormat, err.Error())
+	}
+
+	flag, userID, err := models.UserService.Login(user.Mobile, user.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-
 			log.Logger.Error("User not found:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
 		} else {
-
 			log.Logger.Error("Mysql error:", err)
-		}
 
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		}
 	} else {
 		if flag == false {
 			log.Logger.Error("Name and pass don't match:", err)
@@ -102,7 +108,7 @@ func Login(c echo.Context) error {
 		}
 	}
 
-	sess = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	sess.Set(general.SessionUserID, userID)
 
 	return c.JSON(errcode.ErrSucceed, nil)
@@ -117,7 +123,7 @@ func Logout(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
 	}
-	
+
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 

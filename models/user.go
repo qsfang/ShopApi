@@ -25,7 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *     Modify: 2017/07/19		  Sun Anxiang 登录检查
+ *	   Modify: 2017/07/20		  Zhang Zizhao  登录检查
  */
 
 package models
@@ -33,34 +33,33 @@ package models
 import (
 	"time"
 
+	"ShopApi/general"
 	"ShopApi/orm"
 	"ShopApi/utility"
-	"ShopApi/general"
 )
 
-
-type UserServiceProvider struct{
+type UserServiceProvider struct {
 }
 
 var UserService *UserServiceProvider = &UserServiceProvider{}
 
 type User struct {
-	UserID 		uint64		`sql:"auto_increment;primary_key;" gorm:"column:id" json:"userid"`
-	OpenID 		string		`gorm:"column:openid" json:"openid"`
-	Name 		string		`json:"name"`
-	Password 	string		`json:"password"`
-	Status		uint16		`json:"status"`
-	Type		uint16		`json:"type"`
-	Created 	time.Time	`json:"created"`
+	UserID   uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"userid"`
+	OpenID   string    `gorm:"column:openid" json:"openid"`
+	Name     string    `json:"name"`
+	Password string    `json:"password"`
+	Status   uint16    `json:"status"`
+	Type     uint16    `json:"type"`
+	Created  time.Time `json:"created"`
 }
 
 type UserInfo struct {
-	UserID 		uint64		`sql:"primary_key" gorm:"column:userid" json:"userid"`
-	Avatar 		string		`json:"avatar"`
-	Nickname 	string		`json:"nickname"`
-	Email 		string		`json:"email"`
-	Phone 		string		`json:"phone"`
-	Sex 		uint8		`json:"sex"`
+	UserID   uint64 `sql:"primary_key" gorm:"column:userid" json:"userid"`
+	Avatar   string `json:"avatar"`
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Sex      uint8  `json:"sex"`
 }
 
 func (User) TableName() string {
@@ -78,11 +77,11 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 	}
 
 	u := User{
-		Name: 		*name,
-		Password:	string(hashedPass),
-		Status:		general.UserActive,
-		Type: 		general.PhoneUser,
-		Created:	time.Now(),
+		Name:     *name,
+		Password: string(hashedPass),
+		Status:   general.UserActive,
+		Type:     general.PhoneUser,
+		Created:  time.Now(),
 	}
 
 	db := orm.Conn
@@ -96,16 +95,15 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 		}
 	}()
 
-
 	err = tx.Create(&u).Error
 	if err != nil {
 		return err
 	}
 
 	info := UserInfo{
-		UserID: 	u.UserID,
-		Phone: 		*name,
-		Sex: 		general.Man,
+		UserID: u.UserID,
+		Phone:  *name,
+		Sex:    general.Man,
 	}
 
 	err = tx.Create(&info).Error
@@ -122,26 +120,31 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 }
 
 func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
-	var user User
+	var (
+		u   User
+		err error
+	)
 
 	db := orm.Conn
+	err = db.Where("name = ?", *name).First(&u).Error
+	if err!=nil {
 
-	err := db.Where("name = ?", name).First(&user).Error
-	if err == nil {
-		if !utility.CompareHash([]byte(user.Password), *pass){
-			return false, 0, nil
-		}
-		return true, user.UserID, nil
+		return false, 0, err
 	}
 
-	return false, 0, err
+	if !utility.CompareHash([]byte(u.Password), *pass)  {
+
+		return false, 0, nil
+	}
+
+	return true, u.UserID, err
 }
 
 func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	var (
-		err  error
-		s    UserInfo
+		err error
+		s   UserInfo
 	)
 
 	db := orm.Conn
@@ -152,5 +155,4 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	return s, nil
 }
-
 

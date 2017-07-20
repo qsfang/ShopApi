@@ -30,15 +30,15 @@
 package orm
 
 import (
-	"github.com/jinzhu/gorm"
 	"ShopApi/log"
+	"github.com/jinzhu/gorm"
 )
 
 const sql = "mysql"
 
 var (
 	Conn *gorm.DB
-	err	error
+	err  error
 )
 
 func InitOrm(url string) {

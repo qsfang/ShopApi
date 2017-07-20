@@ -31,18 +31,18 @@ package general
 
 const (
 	// User Type
-	PhoneUser 	= 0xff
-	WechatUser	= 0xfe
+	PhoneUser  = 0xff
+	WechatUser = 0xfe
 
 	// User Status
-	UserActive 		= 0xf0
-	UserInactive	= 0xf1
+	UserActive   = 0xf0
+	UserInactive = 0xf1
 
 	// Login session
 	SessionUserID = "userid"
 
 	// sex
-	Man = 0x1
+	Man   = 0x1
 	Woman = 0x2
 
 	//Address  Default

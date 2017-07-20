@@ -30,17 +30,20 @@
 package errcode
 
 const (
-	NoInformation           = 0x4
-	ErrSucceed				= 0x0
-	ErrInvalidParams		= 0x1
-	ErrMysql 				= 0x2
-	ErrDelete				= 0x3 //用户登出错误
+	NoInformation    = 0x4
+	ErrSucceed       = 0x0
+	ErrInvalidParams = 0x1
+	ErrMysql         = 0x2
+	ErrDelete        = 0x3 //用户登出错误
+	ErrNamefound     = 0x4
+	ErrNameFormat    = 0x5
+	ErrGetsess	     = 0x6
 
 	// 需要登录
-	ErrLoginRequired		= 0x800
-	ErrPermissionDenied		= 0x801
+	ErrLoginRequired    = 0x800
+	ErrPermissionDenied = 0x801
 
 	// 严重错误
-	ErrNoConnection			= 0x1000
-	ErrDBOperationFailed	= 0x1001
+	ErrNoConnection      = 0x1000
+	ErrDBOperationFailed = 0x1001
 )
