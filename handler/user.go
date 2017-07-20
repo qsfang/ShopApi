@@ -40,7 +40,6 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-	"fmt"
 )
 
 type Register struct {
