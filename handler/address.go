@@ -24,7 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Yu yi, Li Zebang
+ *     Initial: 2017/07/19        Yu yi, Li Zebang, Yang Zhengtian
  */
 
 package handler
@@ -104,14 +104,15 @@ func GetAddress(c echo.Context) error {
 		userid		uint64
 		list         	[]models.Addressget
 	)
+	
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	s := sess.Get(general.SessionUserID)
 	userid = s.(uint64)
 	list,err = models.ContactService.GetAddress(userid)
 	if err != nil {
+		log.Logger.Error("error:", err)
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, list)
 }
-
