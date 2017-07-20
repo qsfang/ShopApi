@@ -40,11 +40,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-<<<<<<< HEAD
 	"strconv"
-=======
-	"fmt"
->>>>>>> dc1c03ea3dd66e4f97ed16686d25d5acce2f687c
+
 )
 
 type Register struct {
