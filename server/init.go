@@ -68,7 +68,7 @@ func initMysql() {
 	port := configuration.mysqlPort
 	sqlName := configuration.mysqlDb
 
-	conf := fmt.Sprintf(user + ":" + pass + "@" + "tcp(" + url + port + ")/" + sqlName + "?charset=utf8")
+	conf := fmt.Sprintf(user + ":" + pass + "@" + "tcp(" + url + port + ")/" + sqlName + "?charset=utf8&parseTime=True&loc=Local")
 
 	orm.InitOrm(conf)
 }
