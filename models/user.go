@@ -36,8 +36,6 @@ import (
 	"ShopApi/orm"
 	"ShopApi/utility"
 	"ShopApi/general"
-	"ShopApi/general/errcode"
-	"github.com/jinzhu/gorm"
 )
 
 
@@ -100,23 +98,17 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return false, 0, err
 }
 
-var (
-	err  error
-	s    User
-)
-
-
 func GetInfo(id uint64) (User, error) {
+	var (
+		err  error
+		s    User
+	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", id).Find(&u).Error
-
+	err = db.Where("id = ?", id).Find(&s).Error
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return s, general.NewErrorWithMessage(errcode.NoInformation, err.Error())
-		} else {
-			return s, general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-		}
+		return s, err
 	}
+
 	return s, nil
 }

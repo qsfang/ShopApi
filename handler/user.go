@@ -32,26 +32,25 @@
 package handler
 
 import (
+	"ShopApi/general"
+	"ShopApi/general/errcode"
+	"ShopApi/log"
+	"ShopApi/models"
+	"ShopApi/utility"
 	"github.com/astaxie/session"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-	"ShopApi/log"
-	"ShopApi/general"
-	"ShopApi/general/errcode"
-	"ShopApi/models"
-	"ShopApi/utility"
-	"os/user"
 )
 
 type Register struct {
-	Mobile 		*string 		`json:"mobile" validate:"required,alphanum,min=6,max=30"`
-	Pass 		*string         `json:"pass" validate:"required,alphanum,min=6,max=30"`
+	Mobile *string `json:"mobile" validate:"required,alphanum,min=6,max=30"`
+	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
 
 func Create(c echo.Context) error {
 	var (
-		err 		error
-		u 			Register
+		err error
+		u   Register
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -72,10 +71,10 @@ func Create(c echo.Context) error {
 
 func Login(c echo.Context) error {
 	var (
-		err 		error
-		u 			Register
-		userID		uint64
-		sess		session.Session
+		err    error
+		u      Register
+		userID uint64
+		sess   session.Session
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -123,25 +122,30 @@ func Logout(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func GetInfo(c echo.Context) (user.User, error) {
+func GetInfo(c echo.Context) error {
 	var (
 		err error
 		uu  models.User
+		s   models.User
 	)
 
 	if err = c.Bind(&uu); err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
-		return nil, general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
-	s, err := models.GetInfo(uu.UserID)
+
+	s, err = models.GetInfo(uu.UserID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("User information doesn't exist !")
-			return s, err
+			log.Logger.Error("User information doesn't exist !", err)
+			return general.NewErrorWithMessage(errcode.NoInformation, err.Error())
 		} else {
-
+			log.Logger.Error("Getting information exists errors", err)
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 		}
-
 	}
+
+	log.Logger.Debug("have returned UserInformation.")
+	return c.JSON(errcode.ErrSucceed, s)
 }
