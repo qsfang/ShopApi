@@ -93,3 +93,41 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 
 	return nil
 }
+
+type Addressget struct {
+	Province string `json:"province"`
+	City     string`json:"city"`
+	Street   string `json:"street"`
+	Address  string `json:"address"`
+}
+func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error) {
+	var (
+		cont  Contact
+		list  []Contact
+		s     []Addressget
+	)
+
+	db := orm.Conn
+	err := db.Model(&cont).Where("userid=?", userid).Find(&list).Error
+	if err != nil {
+		return s, err
+	}
+
+	for i, c := range list{
+		s[i].Province = c.Province
+		s[i].City = c.City
+		s[i].Street = c.Street
+		s[i].Address = c.Address
+	}
+
+	return s, nil
+}
+
+
+type Address struct {
+	Province int `json:"province"`
+	City     int`json:"city"`
+	Street   int `json:"street"`
+	Address  string `json:"address"`
+}
+

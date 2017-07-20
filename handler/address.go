@@ -97,3 +97,21 @@ func ChangeAddress(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+
+func GetAddress(c echo.Context) error {
+	var (
+		err 		error
+		userid		uint64
+		list         	[]models.Addressget
+	)
+	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	s := sess.Get(general.SessionUserID)
+	userid = s.(uint64)
+	list,err = models.ContactService.GetAddress(userid)
+	if err != nil {
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, list)
+}
+
