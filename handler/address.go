@@ -41,10 +41,7 @@ import (
 	"ShopApi/utility"
 )
 
-// todo：放到 model * 去掉 id
-// todo: 数据验证！！！
-type Address struct {
-	ID        *uint64 `sql:"auto_increment; primary_key;" json:"id"`
+type Add struct {
 	Name      *string `json:"name"`
 	Phone     *string `json:"phone"`
 	Province  *string `json:"province"`
@@ -55,63 +52,65 @@ type Address struct {
 }
 
 
-//func AddAdress(c echo.Context) error {
-//	var (
-//		err  error
-//		addr AddAddress
-//	)
-//
-//	if err = c.Bind(&addr); err != nil {
-//		log.Logger.Error("Create crash with error:", err)
-//
-//		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-//	}
-//
-//	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-//	userID := session.Get(general.SessionUserID).(uint64)
-//
-//	contact := &models.Contact{
-//		UserID:    userID,
-//		Name:      *addr.Name,
-//		Phone:     *addr.Phone,
-//		Province:  *addr.Province,
-//		City:      *addr.City,
-//		Street:    *addr.Street,
-//		Address:   *addr.Address,
-//	//	IsDefault: addr.IsDefault,
-//	}
-//
-////	err = models.ContactService.AddAddress(contact)
-//	if err != nil {
-//		log.Logger.Error("Add address with error:", err)
-//
-//		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-//	}
-//
-//	return c.JSON(errcode.ErrSucceed, nil)
-//}
+func AddAddress(c echo.Context) error {
+	var (
+		err  error
+		addr Add
+	)
 
-//func ChangeAddress(c echo.Context) error {
-//	var (
-//		err error
-//		m   Address
-//	)
-//
-//	if err = c.Bind(&m); err != nil {
-//		log.Logger.Error("Create crash with error:", err)
-//
-//		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-//	}
-//
-//	err = models.ContactService.ChangeAddress(m.ID, m.Name, m.Phone, m.Province, m.City, m.Street, m.Address)
-//	if err != nil {
-//		log.Logger.Error("create creash with error:", err)
-//
-//		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-//	}
-//
-//	return c.JSON(errcode.ErrSucceed, nil)
-//}
+	if err = c.Bind(&addr); err != nil {
+		log.Logger.Error("Bind with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID).(uint64)
+
+	contact := &models.Contact{
+		UserID:    userID,
+		Name:      *addr.Name,
+		Phone:     *addr.Phone,
+		Province:  *addr.Province,
+		City:      *addr.City,
+		Street:    *addr.Street,
+		Address:   *addr.Address,
+		IsDefault: addr.IsDefault,
+	}
+
+	err = models.ContactService.AddAddress(contact)
+	if err != nil {
+		log.Logger.Error("Add address with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+
+func ChangeAddress(c echo.Context) error {
+	var (
+		err error
+		m   Address
+	)
+
+	if err = c.Bind(&m); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.ContactService.ChangeAddress(m.ID, m.Name, m.Phone, m.Province, m.City, m.Street, m.Address)
+	if err != nil {
+		log.Logger.Error("create creash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+>>>>>>> 1210e443c562e0452a2a5ad5315891f74cb1b621
 
 func GetAddress(c echo.Context) error {
 	var (
@@ -130,4 +129,20 @@ func GetAddress(c echo.Context) error {
 	}
 
 	return c.JSON(errcode.ErrSucceed, list)
+}
+
+func Alter(c echo.Context) error {
+	var (
+		err error
+	)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	user := session.Get(general.SessionUserID).(uint64)
+
+	err = models.ContactService.AlterDefalt(user)
+	if err != nil {
+		log.Logger.Error("Alter Default with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+	return c.JSON(errcode.ErrSucceed, nil)
 }
