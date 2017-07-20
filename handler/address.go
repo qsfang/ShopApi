@@ -45,7 +45,6 @@ import (
 // todo: 数据验证！！！
 type Address struct {
 	ID        *uint64 `sql:"auto_increment; primary_key;" json:"id"`
-type AddAddress struct {
 	Name      *string `json:"name"`
 	Phone     *string `json:"phone"`
 	Province  *string `json:"province"`
@@ -56,63 +55,63 @@ type AddAddress struct {
 }
 
 
-func AddAdress(c echo.Context) error {
-	var (
-		err  error
-		addr AddAddress
-	)
+//func AddAdress(c echo.Context) error {
+//	var (
+//		err  error
+//		addr AddAddress
+//	)
+//
+//	if err = c.Bind(&addr); err != nil {
+//		log.Logger.Error("Create crash with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+//	}
+//
+//	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+//	userID := session.Get(general.SessionUserID).(uint64)
+//
+//	contact := &models.Contact{
+//		UserID:    userID,
+//		Name:      *addr.Name,
+//		Phone:     *addr.Phone,
+//		Province:  *addr.Province,
+//		City:      *addr.City,
+//		Street:    *addr.Street,
+//		Address:   *addr.Address,
+//	//	IsDefault: addr.IsDefault,
+//	}
+//
+////	err = models.ContactService.AddAddress(contact)
+//	if err != nil {
+//		log.Logger.Error("Add address with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+//	}
+//
+//	return c.JSON(errcode.ErrSucceed, nil)
+//}
 
-	if err = c.Bind(&addr); err != nil {
-		log.Logger.Error("Create crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID).(uint64)
-
-	contact := &models.Contact{
-		UserID:    userID,
-		Name:      *addr.Name,
-		Phone:     *addr.Phone,
-		Province:  *addr.Province,
-		City:      *addr.City,
-		Street:    *addr.Street,
-		Address:   *addr.Address,
-		IsDefault: addr.IsDefault,
-	}
-
-	err = models.ContactService.AddAddress(contact)
-	if err != nil {
-		log.Logger.Error("Add address with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, nil)
-}
-
-func ChangeAddress(c echo.Context) error {
-	var (
-		err error
-		m   Address
-	)
-
-	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("Create crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	err = models.ContactService.ChangeAddress(m.ID, m.Name, m.Phone, m.Province, m.City, m.Street, m.Address)
-	if err != nil {
-		log.Logger.Error("create creash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, nil)
-}
+//func ChangeAddress(c echo.Context) error {
+//	var (
+//		err error
+//		m   Address
+//	)
+//
+//	if err = c.Bind(&m); err != nil {
+//		log.Logger.Error("Create crash with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+//	}
+//
+//	err = models.ContactService.ChangeAddress(m.ID, m.Name, m.Phone, m.Province, m.City, m.Street, m.Address)
+//	if err != nil {
+//		log.Logger.Error("create creash with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+//	}
+//
+//	return c.JSON(errcode.ErrSucceed, nil)
+//}
 
 func GetAddress(c echo.Context) error {
 	var (

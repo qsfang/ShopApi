@@ -68,46 +68,46 @@ func (Contact) TableName() string {
 }
 
 // todo: 传入参数
-func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone, province, city, street, address *string, isDefault int8) error {
-	addr := &Contact{
-		Name:      *name,
-		Phone:     *phone,
-		Province:  *province,
-		City:      *city,
-		Street:    *street,
-		Address:   *address,
-		UserID:    *userID,
-		Created:   time.Now(),
-		IsDefault: isDefault,
-	}
-}
-func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
-	contact.Created = time.Now()
-
-	db := orm.Conn
-
-	err := db.Create(contact).Error
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, province, city, street, address *string) error {
-
-	changmap := map[string]interface{}{"name": *name, "phone": *phone, "province": *province, "city": *city, "street": *street, "address": *address}
-
-	// todo: 传入的结构先声明
-	db := orm.Conn
-	err := db.Model(&Contact{}).Where(&Contact{ID: *id}).Updates(changmap).Limit(1).Error
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
+//func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone, province, city, street, address *string, isDefault int8) error {
+//	addr := &Contact{
+//		Name:      *name,
+//		Phone:     *phone,
+//		Province:  *province,
+//		City:      *city,
+//		Street:    *street,
+//		Address:   *address,
+//		UserID:    *userID,
+//		Created:   time.Now(),
+//		IsDefault: isDefault,
+//	}
+//}
+//func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
+//	contact.Created = time.Now()
+//
+//	db := orm.Conn
+//
+//	err := db.Create(contact).Error
+//	if err != nil {
+//		return err
+//	}
+//
+//	return nil
+//}
+//
+//func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, province, city, street, address *string) error {
+//
+//	changmap := map[string]interface{}{"name": *name, "phone": *phone, "province": *province, "city": *city, "street": *street, "address": *address}
+//
+//	// todo: 传入的结构先声明
+//	db := orm.Conn
+//	err := db.Model(&Contact{}).Where(&Contact{ID: *id}).Updates(changmap).Limit(1).Error
+//
+//	if err != nil {
+//		return err
+//	}
+//
+//	return nil
+//}
 
 func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error) {
 	var (

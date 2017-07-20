@@ -25,7 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *     Modify: 2017/07/19		  Sun Anxiang 登录检查
+ *	   Modify: 2017/07/20		  Zhang Zizhao  登录检查
  */
 
 package models
@@ -119,23 +119,6 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 	return nil
 }
 
-/*func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
-	var user User
-
-	db := orm.Conn
-
-	err := db.Where("name = ?", name).First(&user).Error
-	if err == nil {
-		if !utility.CompareHash([]byte(user.Password), *pass){
-			return false, 0, nil
-		}
-		return true, user.UserID, nil
-	}
-
-	return false, 0, err
-}
-*/
-
 func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	var (
 		u   User
@@ -172,5 +155,4 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	return s, nil
 }
-
 

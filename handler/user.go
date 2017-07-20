@@ -25,9 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *	   Modify: 2017/07/19         Sun Anxiang 添加用户登录
- *	   Modify: 2017/07/19         zhngzizhao  添加用户登录
- *	   Modify: 2017/07/19		  Ai Hao 添加用户登出
+ *	   Modify: 2017/07/19		  Ai Hao         添加用户登出
+ *	   Modify: 2017/07/20         Zhang Zizhao   添加用户登录
  */
 
 package handler
@@ -38,9 +37,10 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-	"fmt"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
+	"fmt"
 )
 
 type Register struct {
@@ -70,48 +70,7 @@ func Create(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-/*
-func Login(c echo.Context) error {
-	var (
-		err    error
-		u      Register
-		userID uint64
-		sess   session.Session
-	)
-
-	if err = c.Bind(&u); err != nil {
-		log.Logger.Error("Bind error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	flag, userID, err := models.UserService.Login(u.Mobile, u.Pass)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-
-			log.Logger.Error("User not found:", err)
-		} else {
-
-			log.Logger.Error("Mysql error:", err)
-		}
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	} else {
-		if flag == false {
-			log.Logger.Error("Name and pass don't match:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrLoginRequired, err.Error())
-		}
-	}
-
-	sess = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	sess.Set(general.SessionUserID, userID)
-
-	return c.JSON(errcode.ErrSucceed, nil)
-}
-*/
-
-func LoginHandlerMobilephone(c echo.Context) error {
+func LoginwithMobile(c echo.Context) error {
 	var (
 		user Register
 		err  error
@@ -123,7 +82,6 @@ func LoginHandlerMobilephone(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	fmt.Println(*user.Mobile, *user.Pass)
 	match := utility.IsValidAccount(*user.Mobile)
 	if match == false {
 		log.Logger.Error("err name format", err)

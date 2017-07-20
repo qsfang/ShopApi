@@ -37,7 +37,7 @@ const (
 	ErrDelete        = 0x3 //用户登出错误
 	ErrNamefound     = 0x4
 	ErrNameFormat    = 0x5
-	ErrGenerateHash  = 0x6
+	ErrGetsess	     = 0x6
 
 	// 需要登录
 	ErrLoginRequired    = 0x800
