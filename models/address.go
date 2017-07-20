@@ -47,9 +47,9 @@ type Contact struct {
 	Street    string    `json:"street"`
 	Address   string    `json:"address"`
 	Created   time.Time `json:"created"`
-	// todo: uint8
-	IsDefault  int8      `gorm:"column:isdefault" json:"isdefault"`
+	IsDefault  uint8	`gorm:"column:isdefault" json:"isdefault"`
 }
+
 type Addressget struct {
 	Province string 	`json:"province"`
 	City     string		`json:"city"`
@@ -66,23 +66,12 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
-// todo: 传入参数
-func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault int8) error {
-	addr := &Contact{
-		Name:      *name,
-		Phone:     *phone,
-		Province:  *province,
-		City:      *city,
-		Street:    *street,
-		Address:   *address,
-		UserID:    *userID,
-		Created:   time.Now(),
-		IsDefault: isDefault,
-	}
+func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
+	contact.Created = time.Now()
 
 	db := orm.Conn
 
-	err := db.Create(&addr).Error
+	err := db.Create(contact).Error
 	if err != nil {
 		return err
 	}
