@@ -48,9 +48,8 @@ type Add struct {
 	City      *string `json:"city"`
 	Street    *string `json:"street"`
 	Address   *string `json:"address"`
-	IsDefault int8    `json:"isdefault"`
+	IsDefault uint8   `json:"isdefault"`
 }
-
 
 func AddAddress(c echo.Context) error {
 	var (
@@ -88,29 +87,27 @@ func AddAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-
 func ChangeAddress(c echo.Context) error {
 	var (
 		err error
-		m   Address
+		m   models.Change
 	)
 
 	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("Create crash with error:", err)
+		log.Logger.Error("Change crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ContactService.ChangeAddress(m.ID, m.Name, m.Phone, m.Province, m.City, m.Street, m.Address)
+	err = models.ContactService.ChangeAddress(m)
 	if err != nil {
-		log.Logger.Error("create creash with error:", err)
+		log.Logger.Error("change crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
->>>>>>> 1210e443c562e0452a2a5ad5315891f74cb1b621
 
 func GetAddress(c echo.Context) error {
 	var (

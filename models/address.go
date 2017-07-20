@@ -25,8 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Li Zebang
- *     Modify: 2017/07/20        Yu Yi
- *     Modify: 2017/07/20        Yang Zhengtian
+ *     Modify: 2017/07/20         Yu Yi
+ *     Modify: 2017/07/20         Yang Zhengtian
  */
 
 package models
@@ -35,7 +35,6 @@ import (
 	"time"
 
 	"ShopApi/orm"
-	"fmt"
 )
 
 type Contact struct {
@@ -49,7 +48,7 @@ type Contact struct {
 	Street    string    `json:"street"`
 	Address   string    `json:"address"`
 	Created   time.Time `json:"created"`
-	IsDefault  uint8	`gorm:"column:isdefault" json:"isdefault"`
+	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
 }
 
 type Addressget struct {
@@ -57,6 +56,16 @@ type Addressget struct {
 	City     string `json:"city"`
 	Street   string `json:"street"`
 	Address  string `json:"address"`
+}
+
+type Change struct {
+	ID        uint64  `json:"id" validate:"numeric"`
+	Name      *string `json:"name" validate:"required, alphaunicode, min=2,max=18"`
+	Phone     *string `json:"phone" validate:"required, alphanum, min=6,max=30"`
+	Province  *string `json:"province" validate:"required, alphaunicode, min=2,max=30"`
+	City      *string `json:"city" validate:"required, alphaunicode, min=2,max=30"`
+	Street    *string `json:"street" validate:"required, alphaunicode, min=2,max=30"`
+	Address   *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
 }
 
 type ContactServiceProvider struct {
@@ -68,47 +77,42 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
-// todo: 传入参数
-//func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone, province, city, street, address *string, isDefault int8) error {
-//	addr := &Contact{
-//		Name:      *name,
-//		Phone:     *phone,
-//		Province:  *province,
-//		City:      *city,
-//		Street:    *street,
-//		Address:   *address,
-//		UserID:    *userID,
-//		Created:   time.Now(),
-//		IsDefault: isDefault,
-//	}
-//}
-//func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
-//	contact.Created = time.Now()
-//
-//	db := orm.Conn
-//
-//	err := db.Create(contact).Error
-//	if err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}
-//
-//func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, province, city, street, address *string) error {
-//
-//	changmap := map[string]interface{}{"name": *name, "phone": *phone, "province": *province, "city": *city, "street": *street, "address": *address}
-//
-//	// todo: 传入的结构先声明
-//	db := orm.Conn
-//	err := db.Model(&Contact{}).Where(&Contact{ID: *id}).Updates(changmap).Limit(1).Error
-//
-//	if err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}
+func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
+	contact.Created = time.Now()
+
+	db := orm.Conn
+
+	err := db.Create(contact).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
+	var (
+		con Contact
+	)
+
+	changemap := map[string]interface{}{
+		"name":     m.Name,
+		"phone":    m.Phone,
+		"province": m.Province,
+		"city":     m.City,
+		"street":   m.Street,
+		"address":  m.Address,
+	}
+
+	db := orm.Conn
+	err := db.Model(&con).Where("ID = ?", m.ID).Updates(changemap).Limit(1).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error) {
 	var (
