@@ -37,7 +37,7 @@ import (
 )
 
 type Contact struct {
-	ID        uint64    `sql:"auto_increment;primary_key;" json:"id"`
+	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Name      string    `json:"name"`
 	Phone     string    `json:"phone"`
@@ -58,12 +58,12 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
-func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, address *string) error {
+func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, province, city, street, address *string) error {
 
-	changmap := map[string]interface{}{"province": *province, "city": *city, "street": *street, "address": *address}
+	changmap := map[string]interface{}{"name": *name, "phone": phone, "province": *province, "city": *city, "street": *street, "address": *address}
 
 	db := orm.Conn
-	err := db.Model(&Contact{}).Where(&Contact{Name: *name}).Updates(changmap).Error
+	err := db.Model(&Contact{}).Where(&Contact{ID: *id}).Updates(changmap).Error
 
 	if err != nil {
 		return err

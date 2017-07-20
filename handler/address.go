@@ -40,13 +40,14 @@ import (
 )
 
 type Address struct {
-	Name      *string `json:"name"`
-	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=30"`
-	Province  *string `json:"province"`
-	City      *string `json:"city"`
-	Street    *string `json:"street"`
-	Address   *string `json:"address"`
-	IsDefault bool    `json:"isDefault"`
+	ID        *uint64  `sql:"auto_increment; primary_key;" json:"id"`
+	Name      *string  `json:"name"`
+	Phone     *string  `json:"phone"`
+	Province  *string  `json:"province"`
+	City      *string  `json:"city"`
+	Street    *string  `json:"street"`
+	Address   *string  `json:"address"`
+	IsDefault bool     `json:"isdefault"`
 }
 
 func ChangeAddress(c echo.Context) error {
@@ -55,13 +56,14 @@ func ChangeAddress(c echo.Context) error {
 		m     Address
 	)
 
+
 	if err = c.Bind(&m); err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ContactService.ChangeAddress(m.Name, m.Province, m.City, m.Street, m.Address)
+	err = models.ContactService.ChangeAddress(m.ID, m.Name, m.Phone, m.Province, m.City, m.Street, m.Address)
 	if err != nil {
 		log.Logger.Error("create creash with error:", err)
 
