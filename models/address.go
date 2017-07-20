@@ -96,12 +96,12 @@ func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
 	)
 
 	changemap := map[string]interface{}{
-		"name":     m.Name,
-		"phone":    m.Phone,
-		"province": m.Province,
-		"city":     m.City,
-		"street":   m.Street,
-		"address":  m.Address,
+		"name":     *m.Name,
+		"phone":    *m.Phone,
+		"province": *m.Province,
+		"city":     *m.City,
+		"street":   *m.Street,
+		"address":  *m.Address,
 	}
 
 	db := orm.Conn
