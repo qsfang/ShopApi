@@ -2,6 +2,12 @@
 .idea/
 .idea/vcs.xml
 server/server
+<<<<<<< HEAD
+*.exe
+*.exe
+*.exe
+=======
 server/server.exe
 server/server.exe
 server/server.exe
+>>>>>>> a96214f93b05e8b310e4ad6265f8d4db8e33e3b0

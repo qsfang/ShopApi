@@ -36,10 +36,18 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
-	"ShopApi/utility"
 )
 
 type Address struct {
+<<<<<<< HEAD
+	Name      *string `json:"name"`
+	Phone     *string `json:"phone"`
+	Province  *string `json:"province"`
+	City      *string `json:"city"`
+	Street    *string `json:"street"`
+	Address   *string `json:"address"`
+	IsDefault int8    `json:"isdefault"`
+=======
 	ID        *uint64  `sql:"auto_increment; primary_key;" json:"id"`
 	Name      *string  `json:"name"`
 	Phone     *string  `json:"phone"`
@@ -48,29 +56,7 @@ type Address struct {
 	Street    *string  `json:"street"`
 	Address   *string  `json:"address"`
 	IsDefault bool     `json:"isdefault"`
-}
-
-func ChangeAddress(c echo.Context) error {
-	var (
-		err   error
-		m     Address
-	)
-
-
-	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("Create crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	err = models.ContactService.ChangeAddress(m.ID, m.Name, m.Phone, m.Province, m.City, m.Street, m.Address)
-	if err != nil {
-		log.Logger.Error("create creash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, nil)
+>>>>>>> a96214f93b05e8b310e4ad6265f8d4db8e33e3b0
 }
 
 func Add(c echo.Context) error {
@@ -79,19 +65,50 @@ func Add(c echo.Context) error {
 		addr Address
 	)
 
+<<<<<<< HEAD
 	if err = c.Bind(&addr); err != nil {
+=======
+
+	if err = c.Bind(&m); err != nil {
+>>>>>>> a96214f93b05e8b310e4ad6265f8d4db8e33e3b0
 		log.Logger.Error("Create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	user := session.Get(general.SessionUserID).(uint64)
-	log.Logger.Debug("session get user ID :%v", user)
+<<<<<<< HEAD
+	//session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	//user := session.Get(general.SessionUserID).(uint64)
+	user := uint64(166)
 
 	err = models.ContactService.AddAddress(addr.Name, &user, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, addr.IsDefault)
+=======
+	err = models.ContactService.ChangeAddress(m.ID, m.Name, m.Phone, m.Province, m.City, m.Street, m.Address)
+>>>>>>> a96214f93b05e8b310e4ad6265f8d4db8e33e3b0
 	if err != nil {
 		log.Logger.Error("Add address with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+func ChangeAddress(c echo.Context) error {
+	var (
+		err   error
+		m     Address
+	)
+
+	if err = c.Bind(&m); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.ContactService.ChangeAddress(m.Name, m.Province, m.City, m.Street, m.Address)
+	if err != nil {
+		log.Logger.Error("create creash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

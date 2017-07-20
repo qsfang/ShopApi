@@ -46,7 +46,7 @@ type Contact struct {
 	Street    string    `json:"street"`
 	Address   string    `json:"address"`
 	Created   time.Time `json:"created"`
-	IsDefault bool      `gorm:"column:isdefault" json:"isdefault"`
+	IsDefault int8      `gorm:"column:isdefault" json:"isdefault"`
 }
 
 type ContactServiceProvider struct {
@@ -58,6 +58,9 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
+<<<<<<< HEAD
+func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault int8) error {
+=======
 func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, province, city, street, address *string) error {
 
 	changmap := map[string]interface{}{"name": *name, "phone": *phone, "province": *province, "city": *city, "street": *street, "address": *address}
@@ -71,9 +74,9 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 
 	return nil
 }
+>>>>>>> a96214f93b05e8b310e4ad6265f8d4db8e33e3b0
 
 
-func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault bool) error {
 	addr := &Contact{
 		Name:      *name,
 		Phone:     *phone,
@@ -90,6 +93,20 @@ func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone
 	db := orm.Conn
 
 	err := db.Create(&addr).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, address *string) error {
+
+	changmap := map[string]interface{}{"province": *province, "city": *city, "street": *street, "address": *address}
+
+	db := orm.Conn
+	err := db.Model(&Contact{}).Where(&Contact{Name: *name}).Updates(changmap).Error
+
 	if err != nil {
 		return err
 	}
