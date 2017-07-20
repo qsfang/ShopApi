@@ -127,3 +127,19 @@ func GetAddress(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, list)
 }
+
+func Alter(c echo.Context) error {
+	var (
+		err error
+	)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	user := session.Get(general.SessionUserID).(uint64)
+
+	err = models.ContactService.AlterDefalt(user)
+	if err != nil {
+		log.Logger.Error("Alter Default with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+	return c.JSON(errcode.ErrSucceed, nil)
+}
