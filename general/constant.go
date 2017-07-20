@@ -40,4 +40,8 @@ const (
 
 	// Login session
 	SessionUserID = "userid"
+
+	// sex
+	Man = 0x1
+	Woman = 0x2
 )
