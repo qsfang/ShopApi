@@ -26,12 +26,12 @@
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
  *	   Modify: 2017/07/19         Sun Anxiang 添加用户登录
+ *	   Modify: 2017/07/19         zhngzizhao  添加用户登录
  */
 
 package handler
 
 import (
-	"github.com/astaxie/session"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
@@ -39,8 +39,8 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
-	"ShopApi/orm"
 	"ShopApi/utility"
+	"fmt"
 )
 
 type Register struct {
@@ -112,21 +112,23 @@ func Login(c echo.Context) error {
 */
 func LoginHandlerMobilephone(c echo.Context) error {
 	var (
-		user models.User
+		user Register
 		err  error
 	)
 
-	if err = c.Bind(user); err != nil {
+	if err = c.Bind(&user); err != nil {
+
 		return err
 	}
-	match := utility.IsValidAccount(user.Name)
-	if match == false {
-		log.Logger.Error("err name format:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrNameFormat, err.Error())
+	match:=utility.IsValidAccount(*user.Mobile)
+	if match==false {
+		log.Logger.Error("err name format",err)
+		fmt.Println("hhhhhhhhhhh")
+		return general.NewErrorWithMessage(errcode.ErrNameFormat,err.Error())
 	}
 
-	flag, userID, err := models.UserService.Login(&user.Name, &user.Password)
+	flag, userID, err := models.UserService.Login(user.Mobile, user.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User not found:", err)

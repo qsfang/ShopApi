@@ -36,9 +36,6 @@ import (
 	"ShopApi/orm"
 	"ShopApi/utility"
 	"ShopApi/general"
-	"ShopApi/log"
-	"os/user"
-	"ShopApi/general/errcode"
 )
 
 type UserServiceProvider struct{
