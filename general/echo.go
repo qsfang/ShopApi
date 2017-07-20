@@ -24,51 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/20        Yusan Kurban
  */
 
-package main
-
-import (
-	"fmt"
-
-	"github.com/labstack/echo"
-	_ "github.com/go-sql-driver/mysql"
-
-	"ShopApi/orm"
-	"ShopApi/server/router"
-	"ShopApi/log"
-	"ShopApi/general"
-)
-
-var (
-	server 		*echo.Echo
-)
-
-func startServer() {
-	server = echo.New()
-
-	server.HTTPErrorHandler = general.EchoRestfulErrorHandler
-
-	router.InitRouter(server)
-	log.Logger.Debug("Router already init")
-	log.Logger.Fatal(server.Start(configuration.address))
-}
-
-func init() {
-	readConfiguration()
-	initMysql()
-	startServer()
-}
-
-func initMysql() {
-	user := configuration.mysqlUser
-	pass := configuration.mysqlPass
-	url := configuration.mysqlHost
-	port := configuration.mysqlPort
-	sqlName := configuration.mysqlDb
-
-	conf := fmt.Sprintf(user + ":" + pass + "@" + "tcp(" + url + port + ")/" + sqlName + "?charset=utf8")
-
-	orm.InitOrm(conf)
-}
+package general
