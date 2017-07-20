@@ -33,39 +33,36 @@ import (
 	"time"
 
 	"ShopApi/orm"
-
 )
 
-type ContactServiceProvider struct{
+type ContactServiceProvider struct {
 }
 
 var ContactService *ContactServiceProvider = &ContactServiceProvider{}
 
-
 type Contact struct {
-	ID          uint64      `sql:"auto_increment;primary_key;" json:"id"`
-	OpenID 		string		`gorm:"column:openid" json:"openid"`
-	Name 		string		`json:"name"`
-	Phone       string      `json:"phone"`
-	Province    string    	`json:"province"`
-	City        string	    `json:"city"`
-	Street      string	    `json:"street"`
-	Address     string 	    `json:"address"`
-	Created 	time.Time	`json:"created"`
-	Isdefault   bool        `json:"isdefault"`
-
+	ID        	uint64      `sql:"auto_increment;primary_key;" json:"id"`
+	OpenID    	string      `gorm:"column:openid" json:"openid"`
+	Name      	string      `json:"name"`
+	Phone     	string      `json:"phone"`
+	Province  	string      `json:"province"`
+	City      	string      `json:"city"`
+	Street    	string      `json:"street"`
+	Address   	string      `json:"address"`
+	Created   	time.Time   `json:"created"`
+	Isdefault 	bool        `json:"isdefault"`
 }
 
 func (Contact) TableName() string {
 	return "contact"
 }
 
-func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, address *string) error{
+func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, address *string) error {
 
 	changmap := map[string]interface{}{"province": *province, "city": *city, "street": *street, "address": *address}
 
 	db := orm.Conn
-	err := db.Table("contact").Where(&Contact{Name: *name}).Updates(changmap).Error
+	err := db.Model(&Contact{}).Where(&Contact{Name: *name}).Updates(changmap).Error
 
 	if err != nil {
 		return err
