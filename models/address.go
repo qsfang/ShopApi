@@ -63,7 +63,7 @@ func (us *ContactServiceProvider) ChangeAddress(id *uint64, name, phone, provinc
 	changmap := map[string]interface{}{"name": *name, "phone": phone, "province": *province, "city": *city, "street": *street, "address": *address}
 
 	db := orm.Conn
-	err := db.Model(&Contact{}).Where(&Contact{ID: *id}).Updates(changmap).Error
+	err := db.Model(&Contact{}).Where(&Contact{ID: *id}).Updates(changmap).Limit(1).Error
 
 	if err != nil {
 		return err
