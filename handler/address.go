@@ -41,7 +41,7 @@ import (
 	"ShopApi/utility"
 )
 
-type AddAddress struct {
+type Add struct {
 	Name      *string `json:"name"`
 	Phone     *string `json:"phone"`
 	Province  *string `json:"province"`
@@ -51,14 +51,14 @@ type AddAddress struct {
 	IsDefault uint8   `json:"isdefault"`
 }
 
-func AddAdress(c echo.Context) error {
+func AddAddress(c echo.Context) error {
 	var (
 		err  error
-		addr AddAddress
+		addr Add
 	)
 
 	if err = c.Bind(&addr); err != nil {
-		log.Logger.Error("Create crash with error:", err)
+		log.Logger.Error("Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -126,4 +126,20 @@ func GetAddress(c echo.Context) error {
 	}
 
 	return c.JSON(errcode.ErrSucceed, list)
+}
+
+func Alter(c echo.Context) error {
+	var (
+		err error
+	)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	user := session.Get(general.SessionUserID).(uint64)
+
+	err = models.ContactService.AlterDefalt(user)
+	if err != nil {
+		log.Logger.Error("Alter Default with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+	return c.JSON(errcode.ErrSucceed, nil)
 }
