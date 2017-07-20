@@ -36,17 +36,42 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
-	"ShopApi/utility"
 )
 
 type Address struct {
 	Name      *string `json:"name"`
-	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=30"`
+	Phone     *string `json:"phone"`
 	Province  *string `json:"province"`
 	City      *string `json:"city"`
 	Street    *string `json:"street"`
 	Address   *string `json:"address"`
-	IsDefault bool    `json:"isDefault"`
+	IsDefault int8    `json:"isdefault"`
+}
+
+func Add(c echo.Context) error {
+	var (
+		err  error
+		addr Address
+	)
+
+	if err = c.Bind(&addr); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	//session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	//user := session.Get(general.SessionUserID).(uint64)
+	user := uint64(166)
+
+	err = models.ContactService.AddAddress(addr.Name, &user, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, addr.IsDefault)
+	if err != nil {
+		log.Logger.Error("Add address with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
 }
 
 func ChangeAddress(c echo.Context) error {
@@ -64,32 +89,6 @@ func ChangeAddress(c echo.Context) error {
 	err = models.ContactService.ChangeAddress(m.Name, m.Province, m.City, m.Street, m.Address)
 	if err != nil {
 		log.Logger.Error("create creash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, nil)
-}
-
-func Add(c echo.Context) error {
-	var (
-		err  error
-		addr Address
-	)
-
-	if err = c.Bind(&addr); err != nil {
-		log.Logger.Error("Create crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	user := session.Get(general.SessionUserID).(uint64)
-	log.Logger.Debug("session get user ID :%v", user)
-
-	err = models.ContactService.AddAddress(addr.Name, &user, addr.Phone, addr.Province, addr.City, addr.Street, addr.Address, addr.IsDefault)
-	if err != nil {
-		log.Logger.Error("Add address with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

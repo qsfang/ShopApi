@@ -37,7 +37,7 @@ import (
 )
 
 type Contact struct {
-	ID        uint64    `sql:"auto_increment;primary_key;" json:"id"`
+	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Name      string    `json:"name"`
 	Phone     string    `json:"phone"`
@@ -46,7 +46,7 @@ type Contact struct {
 	Street    string    `json:"street"`
 	Address   string    `json:"address"`
 	Created   time.Time `json:"created"`
-	IsDefault bool      `gorm:"column:isdefault" json:"isdefault"`
+	IsDefault int8      `gorm:"column:isdefault" json:"isdefault"`
 }
 
 type ContactServiceProvider struct {
@@ -58,22 +58,9 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
-func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, address *string) error {
-
-	changmap := map[string]interface{}{"province": *province, "city": *city, "street": *street, "address": *address}
-
-	db := orm.Conn
-	err := db.Model(&Contact{}).Where(&Contact{Name: *name}).Updates(changmap).Error
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
+func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault int8) error {
 
 
-func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone , province , city , street , address *string, isDefault bool) error {
 	addr := &Contact{
 		Name:      *name,
 		Phone:     *phone,
@@ -90,6 +77,20 @@ func (as *ContactServiceProvider) AddAddress(name *string, userID *uint64, phone
 	db := orm.Conn
 
 	err := db.Create(&addr).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (us *ContactServiceProvider) ChangeAddress(name, province, city, street, address *string) error {
+
+	changmap := map[string]interface{}{"province": *province, "city": *city, "street": *street, "address": *address}
+
+	db := orm.Conn
+	err := db.Model(&Contact{}).Where(&Contact{Name: *name}).Updates(changmap).Error
+
 	if err != nil {
 		return err
 	}
