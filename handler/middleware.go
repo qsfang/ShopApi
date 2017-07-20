@@ -32,9 +32,9 @@ package handler
 import (
 	"github.com/labstack/echo"
 
-	"ShopApi/utility"
 	"ShopApi/general"
 	"ShopApi/general/errcode"
+	"ShopApi/utility"
 )
 
 func MustLogin(next echo.HandlerFunc) echo.HandlerFunc {

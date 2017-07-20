@@ -34,8 +34,8 @@ import (
 )
 
 type ErrorResp struct {
-	Code		int			`json:"status"`
-	Message		string		`json:"message"`
+	Code    int    `json:"status"`
+	Message string `json:"message"`
 }
 
 func NewErrorWithMessage(code int, msg string) *ErrorResp {
@@ -44,7 +44,7 @@ func NewErrorWithMessage(code int, msg string) *ErrorResp {
 	}
 
 	return &ErrorResp{
-		Code: code,
+		Code:    code,
 		Message: msg,
 	}
 }

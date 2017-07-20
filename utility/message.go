@@ -31,8 +31,8 @@ package utility
 
 import (
 	"fmt"
-	"time"
 	"math/rand"
+	"time"
 
 	"ShopApi/server/initcache"
 )
@@ -40,7 +40,7 @@ import (
 func CreateCode(phone string) error {
 	code := GenerateCode()
 
-	err := initcache.Bm.Put(phone, code, 60 * time.Second)
+	err := initcache.Bm.Put(phone, code, 60*time.Second)
 	if err == nil {
 		fmt.Println("code", code)
 	}

@@ -90,18 +90,18 @@ func AddAddress(c echo.Context) error {
 func ChangeAddress(c echo.Context) error {
 	var (
 		err error
-		m   Address
+		m   models.Change
 	)
 
 	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("Create crash with error:", err)
+		log.Logger.Error("Change crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ContactService.ChangeAddress(m.ID, m.Name, m.Phone, m.Province, m.City, m.Street, m.Address)
+	err = models.ContactService.ChangeAddress(m)
 	if err != nil {
-		log.Logger.Error("create creash with error:", err)
+		log.Logger.Error("change crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

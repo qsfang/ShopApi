@@ -32,17 +32,18 @@ package main
 import (
 	"fmt"
 
-	"github.com/labstack/echo"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/labstack/echo"
 
+	"ShopApi/log"
 	"ShopApi/orm"
 	"ShopApi/server/router"
-	"ShopApi/log"
+
 	"ShopApi/general"
 )
 
 var (
-	server 		*echo.Echo
+	server *echo.Echo
 )
 
 func startServer() {
