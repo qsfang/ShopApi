@@ -125,8 +125,8 @@ func Logout(c echo.Context) error {
 func GetInfo(c echo.Context) error {
 	var (
 		err error
-		uu  models.User
-		s   models.User
+		uu  models.UserInfo
+		s   models.UserInfo
 	)
 
 	if err = c.Bind(&uu); err != nil {

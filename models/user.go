@@ -137,10 +137,10 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return false, 0, err
 }
 
-func GetInfo(id uint64) (User, error) {
+func GetInfo(id uint64) (UserInfo, error) {
 	var (
 		err  error
-		s    User
+		s    UserInfo
 	)
 
 	db := orm.Conn
