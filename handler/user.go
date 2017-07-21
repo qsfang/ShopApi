@@ -47,6 +47,11 @@ type Register struct {
 	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
 
+type GetPassword struct{
+	Pass *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
+	NewPass *string `json:"new_pass" validate:"required,alphanum,min=6,max=30"`
+}
+
 func Create(c echo.Context) error {
 	var (
 		err error
@@ -153,6 +158,45 @@ func GetInfo(c echo.Context)  error {
 
 	return c.JSON(errcode.ErrSucceed, Output)
 }
+
+func ChangeMobilePassword (c echo.Context) error {
+	var(
+		password GetPassword
+		userid uint64
+		err  error
+	)
+
+	if err = c.Bind(&password); err != nil {
+		log.Logger.Error("analysis creash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	s := sess.Get(general.SessionUserID)
+	userid = s.(uint64)
+	flag,err := models.UserService.ChangeMobilePassword(password.Pass,password.NewPass,userid)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("User not found:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
+		} else {
+			log.Logger.Error("Mysql error:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		}
+	} else {
+		if flag == false {
+			log.Logger.Error("oldpass pass don't match:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrLoginRequired, err.Error())
+		}
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+
 
 
 
