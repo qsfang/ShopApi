@@ -107,9 +107,9 @@ func LoginwithMobile(c echo.Context) error {
 		}
 	} else {
 		if flag == false {
-			log.Logger.Error("Name and pass don't match:", err)
+			log.Logger.Debug("Name and pass don't match:")
 
-			return general.NewErrorWithMessage(errcode.ErrLoginRequired, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrLoginRequired, errors.New("Name and pass don't match:").Error())
 		}
 	}
 
