@@ -33,10 +33,12 @@ package models
 import (
 	"time"
 
-	"ShopApi/orm"
 	"ShopApi/general"
+	"ShopApi/log"
+	"ShopApi/orm"
 )
 
+// todo: 字段名字和代码规范
 type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
@@ -44,12 +46,50 @@ type Orders struct {
 	Payment    float64   `json:"payment"`
 	Freight    float64   `json:"freight"`
 	Remark     string    `json:"remark"`
-	Discount   uint8    `json:"discount"`
+	Discount   uint8     `json:"discount"`
 	Size       string    `json:"size"`
 	Color      string    `json:"color"`
 	Status     uint8     `json:"status"`
 	Created    time.Time `json:"created"`
 	Payway     uint8     `json:"payway"`
+}
+
+type GetOrders struct {
+	TotalPrice float64   `json:"totalprice"`
+	Payment    float64   `json:"payment"`
+	Freight    float64   `json:"freight"`
+	Discount   uint8     `json:"discount"`
+	Size       string    `json:"size"`
+	Color      string    `json:"color"`
+	Status     uint8     `json:"status"`
+	Created    time.Time `json:"created"`
+	Payway     uint8     `json:"payway"`
+}
+type Registerorder struct {
+	Name       string  `json:"productname"`
+	TotalPrice float64 `json:"totalprice"`
+	Payment    float64 `json:"payment"`
+	Freight    float64 `json:"freight"`
+	Remark     string  `json:"remark"`
+	Discount   uint8   `json:"discount"`
+	Size       string  `json:"size"`
+	Color      string  `json:"color"`
+	Payway     uint8   `json:"payway"`
+}
+
+type Order struct {
+	Name       string
+	UserID     uint64
+	TotalPrice float64
+	Payment    float64
+	Freight    float64
+	Remark     string
+	Discount   uint8
+	Size       string
+	Color      string
+	Status     uint8
+	Created    time.Time
+	Payway     uint8
 }
 
 type OrderServiceProvider struct {
@@ -59,6 +99,41 @@ var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 
 func (Orders) TableName() string {
 	return "orders"
+}
+
+func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
+	var (
+		pro Product
+		err error
+	)
+
+	db := orm.Conn
+
+	err = db.Model(&pro).Where("name = ? AND size = ? AND color = ?", o.Name, o.Size, o.Color).Find(&pro).Error
+	if err != nil {
+		return err
+	}
+
+	order := Orders{
+		UserID:     n,
+		TotalPrice: o.TotalPrice,
+		Payment:    o.Payment,
+		Freight:    o.Freight,
+		Remark:     o.Remark,
+		Discount:   o.Discount,
+		Size:       o.Size,
+		Color:      o.Color,
+		Status:     general.OrderFinished,
+		Created:    time.Now(),
+		Payway:     o.Payway,
+	}
+
+	err =db.Create(&order).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Orders, error) {
@@ -86,6 +161,30 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
+// todo: 代码风格
+
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
+	var(
+		err 	error
+		order   GetOrders
+	)
+
+	db := orm.Conn
+	err = db.Where("id = ?", ID).First(&order).Error
+	if err != nil {
+		return order, err, false
+	}
+
+	err = db.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
+	if err != nil {
+		log.Logger.Error("Access with error :", err)
+
+		return order, err, true
+	}
+	return order, nil, false
+
+}
+
 func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha :=Orders{
 		Status:   	status,
@@ -101,3 +200,4 @@ func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 
 	return nil
 }
+

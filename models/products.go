@@ -31,11 +31,11 @@
 
 package models
 
+// todo: 导入包的顺序和风格
 import (
 	"ShopApi/general"
 	"ShopApi/orm"
 	"time"
-
 )
 
 type ProductServiceProvider struct {
@@ -46,23 +46,23 @@ var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 type ProductID struct{
 	ID				uint64 `json:"id"`
 }
-
+// todo:sql
 type Product struct {
-	ID				uint64 		`json:"id"`
-	Name			string		`json:"name"`
-	Totalsale   	uint64		`json:"totalsale"`
-	Categories		uint64 		`json:"categories"`
-	Price			float64 	`json:"price"`
-	Originalprice	float64 	`json:"originalprice"`
-	Status          uint64 		`json:"status"`
-	Size            string 		`json:"size"`
-	Color           string 		`json:"color"`
-	Imageid			uint64 		`json:"imageid"`
-	Imageids		string 		`json:"imageids"`
-	Remark			string 		`json:"remark"`
-	Detail			string 		`json:"detail"`
-	Created			time.Time 	`json:"created"`
-	Inventory		uint64 		`json:"inventory"`
+	ID            uint64        `json:"id"`
+	Name          string        `json:"name"`
+	Totalsale     uint64        `json:"totalsale"`
+	Categories    uint64        `json:"categories"`
+	Price         float64    `json:"price"`
+	Originalprice float64    `json:"originalprice"`
+	Status        uint64        `json:"status"`
+	Size          string        `json:"size"`
+	Color         string        `json:"color"`
+	Imageid       uint64        `json:"imageid"`
+	Imageids      string        `json:"imageids"`
+	Remark        string        `json:"remark"`
+	Detail        string        `json:"detail"`
+	Created       time.Time    `json:"created"`
+	Inventory     uint64        `json:"inventory"`
 }
 
 type GetCategories struct {
@@ -132,7 +132,7 @@ func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 
 	return nil
 }
-
+// todo: 代码规范
 func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, error) {
 	var (
 		ware  Product
@@ -166,6 +166,7 @@ func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, err
 	return s, nil
 }
 
+// todo: 命名代码规范
 func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	var (
 		pro Product
@@ -190,8 +191,8 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
-func (ps *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
 
+func (ps *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
 	var (
 		err error
 		proinfo   Product
@@ -207,7 +208,8 @@ func (ps *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
 	return proinfo, nil
 }
 
-func (ps *CategoriesServiceProvider) ChangeCategories(m ChangeCate) error {
+// todo: 代码规范 updates
+func (ps *ProductServiceProvider) ChangeCategories(m ChangeCate) error {
 	var (
 		cate Product
 	)

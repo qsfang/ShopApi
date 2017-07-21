@@ -25,28 +25,67 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Li Zebang
- *	   Modify: 2017/07/21		 Ai Hao  订单状态更改
+ *     Modify: 2017/07/21        Zhang Zizhao 添加创建订单
+ *	   Modify: 2017/07/21		 Ai Hao       订单状态更改
  */
 
 package handler
 
 import (
 	"github.com/labstack/echo"
+	"github.com/jinzhu/gorm"
 
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
+
+
 )
 
 type Status struct {
 	Status uint8 `json:"status"`
 }
+type ID struct {
+	ID uint64 `sql:"auto_increment;primary_key;" json:"id"`
+}
 
 type ChangStatus struct {
 	ID 		uint64	`json:"id"`
 	Status  uint8	`json:"status"`
+}
+
+//todo: 错误判断
+func CreateOrder(c echo.Context) error {
+	var (
+		order models.Registerorder
+		err   error
+	)
+
+	if err = c.Bind(&order); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	numberID := sess.Get(general.SessionUserID).(uint64)
+
+	err = models.OrderService.Createorder(numberID, order)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("Product not found:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
+		} else {
+			log.Logger.Error("Mysql error:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		}
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
 }
 
 func GetOrders(c echo.Context) error {
@@ -78,6 +117,45 @@ func GetOrders(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, orders)
 }
 
+
+func GetOneOrder(c echo.Context) error {
+	var (
+		err    error
+		order  ID
+		judge  bool
+		OutPut models.GetOrders
+	)
+	if err = c.Bind(&order); err != nil {
+		log.Logger.Error("Bind with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	UserID := sess.Get(general.SessionUserID).(uint64)
+
+	OutPut, err, judge = models.OrderService.GetOneOrder(order.ID, UserID)
+	if judge == true {
+		log.Logger.Error("Access with error :", err)
+
+		return general.NewErrorWithMessage(errcode.ErrAccess, err.Error())
+	}
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("Find order with error:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
+		}
+
+			log.Logger.Error("Get Order with error:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrGetOrders, err.Error())
+		}
+
+	return c.JSON(errcode.ErrSucceed, OutPut)
+}
+
 func ChangeStatus(c echo.Context) error {
 	var (
 		err		error
@@ -99,3 +177,4 @@ func ChangeStatus(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+

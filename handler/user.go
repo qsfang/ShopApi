@@ -34,15 +34,16 @@
 package handler
 
 import (
+	"errors"
+
+	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
+
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-
-	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo"
-	"errors"
 )
 
 type Register struct {
@@ -148,7 +149,7 @@ func GetInfo(c echo.Context) error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User information doesn't exist !", err)
 
-			return general.NewErrorWithMessage(errcode.NoInformation, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
 		}
 
 		log.Logger.Error("Getting information exists errors", err)
@@ -163,6 +164,7 @@ func GetInfo(c echo.Context) error {
 
 func ChangeMobilePassword(c echo.Context) error {
 	var (
+
 		password GetPassword
 		userid uint64
 		err error
@@ -232,10 +234,10 @@ func ChangeUserinfo(c echo.Context) error {
 func Changephone(c echo.Context) error {
 	var (
 		err error
-		m models.Phone
+		m   models.Phone
 	)
 	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("ChangePhone crash with error:", err)
+		log.Logger.Error("Bind crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
