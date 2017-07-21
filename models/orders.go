@@ -36,9 +36,13 @@ import (
 	"ShopApi/general"
 	"ShopApi/log"
 	"ShopApi/orm"
+<<<<<<< HEAD
 
+=======
+>>>>>>> ab0afe7f26d1fd90e6585f8de10e9296b9729615
 )
 
+// todo: 字段名字和代码规范
 type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
@@ -64,7 +68,11 @@ type GetOrders struct {
 	Status     uint8     `json:"status"`
 	Created    time.Time `json:"created"`
 	Payway     uint8     `json:"payway"`
+<<<<<<< HEAD
 
+=======
+}
+>>>>>>> ab0afe7f26d1fd90e6585f8de10e9296b9729615
 type Registerorder struct {
 	Name       string  `json:"productname"`
 	TotalPrice float64 `json:"totalprice"`
@@ -90,7 +98,10 @@ type Order struct {
 	Status     uint8
 	Created    time.Time
 	Payway     uint8
+<<<<<<< HEAD
 
+=======
+>>>>>>> ab0afe7f26d1fd90e6585f8de10e9296b9729615
 }
 
 type OrderServiceProvider struct {
@@ -162,6 +173,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
+// todo: 代码风格
 
 func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
 	var(

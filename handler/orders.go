@@ -56,6 +56,7 @@ type ChangStatus struct {
 	Status  uint8	`json:"status"`
 }
 
+//todo: 错误判断
 func CreateOrder(c echo.Context) error {
 	var (
 		order models.Registerorder
