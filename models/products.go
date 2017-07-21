@@ -24,13 +24,9 @@
 
 /*
  * Revision History:
-<<<<<<< HEAD
- *		Initial: 2017/07/21			Ai Hao
- *		Modify: 2017/07/21			Zhu Yaqiang
-=======
  *     Initial: 2017/07/21        Ai Hao
+ *	   Modify: 2017/07/21		  Zhu Yaqiang
  *     Modify: 2017/07/21         Yu Yi
->>>>>>> 7a2dbef65b4bdcdef5eaab60548b91f3cc430d34
  */
 
 package models
