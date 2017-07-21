@@ -34,11 +34,9 @@ import (
 	"time"
 
 	"ShopApi/general"
-<<<<<<< HEAD
 	"ShopApi/log"
-=======
 	"ShopApi/orm"
->>>>>>> 9f211a37d0cff792f2407a88630153d71f2c7172
+
 )
 
 type Orders struct {
@@ -56,7 +54,6 @@ type Orders struct {
 	Payway     uint8     `json:"payway"`
 }
 
-<<<<<<< HEAD
 type GetOrders struct {
 	TotalPrice float64   `json:"totalprice"`
 	Payment    float64   `json:"payment"`
@@ -67,7 +64,7 @@ type GetOrders struct {
 	Status     uint8     `json:"status"`
 	Created    time.Time `json:"created"`
 	Payway     uint8     `json:"payway"`
-=======
+
 type Registerorder struct {
 	Name       string  `json:"productname"`
 	TotalPrice float64 `json:"totalprice"`
@@ -93,7 +90,7 @@ type Order struct {
 	Status     uint8
 	Created    time.Time
 	Payway     uint8
->>>>>>> 9f211a37d0cff792f2407a88630153d71f2c7172
+
 }
 
 type OrderServiceProvider struct {
@@ -104,7 +101,7 @@ var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 func (Orders) TableName() string {
 	return "orders"
 }
-
+/*
 func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
 	var (
 		pro Product
@@ -139,7 +136,7 @@ func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
 
 	return nil
 }
-
+*/
 func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Orders, error) {
 	var (
 		order  Orders
