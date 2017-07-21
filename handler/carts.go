@@ -2,11 +2,12 @@ package handler
 
 import (
 	"github.com/labstack/echo"
+	"github.com/jinzhu/gorm"
+
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
-	"github.com/jinzhu/gorm"
 )
 
 func Cartsdel(c echo.Context) error {
@@ -25,7 +26,7 @@ func Cartsdel(c echo.Context) error {
 	if err == gorm.ErrRecordNotFound {
 		log.Logger.Error("The product doesn't exist !", err)
 
-		return general.NewErrorWithMessage(errcode.NoInformation, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
 	err = models.CartsService.CartsDelete(cartid.ID)

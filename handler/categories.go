@@ -31,12 +31,13 @@
 package handler
 
 import (
+	"github.com/labstack/echo"
+	"github.com/jinzhu/gorm"
+
 	"ShopApi/log"
 	"ShopApi/models"
-	"github.com/labstack/echo"
 	"ShopApi/general"
 	"ShopApi/general/errcode"
-	"github.com/jinzhu/gorm"
 )
 
 type Pid struct {
