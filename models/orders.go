@@ -34,15 +34,10 @@ import (
 	"time"
 
 	"ShopApi/general"
-	"ShopApi/log"
+	//"ShopApi/log"
 	"ShopApi/orm"
-<<<<<<< HEAD
-
-=======
->>>>>>> ab0afe7f26d1fd90e6585f8de10e9296b9729615
 )
 
-// todo: 字段名字和代码规范
 type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
@@ -68,11 +63,8 @@ type GetOrders struct {
 	Status     uint8     `json:"status"`
 	Created    time.Time `json:"created"`
 	Payway     uint8     `json:"payway"`
-<<<<<<< HEAD
-
-=======
 }
->>>>>>> ab0afe7f26d1fd90e6585f8de10e9296b9729615
+
 type Registerorder struct {
 	Name       string  `json:"productname"`
 	TotalPrice float64 `json:"totalprice"`
@@ -98,10 +90,6 @@ type Order struct {
 	Status     uint8
 	Created    time.Time
 	Payway     uint8
-<<<<<<< HEAD
-
-=======
->>>>>>> ab0afe7f26d1fd90e6585f8de10e9296b9729615
 }
 
 type OrderServiceProvider struct {
@@ -112,6 +100,7 @@ var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 func (Orders) TableName() string {
 	return "orders"
 }
+
 /*
 func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
 	var (
@@ -173,33 +162,44 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
-// todo: 代码风格
-
-func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
-	var(
-		err 	error
-		order   GetOrders
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) ([]GetOrders, error, bool) {
+	var (
+		err      error
+		order    Orders
+		getOrder []GetOrders
 	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", ID).First(&order).Error
+	err = db.Where("id = ?", ID).Find(&order).Error
 	if err != nil {
-		return order, err, false
+		return getOrder, err, false
 	}
+
+	add := GetOrders{
+		TotalPrice:		order.TotalPrice,
+		Payment:		order.Payment,
+		Freight:		order.Freight,
+		Discount:   	order.Discount,
+		Size:			order.Size,
+		Color:			order.Color,
+		Status:     	order.Status,
+		Created:    	order.Created,
+		Payway:			order.Payway,
+	}
+	getOrder = append(getOrder, add)
 
 	err = db.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
 	if err != nil {
-		log.Logger.Error("Access with error :", err)
 
-		return order, err, true
+		return getOrder, err, true
 	}
-	return order, nil, false
+	return getOrder, nil, false
 
 }
 
 func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
-	cha :=Orders{
-		Status:   	status,
+	cha := Orders{
+		Status: status,
 	}
 
 	updater := map[string]interface{}{"status": status}
@@ -212,4 +212,3 @@ func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 
 	return nil
 }
-
