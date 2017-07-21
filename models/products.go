@@ -77,6 +77,11 @@ type CreatePro struct {
 	Inventory     uint64  `json:"inventory"`
 }
 
+type ChangePro struct {
+	ID     uint64 `json:"id" validate:"numeric"`
+	Status uint64 `json:"status" validate:"numeric"`
+}
+
 func (Product) TableName() string {
 	return "products"
 }
@@ -107,13 +112,7 @@ func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 	return nil
 }
 
-type ChangePro struct {
-	ID     uint64 `json:"id" validate:"numeric"`
-	Status uint64 `json:"status" validate:"numeric"`
-}
-
-
-func (prod *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
+func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	var (
 		pro Product
 		err error
