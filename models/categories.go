@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Yang Zhengtian
+ *     Modify: 2017/07/21         Li Zebang
  */
 
 package models
@@ -59,7 +60,7 @@ func (Categories) TableName() string {
 	return "categories"
 }
 
-func (ps *CategoriesServiceProvider) Create(ca CreateCat) error {
+func (cps *CategoriesServiceProvider) Create(ca CreateCat) error {
 	cate := Categories{
 		Name:                ca.Name,
 		Pid:                 ca.Pid,
@@ -76,4 +77,20 @@ func (ps *CategoriesServiceProvider) Create(ca CreateCat) error {
 	}
 
 	return nil
+}
+
+func (csp *CategoriesServiceProvider) GetCategories(pid uint64) ([]Categories, error) {
+	var (
+		category  Categories
+		categories []Categories
+	)
+
+	db := orm.Conn
+
+	err := db.Model(&category).Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).Find(&categories).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return categories, nil
 }
