@@ -24,32 +24,42 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/21        Ai Hao
  */
 
-package router
+package handler
 
 import (
+	"ShopApi/log"
+	"ShopApi/models"
 	"github.com/labstack/echo"
-
-	"ShopApi/handler"
+	"ShopApi/general"
+	"ShopApi/general/errcode"
 )
 
-func InitRouter(server *echo.Echo) {
-	if server == nil {
-		panic("[InitRouter], server couldn't be nil")
+//名称name，totalsale  ，类型categories，价格price，原价originalprice，
+// 状态status，尺码siez，颜色color,封面图片imageid，图片集imageids，评论remark,
+//详细信息 detail ，创建日期 created，存货量inventory
+
+func CreateP(c echo.Context) error {
+	var (
+		err 	error
+		p		models.CreatePro
+	)
+
+	if err = c.Bind(&p); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
-	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/user/login", handler.LoginwithMobile)
-	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
-	server.GET("/api/v1/user/logout", handler.Logout)
-	server.GET("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
-	server.POST("/api/v1/contact/addaddress", handler.AddAddress, handler.MustLogin)
-	//server.GET("/api/vl/contact/alter",handler.Alter)
-	server.POST("/api/v1/contact/change",handler.ChangeAddress)
-	server.POST("/api/v1/user/changemobilepass",handler.ChangeMobilePassword)
-	server.POST("/api/v1/user/changeinfo", handler.ChangeUserinfo)
-	server.POST("/api/v1/user/changepass",handler.ChangeMobilePassword,handler.MustLogin)
-	//server.GET("/api/vl/user/changephone",handler.Changephone)
-	server.POST("/api/v1/products/create",handler.CreateP)//创建商品
+
+	err = models.ProductService.CreateP(p)
+	if err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
 }
+

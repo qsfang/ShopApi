@@ -42,12 +42,12 @@ import (
 )
 
 type Add struct {
-	Name      *string `json:"name" validate:"required, alphanum, min=6, max=100"`
-	Phone     *string `json:"phone" validate:"required, alphanum, min=6, max=20"`
-	Province  *string `json:"province" validate:"required, alphanum, min=6, max=100"`
-	City      *string `json:"city" validate:"required, alphanum, min=6, max=100"`
-	Street    *string `json:"street" validate:"required, alphanum, min=6, max=100"`
-	Address   *string `json:"address" validate:"required, alphanum, min=6, max=200"`
+	Name      *string `json:"name" validate:"required,alphanum,min=6,max=100"`
+	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=20"`
+	Province  *string `json:"province" validate:"required,alphanum,min=6,max=100"`
+	City      *string `json:"city" validate:"required,alphanum,min=6,max=100"`
+	Street    *string `json:"street" validate:"required,alphanum,min=6,max=100"`
+	Address   *string `json:"address" validate:"required,alphanum,min=6,max=200"`
 	IsDefault uint8   `json:"isdefault"`
 }
 
@@ -128,7 +128,7 @@ func GetAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, list)
 }
 
-func Alter(c echo.Context) error {
+/*func Alter(c echo.Context) error {
 	var (
 		err error
 	)
@@ -142,4 +142,4 @@ func Alter(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 	return c.JSON(errcode.ErrSucceed, nil)
-}
+}*/
