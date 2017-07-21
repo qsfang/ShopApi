@@ -40,8 +40,12 @@ const (
 	ErrGetsess             = 0x6
 	ErrInvalidOrdersStatus = 0x7
 	ErrGetOrders           = 0x8
+<<<<<<< HEAD
 	NoOrder                = 0x9
 	ErrAccess              = 0x10
+=======
+	ErrGetCategories       = 0x9
+>>>>>>> 3d274202456f9bbfe11def0d2b2dca7d40f43e8d
 
 	// 需要登录
 	ErrLoginRequired    = 0x800

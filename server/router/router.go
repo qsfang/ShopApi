@@ -43,20 +43,32 @@ func InitRouter(server *echo.Echo) {
 	}
 	server.POST("/api/v1/user/create", handler.Create)
 	server.POST("/api/v1/user/login", handler.LoginwithMobile)
-	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
-	server.GET("/api/v1/user/logout", handler.Logout)
-	server.GET("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
-	server.POST("/api/v1/contact/add", handler.AddAddress, handler.MustLogin)
-	server.POST("/api/vl/contact/alter",handler.Alter)
-	server.POST("/api/v1/contact/change",handler.ChangeAddress)
 	server.POST("/api/v1/user/changemobilepass",handler.ChangeMobilePassword)
 	server.POST("/api/v1/user/changeinfo", handler.ChangeUserinfo)
 	server.POST("/api/v1/user/changepass",handler.ChangeMobilePassword,handler.MustLogin)
 	server.POST("/api/vl/user/changephone",handler.Changephone)
+	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
+	server.GET("/api/v1/user/logout", handler.Logout)
+
+	server.POST("/api/v1/contact/add", handler.AddAddress, handler.MustLogin)
+	server.POST("/api/vl/contact/alter",handler.Alter)
+	server.POST("/api/v1/contact/change",handler.ChangeAddress)
+	server.GET("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
+
 	server.POST("/api/v1/products/create",handler.CreateP)//创建商品
+	server.POST("/api/v1/product/getinfo",handler.GetProInfo,handler.MustLogin)
 	server.POST("/api/v1/products/changestatus", handler.ChangeProStatus)
-	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
-	server.POST("api/v1/products/getlist", handler.GetProductList)
+	server.POST("/api/v1/products/getlist", handler.GetProductList)
+	server.POST("/api/v1/products/changecate",handler.ChangeCategories)
+
+	server.POST("/api/vl/categories/get", handler.GetCategories)
 	server.POST("/api/v1/categoties/create",handler.Create)
+<<<<<<< HEAD
 	server.POST("/api/v1/orders/getone", handler.GetOneOrder)
+=======
+
+	server.POST("/api/v1/orders/changestatus",handler.ChangeStatus)
+	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
+
+>>>>>>> 3d274202456f9bbfe11def0d2b2dca7d40f43e8d
 }

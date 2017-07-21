@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21        Ai Hao
+ *	   Modify: 2017/07/21		  Zhu Yaqiang
  *     Modify: 2017/07/21         Yu Yi
  */
 
@@ -41,6 +42,10 @@ type ProductServiceProvider struct {
 }
 
 var ProductService *ProductServiceProvider = &ProductServiceProvider{}
+
+type ProductID struct{
+	ID				uint64 `json:"id"`
+}
 
 type Product struct {
 	ID				uint64 		`json:"id"`
@@ -91,6 +96,11 @@ type CreatePro struct {
 type ChangePro struct {
 	ID     uint64 `json:"id" validate:"numeric"`
 	Status uint64 `json:"status" validate:"numeric"`
+}
+
+type ChangeCate struct {
+	ID             uint64     `json:"id"`
+	Categories     uint64     `json:"categories"`
 }
 
 func (Product) TableName() string {
@@ -177,5 +187,39 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
+
+	var (
+		err error
+		proinfo   Product
+	)
+
+	db := orm.Conn
+	err = db.Where("id = ?", ProID.ID).First(&proinfo).Error
+
+	if err != nil {
+		return proinfo, err
+	}
+
+	return proinfo, nil
+}
+
+func (ps *ProductServiceProvider) ChangeCategories(m ChangeCate) error {
+	var (
+		cate Product
+	)
+
+	change := map[string]uint64{"categories": m.Categories}
+
+	db := orm.Conn
+	err := db.Model(&cate).Where("ID = ?", m.ID).Updates(change).Limit(1).Error
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

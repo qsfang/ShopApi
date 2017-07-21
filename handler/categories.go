@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21        Yang Zhengtian
+ *     Modify: 2017/07/21         Li Zebang
  */
 
 package handler
@@ -36,6 +37,10 @@ import (
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 )
+
+type Pid struct {
+	Pid uint64 `json:"pid"`
+}
 
 func CreateC(c echo.Context) error {
 	var (
@@ -58,4 +63,24 @@ func CreateC(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+func GetCategories(c echo.Context) error {
+	var (
+		err        error
+		pid        Pid
+		categories []models.Categories
+	)
 
+	if err = c.Bind(&pid); err != nil {
+		log.Logger.Error("Bind with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	categories, err = models.CategoriesService.GetCategories(pid.Pid)
+	if err != nil {
+		log.Logger.Error("error:", err)
+		return general.NewErrorWithMessage(errcode.ErrGetCategories, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, categories)
+}

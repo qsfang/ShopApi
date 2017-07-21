@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Li Zebang
+ *	   Modify: 2017/07/21		 Ai Hao 订单状态更改
  */
 
 package models
@@ -98,6 +99,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
+<<<<<<< HEAD
 func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
 	var(
 		err 	error
@@ -119,3 +121,20 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrder
 	return order, nil, false
 
 }
+=======
+func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
+	cha :=Orders{
+		Status:   	status,
+	}
+
+	updater := map[string]interface{}{"status": status}
+	db := orm.Conn
+
+	err := db.Model(&cha).Where("id=?", id).Update(updater).Limit(1).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+>>>>>>> 3d274202456f9bbfe11def0d2b2dca7d40f43e8d
