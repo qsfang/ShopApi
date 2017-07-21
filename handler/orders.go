@@ -33,17 +33,15 @@ package handler
 
 import (
 	"github.com/labstack/echo"
+	"github.com/jinzhu/gorm"
 
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-<<<<<<< HEAD
-	"github.com/gorm"
-=======
-	"github.com/jinzhu/gorm"
->>>>>>> 9f211a37d0cff792f2407a88630153d71f2c7172
+
+
 )
 
 type Status struct {

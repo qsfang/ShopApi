@@ -34,15 +34,16 @@
 package handler
 
 import (
+	"errors"
+
+	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
+
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-
-	"errors"
-	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo"
 )
 
 type Register struct {
