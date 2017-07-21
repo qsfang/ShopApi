@@ -38,7 +38,6 @@ import (
 )
 
 type Contact struct {
-	// todo: uint8
 	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Name      string    `json:"name"`
@@ -96,12 +95,12 @@ func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
 	)
 
 	changemap := map[string]interface{}{
-		"name":     m.Name,
-		"phone":    m.Phone,
-		"province": m.Province,
-		"city":     m.City,
-		"street":   m.Street,
-		"address":  m.Address,
+		"name":     *m.Name,
+		"phone":    *m.Phone,
+		"province": *m.Province,
+		"city":     *m.City,
+		"street":   *m.Street,
+		"address":  *m.Address,
 	}
 
 	db := orm.Conn
@@ -127,11 +126,14 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 		return s, err
 	}
 
-	for i, c := range list {
-		s[i].Province = c.Province
-		s[i].City = c.City
-		s[i].Street = c.Street
-		s[i].Address = c.Address
+	for _, c := range list {
+		add := Addressget{
+			Province: c.Province,
+			City:c.City,
+			Street:c.Street,
+			Address:c.Address,
+		}
+		s = append(s, add)
 	}
 
 	return s, nil

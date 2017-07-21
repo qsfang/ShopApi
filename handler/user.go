@@ -111,6 +111,7 @@ func LoginwithMobile(c echo.Context) error {
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	sess.Set(general.SessionUserID, userID)
 
+
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
@@ -132,19 +133,12 @@ func GetInfo(c echo.Context) error {
 	var (
 		err    error
 		Output models.UserInfo
+		number string
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-
-	err = sess.Delete(general.SessionUserID)
-	if err != nil {
-		log.Logger.Error("Logout with error", err)
-
-		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
-	}
-
-	number := sess.SessionID()
-	ID, _ := strconv.Atoi(number)
+	sess.Get(general.SessionUserID)
+	ID, _ := strconv.Atoi(sess.SessionID())
 	Output, err = models.UserService.GetInfo(ID)
 
 	if err != nil {
@@ -164,3 +158,5 @@ func GetInfo(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, Output)
 }
+
+
