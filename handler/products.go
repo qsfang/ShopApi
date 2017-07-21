@@ -133,4 +133,3 @@ func GetProInfo(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, proinfo)
 }
-
