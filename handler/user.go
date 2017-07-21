@@ -237,7 +237,7 @@ func Changephone(c echo.Context) error {
 		m   models.Phone
 	)
 	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("ChangePhone crash with error:", err)
+		log.Logger.Error("Bind crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
