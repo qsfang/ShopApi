@@ -62,6 +62,7 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
+
 func (User) TableName() string {
 	return "users"
 }
@@ -108,7 +109,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	err = tx.Create(&info).Error
 	if err != nil {
-		return nil
+		return err
 	}
 
 	err = tx.Commit().Error
@@ -137,7 +138,7 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 		return false, 0, nil
 	}
 
-	return true, u.UserID, err
+	return true, u.UserID, nil
 }
 
 func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
@@ -171,3 +172,25 @@ func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone *string) error{
 	return  nil
 }
 
+func (us *UserServiceProvider) ChangeMobilePassword(oldpass *string ,newpass *string , id uint64) (bool,error) {
+	var(
+		user   User
+		err error
+	)
+	db := orm.Conn
+	err = db.Where("id = ?", id).First(&user).Error
+	if err!=nil {
+		return false,err
+	}
+
+	if !utility.CompareHash([]byte(user.Password), *oldpass)  {
+
+		return false, nil
+	}
+	err = db.Model(&user).Where("id = ?", id).Update(user.Password,*newpass).Limit(1).Error
+	if err!=nil{
+		return false,err
+	}
+
+	return true, nil
+}

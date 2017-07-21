@@ -46,10 +46,12 @@ type Register struct {
 	Mobile *string `json:"mobile" validate:"required,alphanum,min=6,max=30"`
 	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
+
 type GetPassword struct{
 	Pass *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-	NewPass *string `json:"new_pass" validate:"required,alphanum,min=6,max=30""`
+	NewPass *string `json:"new_pass" validate:"required,alphanum,min=6,max=30"`
 }
+
 func Create(c echo.Context) error {
 	var (
 		err error
@@ -159,20 +161,20 @@ func GetInfo(c echo.Context)  error {
 
 func ChangeMobilePassword (c echo.Context) error {
 	var(
-		oldpassword GetPassword
-		userid string
+		password GetPassword
+		userid uint64
 		err  error
 	)
 
-	if err = c.Bind(&oldpassword); err != nil {
+	if err = c.Bind(&password); err != nil {
 		log.Logger.Error("analysis creash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	s := sess.Get(general.SessionUserID)
-	userid = s.(string)
-	flag,err := models.UserService.ChangeMobilePass(oldpassword.Pass,userid)
+	userid = s.(uint64)
+	flag,err := models.UserService.ChangeMobilePassword(password.Pass,password.NewPass,userid)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User not found:", err)
@@ -185,15 +187,11 @@ func ChangeMobilePassword (c echo.Context) error {
 		}
 	} else {
 		if flag == false {
-			log.Logger.Error("Name and pass don't match:", err)
+			log.Logger.Error("oldpass pass don't match:", err)
 
 			return general.NewErrorWithMessage(errcode.ErrLoginRequired, err.Error())
 		}
 	}
-
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	sess.Set(general.SessionUserID, userID)
-
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
