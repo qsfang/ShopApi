@@ -52,4 +52,9 @@ const (
 	//Products Status
 	ProductOnsale = 0xe0
 	ProductUnsale = 0xe1
+
+	// Order Status
+	OrderUnfinished = 0xef
+	OrderFinished   = 0xee
+	OrderGetAll		= 0xed // Not order status
 )

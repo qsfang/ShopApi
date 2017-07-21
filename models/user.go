@@ -25,7 +25,9 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *	   Modify: 2017/07/20		  Zhang Zizhao  登录检查
+ *    Modify: 2017/07/21      Xu Haosheng   更改用户信息
+ *     Modify: 2017/07/20	  Zhang Zizhao  登录检查
+ *     Modify: 2017/07/21         Yang Zhengtian  添加判断用户是否存在和修改密码
  */
 
 package models
@@ -62,6 +64,13 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
+type CUseInfo struct {
+	Avatar   string `json:"avatar"`
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Sex      uint8  `json:"sex"`
+}
 type Phone struct {
 	Phone    string `json:"phone"`
 }
@@ -160,7 +169,7 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 	return UI, nil
 }
 
-/*func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone string) error{
+func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone string) error{
 	var (
 		err	error
 		con	Contact
@@ -173,7 +182,7 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 		return err
 	}
 	return  nil
-}*/
+}
 
 func (us *UserServiceProvider) IsUserExist(id uint64) (string,error) {
 	var (
@@ -205,6 +214,21 @@ func (us *UserServiceProvider) ChangeMobilePassword(newpass *string,id uint64) e
 	updater := map[string]interface{}{"password": hashpass}
 	err = db.Model(&user).Where("id =? ",id).Update(updater).Limit(1).Error
 	if err != nil{
+		return err
+	}
+
+	return nil
+}
+
+func (us *UserServiceProvider) ChangeUserInfo(info CUseInfo, CuserID uint64) error {
+	var con Contact
+
+	changMap := map[string]interface{} {"avatar": info.Avatar, "nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
+
+	db := orm.Conn
+	err := db.Model(&con).Where("userid = ?", CuserID ).Updates(changMap).Limit(1).Error
+
+	if err != nil {
 		return err
 	}
 

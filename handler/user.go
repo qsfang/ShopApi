@@ -27,6 +27,8 @@
  *     Initial: 2017/07/18        Yusan Kurban
  *	   Modify: 2017/07/19		  Ai Hao         添加用户登出
  *	   Modify: 2017/07/20         Zhang Zizhao   添加用户登录
+ *    Modify: 2017/07/21          Xu Haosheng  更改用户信息
+ *	   Modify: 2017/07/21         Yang Zhengtian  添加修改密码
  */
 
 package handler
@@ -107,9 +109,9 @@ func LoginwithMobile(c echo.Context) error {
 		}
 	} else {
 		if flag == false {
-			log.Logger.Error("Name and pass don't match:", err)
+			log.Logger.Debug("Name and pass don't match:")
 
-			return general.NewErrorWithMessage(errcode.ErrLoginRequired, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrLoginRequired, errors.New("Name and pass don't match:").Error())
 		}
 	}
 
@@ -201,10 +203,37 @@ func ChangeMobilePassword (c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-/*func Changephone(c echo.Context) error {
+func ChangeUserinfo(c echo.Context) error {
 	var (
-		err 	error
-		m	models.Phone
+		err  error
+		info models.CUseInfo
+	)
+
+	if err = c.Bind(&info); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	cuserID := session.Get(general.SessionUserID)
+	id := cuserID.(uint64)
+	log.Logger.Debug("id %d", id)
+
+	err = models.UserService.ChangeUserInfo(info, id)
+	if err != nil {
+		log.Logger.Error("create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+func Changephone(c echo.Context) error {
+	var (
+		err error
+		m models.Phone
 	)
 	if err = c.Bind(&m); err != nil {
 		log.Logger.Error("ChangePhone crash with error:", err)
@@ -214,7 +243,7 @@ func ChangeMobilePassword (c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	user := session.Get(general.SessionUserID).(uint64)
 
-	err = models.UserService.ChangePhone(user,m.Phone)
+	err = models.UserService.ChangePhone(user, m.Phone)
 	if err != nil {
 		log.Logger.Error("changephone crash with error:", err)
 
@@ -222,4 +251,4 @@ func ChangeMobilePassword (c echo.Context) error {
 	}
 
 	return c.JSON(errcode.ErrSucceed, nil)
-}*/
+}

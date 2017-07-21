@@ -25,6 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
+ *     Modify: 2017/07/19         Yang Zhengtian   添加返回收获地址
+ *     Modify: 2017/07/20         Yang Zhengtain    添加修改密码
  */
 
 package router
@@ -44,11 +46,17 @@ func InitRouter(server *echo.Echo) {
 	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
 	server.GET("/api/v1/user/logout", handler.Logout)
 	server.GET("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
-	server.POST("/api/v1/contact/addaddress", handler.AddAddress, handler.MustLogin)
-	//server.GET("/api/vl/contact/alter",handler.Alter)
+	server.POST("/api/v1/contact/add", handler.AddAddress, handler.MustLogin)
+	server.GET("/api/vl/contact/alter",handler.Alter)
 	server.POST("/api/v1/contact/change",handler.ChangeAddress)
+	server.POST("/api/v1/user/changemobilepass",handler.ChangeMobilePassword)
+	server.POST("/api/v1/user/changeinfo", handler.ChangeUserinfo)
 	server.POST("/api/v1/user/changepass",handler.ChangeMobilePassword,handler.MustLogin)
-	//server.GET("/api/vl/user/changephone",handler.Changephone)
+	server.GET("/api/vl/user/changephone",handler.Changephone)
 	server.POST("/api/v1/products/create",handler.CreateP)//创建商品
+<<<<<<< HEAD
 	server.POST("/api/v1/products/changestatus", handler.ChangeProStatus)
+=======
+	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
+>>>>>>> 6b43321364958696961ca6e953c3c6cd1d743b86
 }
