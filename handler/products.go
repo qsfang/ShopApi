@@ -113,7 +113,6 @@ func ChangeProStatus(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
-<<<<<<< HEAD
 
 //根据商品ID获取商品信息
 func GetProInfo(c echo.Context) error {
@@ -137,9 +136,6 @@ func GetProInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Debug("i got here :%v", proinfo)
-
 	return c.JSON(errcode.ErrSucceed, proinfo)
 }
-=======
->>>>>>> 7a2dbef65b4bdcdef5eaab60548b91f3cc430d34
+

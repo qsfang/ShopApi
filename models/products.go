@@ -188,7 +188,6 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	}
 	return nil
 }
-<<<<<<< HEAD
 
 func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
 
@@ -206,5 +205,3 @@ func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,e
 
 	return proinfo, nil
 }
-=======
->>>>>>> 7a2dbef65b4bdcdef5eaab60548b91f3cc430d34
