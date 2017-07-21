@@ -212,7 +212,7 @@ func (ps *CategoriesServiceProvider) ChangeCategories(m ChangeCate) error {
 		cate Product
 	)
 
-	change := map[string]uint64{"categories":m.Categories}
+	change := map[string]uint64{"categories": m.Categories}
 
 	db := orm.Conn
 	err := db.Model(&cate).Where("ID = ?", m.ID).Updates(change).Limit(1).Error
