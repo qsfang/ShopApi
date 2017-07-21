@@ -25,7 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Li Zebang
- *	   Modify: 2017/07/21		 Ai Hao  订单状态更改
+ *     Modify: 2017/07/21        Zhang Zizhao 添加创建订单
+ *	   Modify: 2017/07/21		 Ai Hao       订单状态更改
  */
 
 package handler
@@ -38,7 +39,11 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
+<<<<<<< HEAD
 	"github.com/gorm"
+=======
+	"github.com/jinzhu/gorm"
+>>>>>>> 9f211a37d0cff792f2407a88630153d71f2c7172
 )
 
 type Status struct {
@@ -51,6 +56,37 @@ type ID struct {
 type ChangStatus struct {
 	ID 		uint64	`json:"id"`
 	Status  uint8	`json:"status"`
+}
+
+func CreateOrder(c echo.Context) error {
+	var (
+		order models.Registerorder
+		err   error
+	)
+
+	if err = c.Bind(&order); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	numberID := sess.Get(general.SessionUserID).(uint64)
+
+	err = models.OrderService.Createorder(numberID, order)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("Product not found:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
+		} else {
+			log.Logger.Error("Mysql error:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		}
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
 }
 
 func GetOrders(c echo.Context) error {

@@ -46,8 +46,8 @@ const (
 	Woman = 0x2
 
 	//Address  Default
-	Default		=1
-	Undefault	=0
+	Default   = 1
+	Undefault = 0
 
 	//Products Status
 	ProductOnsale = 0xe0
