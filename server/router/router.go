@@ -42,9 +42,9 @@ func InitRouter(server *echo.Echo) {
 		panic("[InitRouter], server couldn't be nil")
 	}
 	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/user/login", handler.LoginwithMobile)
+	server.POST("/api/v1/user/login", handler.Login)
 	server.POST("/api/v1/user/changemobilepass",handler.ChangeMobilePassword)
-	server.POST("/api/v1/user/changeinfo", handler.ChangeUserinfo)
+	server.POST("/api/v1/user/changeinfo", handler.ChangeUserInfo)
 	server.POST("/api/v1/user/changepass",handler.ChangeMobilePassword,handler.MustLogin)
 	server.POST("/api/vl/user/changephone",handler.Changephone)
 	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
@@ -61,10 +61,9 @@ func InitRouter(server *echo.Echo) {
 	server.POST("/api/v1/products/getlist", handler.GetProductList)
 	server.POST("/api/v1/products/changecate",handler.ChangeCategories)
 	server.POST("/api/vl/categories/get", handler.GetCategories)
-	server.POST("/api/v1/categoties/create",handler.Create)
+	server.POST("/api/v1/categoties/create",handler.CreateCategories)
 	server.POST("/api/v1/orders/getone", handler.GetOneOrder)
 	server.POST("/api/v1/orders/changestatus",handler.ChangeStatus)
 	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
-
-
+	server.POST("/api/v1/carts/delete", handler.Cartsdel)
 }

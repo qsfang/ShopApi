@@ -24,33 +24,48 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Feng Yifei
+ *     Initial: 2017/07/21        Zhu Yaqiang
  */
 
-package errcode
+package handler
 
-const (
-	ErrInformation         = 0x4
-	ErrSucceed             = 0x0
-	ErrInvalidParams       = 0x1
-	ErrMysql               = 0x2
-	ErrDelete              = 0x3 //用户登出错误
-	ErrMysqlfound          = 0x4
-	ErrNameFormat          = 0x5
-	ErrGetsess             = 0x6
-	ErrInvalidOrdersStatus = 0x7
-	ErrGetOrders           = 0x8
-	NoOrder                = 0x11
-	ErrAccess              = 0x10
-	ErrGetCategories       = 0x9
-	ErrNotFound		= 0xa
+import (
+	"github.com/labstack/echo"
+	"github.com/jinzhu/gorm"
 
-
-	// 需要登录
-	ErrLoginRequired    = 0x800
-	ErrPermissionDenied = 0x801
-
-	// 严重错误
-	ErrNoConnection      = 0x1000
-	ErrDBOperationFailed = 0x1001
+	"ShopApi/general"
+	"ShopApi/general/errcode"
+	"ShopApi/log"
+	"ShopApi/models"
 )
+
+func Cartsdel(c echo.Context) error {
+	var (
+		err error
+		cartid   models.CartsID
+	)
+
+	if err = c.Bind(&cartid); err != nil {
+		log.Logger.Error("Get crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.CartsService.CartsWhether(cartid.ID)
+
+	if err == gorm.ErrRecordNotFound {
+		log.Logger.Error("The product doesn't exist !", err)
+
+		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+	}
+
+	err = models.CartsService.CartsDelete(cartid.ID)
+
+	if err != nil {
+		log.Logger.Error("Delete product with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}

@@ -24,33 +24,67 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Feng Yifei
+ *     Initial: 2017/07/21        Zhu Yaqiang
  */
 
-package errcode
+package models
 
-const (
-	ErrInformation         = 0x4
-	ErrSucceed             = 0x0
-	ErrInvalidParams       = 0x1
-	ErrMysql               = 0x2
-	ErrDelete              = 0x3 //用户登出错误
-	ErrMysqlfound          = 0x4
-	ErrNameFormat          = 0x5
-	ErrGetsess             = 0x6
-	ErrInvalidOrdersStatus = 0x7
-	ErrGetOrders           = 0x8
-	NoOrder                = 0x11
-	ErrAccess              = 0x10
-	ErrGetCategories       = 0x9
-	ErrNotFound		= 0xa
+import (
+	"time"
 
-
-	// 需要登录
-	ErrLoginRequired    = 0x800
-	ErrPermissionDenied = 0x801
-
-	// 严重错误
-	ErrNoConnection      = 0x1000
-	ErrDBOperationFailed = 0x1001
+	"ShopApi/orm"
 )
+
+type CartsID struct {
+	ID			uint64		`json:"id"`
+}
+
+type Carts struct {
+	ID			uint64		`json:"id"`
+	Productid	uint64		`json:"productid"`
+	Name		string		`json:"name"`
+	Count		uint64		`json:"count"`
+	Size		string		`json:"size"`
+	Color		string		`json:"color"`
+	Imagineid	uint64		`json:"imageid"`
+	Userid		uint64		`json:"userid"`
+	Status		uint64		`gorm:"column:status" json:"status"`
+	Created		time.Time 	`json:"created"`
+}
+
+type CartsServiceProvider struct {
+}
+
+var CartsService *CartsServiceProvider = &CartsServiceProvider{}
+
+func (cs *CartsServiceProvider) CartsWhether (CartsID uint64)  error {
+	var (
+		err error
+		cart Carts
+	)
+
+	db := orm.Conn
+	err = db.Where("id = ?", CartsID).First(&cart).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//状态1表示商品在购物车，状态0表示商品不在购物车
+func (cs *CartsServiceProvider) CartsDelete (CartsID uint64) error {
+	var (
+		cart Carts
+	)
+
+	db := orm.Conn
+	err := db.Model(&cart).Where("id = ?", CartsID).Update("status", 0).Limit(1).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

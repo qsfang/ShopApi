@@ -70,7 +70,7 @@ func Create(c echo.Context) error {
 
 	err = models.UserService.Create(u.Mobile, u.Pass)
 	if err != nil {
-		log.Logger.Error("create creash with error:", err)
+		log.Logger.Error("create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -78,20 +78,20 @@ func Create(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func LoginwithMobile(c echo.Context) error {
+func Login(c echo.Context) error {
 	var (
 		user Register
 		err error
 	)
 
 	if err = c.Bind(&user); err != nil {
-		log.Logger.Error("analysis creash with error:", err)
+		log.Logger.Error("analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	match := utility.IsValidAccount(*user.Mobile)
-	if match == false {
+	if !match {
 		log.Logger.Error("err name format", err)
 
 		return general.NewErrorWithMessage(errcode.ErrNameFormat, err.Error())
@@ -102,14 +102,13 @@ func LoginwithMobile(c echo.Context) error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User not found:", err)
 
-			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
-		} else {
+			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
+		}
 			log.Logger.Error("Mysql error:", err)
 
 			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-		}
 	} else {
-		if flag == false {
+		if !flag {
 			log.Logger.Debug("Name and pass don't match:")
 
 			return general.NewErrorWithMessage(errcode.ErrLoginRequired, errors.New("Name and pass don't match:").Error())
@@ -166,9 +165,9 @@ func ChangeMobilePassword(c echo.Context) error {
 	var (
 
 		password GetPassword
-		userid uint64
+		userId uint64
 		err error
-		userpassword string
+		userPassword string
 	)
 
 	if err = c.Bind(&password); err != nil {
@@ -179,24 +178,24 @@ func ChangeMobilePassword(c echo.Context) error {
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	s := sess.Get(general.SessionUserID)
-	userid = s.(uint64)
+	userId = s.(uint64)
 
-	userpassword, err = models.UserService.IsUserExist(userid)
+	userPassword, err = models.UserService.IsUserExist(userId)
 	if err != nil {
 		log.Logger.Error("User not found:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 	}
 
-	if !utility.CompareHash([]byte(userpassword), *password.Pass) {
+	if !utility.CompareHash([]byte(userPassword), *password.Pass) {
 		log.Logger.Debug("Password doesn't match:", *password.Pass)
 
-		return general.NewErrorWithMessage(errcode.ErrNamefound, errors.New("password").Error())
+		return general.NewErrorWithMessage(errcode.ErrMysqlfound, errors.New("password").Error())
 	}
 
-	err = models.UserService.ChangeMobilePassword(password.NewPass, userid)
+	err = models.UserService.ChangeMobilePassword(password.NewPass, userId)
 	if err != nil {
-		log.Logger.Error("change faluse:", err)
+		log.Logger.Error("Change faluse:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -204,10 +203,10 @@ func ChangeMobilePassword(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func ChangeUserinfo(c echo.Context) error {
+func ChangeUserInfo(c echo.Context) error {
 	var (
 		err error
-		info models.CUseInfo
+		info models.ChangeUseInfo
 	)
 
 	if err = c.Bind(&info); err != nil {
@@ -217,9 +216,8 @@ func ChangeUserinfo(c echo.Context) error {
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	cuserID := session.Get(general.SessionUserID)
-	id := cuserID.(uint64)
-	log.Logger.Debug("id %d", id)
+	userID := session.Get(general.SessionUserID)
+	id := userID.(uint64)
 
 	err = models.UserService.ChangeUserInfo(info, id)
 	if err != nil {
@@ -237,7 +235,7 @@ func Changephone(c echo.Context) error {
 		m   models.Phone
 	)
 	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("ChangePhone crash with error:", err)
+		log.Logger.Error("Bind crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
