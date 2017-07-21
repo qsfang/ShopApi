@@ -24,32 +24,36 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
- *     Modify: 2017/07/19         Yang Zhengtian   添加返回收获地址
- *     Modify: 2017/07/20         Yang Zhengtain    添加修改密码
+ *     Initial: 2017/07/21         Zhang Zizhao
  */
 
-package router
+package handler
 
 import (
+	"ShopApi/general"
+	"ShopApi/general/errcode"
+	"ShopApi/log"
+	"ShopApi/models"
 	"github.com/labstack/echo"
-
-	"ShopApi/handler"
 )
 
-func InitRouter(server *echo.Echo) {
-	if server == nil {
-		panic("[InitRouter], server couldn't be nil")
+type Registerorder struct {
+	userName    *string `json:"mobile" validate:"required,alphanum,min=6,max=30"`
+	productName *string
+}
+// 未完成
+func CreateOrder(c echo.Context) error {
+	var (
+		order Registerorder
+		err   error
+	)
+
+	if err = c.Bind(&order); err != nil {
+		log.Logger.Error("Create order crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
-	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/user/login", handler.LoginwithMobile)
-	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
-	server.GET("/api/v1/user/logout", handler.Logout)
-	server.GET("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
-	server.POST("/api/v1/contact/addaddress", handler.AddAddress, handler.MustLogin)
-	server.GET("/api/vl/contact/alter",handler.Alter)
-	server.POST("/api/v1/contact/change",handler.ChangeAddress)
-	server.POST("/api/v1/user/changepass",handler.ChangeMobilePassword,handler.MustLogin)
-	server.GET("/api/vl/user/changephone",handler.Changephone)
-	server.POST("/api/v1/products/create",handler.CreateP)//创建商品
+
+	err = models.CreateOrder(order.userName)
+	return nil
 }
