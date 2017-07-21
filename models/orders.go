@@ -40,7 +40,7 @@ import (
 type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
-	TotalPrice float64   `json:"totalprice"`
+	TotalPrice float64   `gorm:"column:totalprice"json:"totalprice"`
 	Payment    float64   `json:"payment"`
 	Freight    float64   `json:"freight"`
 	Remark     string    `json:"remark"`
@@ -96,7 +96,7 @@ func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
 
 	db := orm.Conn
 
-	err = db.Model(&pro).Where("name = ? AND size = ? AND color = ?", o.Name, o.Size, o.Color).Find(&pro).Error
+	err = db.Where("name = ? AND size = ? AND color = ?", o.Name, o.Size, o.Color).Find(&pro).Error
 	if err != nil {
 		return err
 	}
