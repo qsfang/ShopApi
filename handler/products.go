@@ -24,8 +24,13 @@
 
 /*
  * Revision History:
+<<<<<<< HEAD
+ *		Initial: 2017/07/21			Ai Hao
+ *		Modify: 2017/07/21			Zhu Yaqiang
+=======
  *     Initial: 2017/07/21        Ai Hao
  *     Modify: 2017/07/21         Yu Yi
+>>>>>>> 7a2dbef65b4bdcdef5eaab60548b91f3cc430d34
  */
 
 package handler
@@ -108,3 +113,33 @@ func ChangeProStatus(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+<<<<<<< HEAD
+
+//根据商品ID获取商品信息
+func GetProInfo(c echo.Context) error {
+	var (
+		err error
+		proid   models.ProductID
+		proinfo models.Product
+	)
+
+	if err = c.Bind(&proid); err != nil {
+		log.Logger.Error("Get crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	proinfo,err = models.ProductService.GetProInfo(proid)
+
+	if err != nil {
+		log.Logger.Error("error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	log.Logger.Debug("i got here :%v", proinfo)
+
+	return c.JSON(errcode.ErrSucceed, proinfo)
+}
+=======
+>>>>>>> 7a2dbef65b4bdcdef5eaab60548b91f3cc430d34
