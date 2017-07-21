@@ -27,6 +27,7 @@
  *     Initial: 2017/07/18        Yusan Kurban
  *	   Modify: 2017/07/19		  Ai Hao         添加用户登出
  *	   Modify: 2017/07/20         Zhang Zizhao   添加用户登录
+ *	   Modify: 2017/07/21         Yang Zhengtian  添加修改密码
  */
 
 package handler
