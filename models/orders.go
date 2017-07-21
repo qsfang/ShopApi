@@ -33,8 +33,8 @@ package models
 import (
 	"time"
 
-	"ShopApi/orm"
 	"ShopApi/general"
+	"ShopApi/orm"
 )
 
 // todo: 字段名字和代码规范
@@ -45,12 +45,39 @@ type Orders struct {
 	Payment    float64   `json:"payment"`
 	Freight    float64   `json:"freight"`
 	Remark     string    `json:"remark"`
-	Discount   uint8    `json:"discount"`
+	Discount   uint8     `json:"discount"`
 	Size       string    `json:"size"`
 	Color      string    `json:"color"`
 	Status     uint8     `json:"status"`
 	Created    time.Time `json:"created"`
 	Payway     uint8     `json:"payway"`
+}
+
+type Registerorder struct {
+	Name       string  `json:"productname"`
+	TotalPrice float64 `json:"totalprice"`
+	Payment    float64 `json:"payment"`
+	Freight    float64 `json:"freight"`
+	Remark     string  `json:"remark"`
+	Discount   uint8   `json:"discount"`
+	Size       string  `json:"size"`
+	Color      string  `json:"color"`
+	Payway     uint8   `json:"payway"`
+}
+
+type Order struct {
+	Name       string
+	UserID     uint64
+	TotalPrice float64
+	Payment    float64
+	Freight    float64
+	Remark     string
+	Discount   uint8
+	Size       string
+	Color      string
+	Status     uint8
+	Created    time.Time
+	Payway     uint8
 }
 
 type OrderServiceProvider struct {
@@ -60,6 +87,41 @@ var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 
 func (Orders) TableName() string {
 	return "orders"
+}
+
+func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
+	var (
+		pro Product
+		err error
+	)
+
+	db := orm.Conn
+
+	err = db.Model(&pro).Where("name = ? AND size = ? AND color = ?", o.Name, o.Size, o.Color).Find(&pro).Error
+	if err != nil {
+		return err
+	}
+
+	order := Orders{
+		UserID:     n,
+		TotalPrice: o.TotalPrice,
+		Payment:    o.Payment,
+		Freight:    o.Freight,
+		Remark:     o.Remark,
+		Discount:   o.Discount,
+		Size:       o.Size,
+		Color:      o.Color,
+		Status:     general.OrderFinished,
+		Created:    time.Now(),
+		Payway:     o.Payway,
+	}
+
+	err =db.Create(&order).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Orders, error) {

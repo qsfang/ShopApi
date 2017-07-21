@@ -36,7 +36,6 @@ import (
 	"ShopApi/general"
 	"ShopApi/orm"
 	"time"
-
 )
 
 type ProductServiceProvider struct {
@@ -49,21 +48,21 @@ type ProductID struct{
 }
 // todo:sql
 type Product struct {
-	ID				uint64 		`json:"id"`
-	Name			string		`json:"name"`
-	Totalsale   	uint64		`json:"totalsale"`
-	Categories		uint64 		`json:"categories"`
-	Price			float64 	`json:"price"`
-	Originalprice	float64 	`json:"originalprice"`
-	Status          uint64 		`json:"status"`
-	Size            string 		`json:"size"`
-	Color           string 		`json:"color"`
-	Imageid			uint64 		`json:"imageid"`
-	Imageids		string 		`json:"imageids"`
-	Remark			string 		`json:"remark"`
-	Detail			string 		`json:"detail"`
-	Created			time.Time 	`json:"created"`
-	Inventory		uint64 		`json:"inventory"`
+	ID            uint64        `json:"id"`
+	Name          string        `json:"name"`
+	Totalsale     uint64        `json:"totalsale"`
+	Categories    uint64        `json:"categories"`
+	Price         float64    `json:"price"`
+	Originalprice float64    `json:"originalprice"`
+	Status        uint64        `json:"status"`
+	Size          string        `json:"size"`
+	Color         string        `json:"color"`
+	Imageid       uint64        `json:"imageid"`
+	Imageids      string        `json:"imageids"`
+	Remark        string        `json:"remark"`
+	Detail        string        `json:"detail"`
+	Created       time.Time    `json:"created"`
+	Inventory     uint64        `json:"inventory"`
 }
 
 type GetCategories struct {

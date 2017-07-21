@@ -25,9 +25,9 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *    Modify: 2017/07/21      Xu Haosheng   更改用户信息
- *     Modify: 2017/07/20	  Zhang Zizhao  登录检查
- *     Modify: 2017/07/21         Yang Zhengtian  添加判断用户是否存在和修改密码
+ *     Modify: 2017/07/21          Xu Haosheng   更改用户信息
+ *     Modify: 2017/07/20	      Zhang Zizhao   登录检查
+ *     Modify: 2017/07/21         Yang Zhengtian 添加判断用户是否存在和修改密码
  */
 
 package models
@@ -187,7 +187,7 @@ func (us *UserServiceProvider)ChangePhone(UserID uint64, Phone string) error {
 func (us *UserServiceProvider) IsUserExist(id uint64) (string, error) {
 	var (
 		user User
-		err error
+		err  error
 	)
 
 	db := orm.Conn

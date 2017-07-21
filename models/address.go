@@ -58,13 +58,13 @@ type Addressget struct {
 }
 
 type Change struct {
-	ID        uint64  `json:"id" validate:"numeric"`
-	Name      *string `json:"name" validate:"required, alphaunicode, min=2,max=18"`
-	Phone     *string `json:"phone" validate:"required, alphanum, min=6,max=30"`
-	Province  *string `json:"province" validate:"required, alphaunicode, min=2,max=30"`
-	City      *string `json:"city" validate:"required, alphaunicode, min=2,max=30"`
-	Street    *string `json:"street" validate:"required, alphaunicode, min=2,max=30"`
-	Address   *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
+	ID       uint64  `json:"id" validate:"numeric"`
+	Name     *string `json:"name" validate:"required, alphaunicode, min=2,max=18"`
+	Phone    *string `json:"phone" validate:"required, alphanum, min=6,max=30"`
+	Province *string `json:"province" validate:"required, alphaunicode, min=2,max=30"`
+	City     *string `json:"city" validate:"required, alphaunicode, min=2,max=30"`
+	Street   *string `json:"street" validate:"required, alphaunicode, min=2,max=30"`
+	Address  *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
 }
 // todo:命名 sql
 type AddressDfault struct {
@@ -135,9 +135,9 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 	for _, c := range list {
 		add := Addressget{
 			Province: c.Province,
-			City:c.City,
-			Street:c.Street,
-			Address:c.Address,
+			City:     c.City,
+			Street:   c.Street,
+			Address:  c.Address,
 		}
 		s = append(s, add)
 	}
@@ -153,15 +153,15 @@ func(us *ContactServiceProvider) AlterDefalt(id uint64) error{
 		con	Contact
 	)
 	db := orm.Conn
-	err := db.Where("id=?",id).Find(&s).Error
+	err := db.Where("id=?", id).Find(&s).Error
 	if err != nil {
-	return err
+		return err
 	}
-	if s.IsDefault == 0{
+	if s.IsDefault == 0 {
 		a = 1
 	}
 	updater := map[string]interface{}{"isdefault": a}
-	err = db.Model(&con).Where("id=?",id).Update(updater).Limit(1).Error
+	err = db.Model(&con).Where("id=?", id).Update(updater).Limit(1).Error
 	if err != nil {
 		return err
 	}
