@@ -24,7 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/21        Ai Hao
+ *     Initial: 2017/07/21        Yang Zhengtian
  */
 
 package handler
@@ -37,23 +37,18 @@ import (
 	"ShopApi/general/errcode"
 )
 
-//名称name，totalsale  ，类型categories，价格price，原价originalprice，
-// 状态status，尺码siez，颜色color,封面图片imageid，图片集imageids，评论remark,
-//详细信息 detail ，创建日期 created，存货量inventory
-
-func CreateP(c echo.Context) error {
+func CreateC(c echo.Context) error {
 	var (
-		err 	error
-		p		models.CreatePro
+		err error
+		cate models.CreateCat
 	)
-
-	if err = c.Bind(&p); err != nil {
+	if err = c.Bind(&cate); err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.CreateP(p)
+	err = models.CategoriesService.Create(cate)
 	if err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
@@ -63,25 +58,4 @@ func CreateP(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func ChangeProStatus(c echo.Context) error {
-	var(
-		err		error
-		pro		models.ChangePro
-	)
-
-	if err = c.Bind(&pro); err != nil {
-		log.Logger.Error("Change crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	err = models.ProductService.ChangeProStatus(pro)
-	if err != nil {
-		log.Logger.Error("change crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, nil)
-}
 
