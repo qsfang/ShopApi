@@ -40,12 +40,8 @@ const (
 	ErrGetsess             = 0x6
 	ErrInvalidOrdersStatus = 0x7
 	ErrGetOrders           = 0x8
-<<<<<<< HEAD
 	NoOrder                = 0x11
 	ErrAccess              = 0x10
-=======
-	ErrValidTransaction	   = 0x8 //数据库操作错误
->>>>>>> 9f211a37d0cff792f2407a88630153d71f2c7172
 	ErrGetCategories       = 0x9
 
 
