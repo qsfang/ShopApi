@@ -26,6 +26,7 @@
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
  *	   Modify: 2017/07/20		  Zhang Zizhao  登录检查
+ *    Modify: 2017/07/21      Xu Haosheng   更改用户信息
  */
 
 package models
@@ -62,6 +63,13 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
+type CUseInfo struct {
+	Avatar               string `json:"avatar"`
+	Nickname         string `json:"nickname"`
+	Email                 string `json:"email"`
+	Phone                string `json:"phone"`
+	Sex                     uint8  `json:"sex"`
+}
 
 func (User) TableName() string {
 	return "users"
@@ -193,4 +201,19 @@ func (us *UserServiceProvider) ChangeMobilePassword(oldpass *string ,newpass *st
 	}
 
 	return true, nil
+}
+
+func (us *UserServiceProvider) ChangeUserInfo(info CUseInfo, CuserID uint64) error {
+	var con Contact
+
+	changMap := map[string]interface{} {"avatar": info.Avatar, "nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
+
+	db := orm.Conn
+	err := db.Model(&con).Where("userid = ?", CuserID ).Updates(changMap).Limit(1).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

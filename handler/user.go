@@ -27,6 +27,7 @@
  *     Initial: 2017/07/18        Yusan Kurban
  *	   Modify: 2017/07/19		  Ai Hao         添加用户登出
  *	   Modify: 2017/07/20         Zhang Zizhao   添加用户登录
+ *    Modify: 2017/07/21          Xu Haosheng  更改用户信息
  */
 
 package handler
@@ -196,7 +197,29 @@ func ChangeMobilePassword (c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+func ChangeUserinfo(c echo.Context) error {
+	var (
+		err  error
+		info models.CUseInfo
+	)
 
+	if err = c.Bind(&info); err != nil {
+		log.Logger.Error("Create crash with error:", err)
 
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
 
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	cuserID := session.Get(general.SessionUserID)
+	id := cuserID.(uint64)
+	log.Logger.Debug("id %d", id)
 
+	err = models.UserService.ChangeUserInfo(info, id)
+	if err != nil {
+		log.Logger.Error("create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
