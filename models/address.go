@@ -118,7 +118,7 @@ func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
 }
 
 // todo: 修改接受者 保持同一
-func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error) {
+func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, error) {
 	var (
 		cont Contact
 		list []Contact
@@ -126,7 +126,7 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 	)
 
 	db := orm.Conn
-	err := db.Model(&cont).Where("userid=?", userid).Find(&list).Error
+	err := db.Model(&cont).Where("userid=?", userId).Find(&list).Error
 	if err != nil {
 		return s, err
 	}

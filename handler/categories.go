@@ -44,7 +44,7 @@ type Pid struct {
 	Pid uint64 `json:"pid"`
 }
 
-func CreateC (c echo.Context) error {
+func CreateCategories (c echo.Context) error {
 	var (
 		err error
 		cate models.CreateCat

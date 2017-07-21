@@ -201,19 +201,19 @@ func (us *UserServiceProvider) IsUserExist(id uint64) (string, error) {
 	return user.Password, nil
 }
 
-func (us *UserServiceProvider) ChangeMobilePassword(newpass *string, id uint64) error {
+func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) error {
 	var (
 		user User
 		err error
 	)
 
 	db := orm.Conn
-	hashpass, err := utility.GenerateHash(*newpass)
+	hashPass, err := utility.GenerateHash(*newPass)
 	if err != nil {
 		return err
 	}
 
-	updater := map[string]interface{}{"password": hashpass}
+	updater := map[string]interface{}{"password": hashPass}
 	err = db.Model(&user).Where("id =? ", id).Update(updater).Limit(1).Error
 	if err != nil {
 		return err
