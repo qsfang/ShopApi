@@ -70,7 +70,7 @@ func Create(c echo.Context) error {
 
 	err = models.UserService.Create(u.Mobile, u.Pass)
 	if err != nil {
-		log.Logger.Error("create creash with error:", err)
+		log.Logger.Error("create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -78,20 +78,20 @@ func Create(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func LoginwithMobile(c echo.Context) error {
+func Login(c echo.Context) error {
 	var (
 		user Register
 		err error
 	)
 
 	if err = c.Bind(&user); err != nil {
-		log.Logger.Error("analysis creash with error:", err)
+		log.Logger.Error("analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	match := utility.IsValidAccount(*user.Mobile)
-	if match == false {
+	if !match {
 		log.Logger.Error("err name format", err)
 
 		return general.NewErrorWithMessage(errcode.ErrNameFormat, err.Error())
@@ -102,14 +102,13 @@ func LoginwithMobile(c echo.Context) error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User not found:", err)
 
-			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
-		} else {
+			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
+		}
 			log.Logger.Error("Mysql error:", err)
 
 			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-		}
 	} else {
-		if flag == false {
+		if !flag {
 			log.Logger.Debug("Name and pass don't match:")
 
 			return general.NewErrorWithMessage(errcode.ErrLoginRequired, errors.New("Name and pass don't match:").Error())
@@ -185,13 +184,13 @@ func ChangeMobilePassword(c echo.Context) error {
 	if err != nil {
 		log.Logger.Error("User not found:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 	}
 
 	if !utility.CompareHash([]byte(userPassword), *password.Pass) {
 		log.Logger.Debug("Password doesn't match:", *password.Pass)
 
-		return general.NewErrorWithMessage(errcode.ErrNamefound, errors.New("password").Error())
+		return general.NewErrorWithMessage(errcode.ErrMysqlfound, errors.New("password").Error())
 	}
 
 	err = models.UserService.ChangeMobilePassword(password.NewPass, userId)
