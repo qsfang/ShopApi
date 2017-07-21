@@ -64,7 +64,7 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
-type CUseInfo struct {
+type ChangeUseInfo struct {
 	Avatar   string `json:"avatar"`
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
@@ -222,13 +222,13 @@ func (us *UserServiceProvider) ChangeMobilePassword(newpass *string, id uint64) 
 	return nil
 }
 
-func (us *UserServiceProvider) ChangeUserInfo(info CUseInfo, CuserID uint64) error {
+func (us *UserServiceProvider) ChangeUserInfo(info ChangeUseInfo, userID uint64) error {
 	var con Contact
 
 	changMap := map[string]interface{}{"avatar": info.Avatar, "nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
 
 	db := orm.Conn
-	err := db.Model(&con).Where("userid = ?", CuserID).Updates(changMap).Limit(1).Error
+	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
 
 	if err != nil {
 		return err
