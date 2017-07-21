@@ -72,3 +72,29 @@ func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 
 	return nil
 }
+
+type ChangePro struct{
+	Status  uint64  `json:"status" validate:"numeric"`
+}
+
+type ProductsServiceProvider struct {
+}
+
+var ProductsService *ProductsServiceProvider = &ProductsServiceProvider{}
+
+func (prod *ProductsServiceProvider) ChangeProStatus(m ChangePro) error {
+	var (
+		pro Product
+		err error
+	)
+
+	changemap := map[string]interface{}{
+		"status":		m.Status,
+	}
+	db := orm.Conn
+	err = db.Model(&pro).Where("status = ?", m.Status).Updates(changemap).Limit(1).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

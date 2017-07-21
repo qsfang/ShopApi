@@ -34,3 +34,24 @@ func CreateP(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+func ChangeProStatus(c echo.Context) error {
+	var(
+		err		error
+		pro		models.ChangePro
+	)
+
+	if err = c.Bind(&pro); err != nil {
+		log.Logger.Error("Change crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.ProductsService.ChangeProStatus(pro)
+	if err != nil {
+		log.Logger.Error("change crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
