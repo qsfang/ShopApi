@@ -37,6 +37,7 @@ import (
 	"ShopApi/general"
 )
 
+// todo: 字段名字和代码规范
 type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
@@ -86,6 +87,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
+// todo: 代码风格
 func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha :=Orders{
 		Status:   	status,

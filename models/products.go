@@ -31,6 +31,7 @@
 
 package models
 
+// todo: 导入包的顺序和风格
 import (
 	"ShopApi/general"
 	"ShopApi/orm"
@@ -46,7 +47,7 @@ var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 type ProductID struct{
 	ID				uint64 `json:"id"`
 }
-
+// todo:sql
 type Product struct {
 	ID				uint64 		`json:"id"`
 	Name			string		`json:"name"`
@@ -132,7 +133,7 @@ func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 
 	return nil
 }
-
+// todo: 代码规范
 func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, error) {
 	var (
 		ware  Product
@@ -166,6 +167,7 @@ func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, err
 	return s, nil
 }
 
+// todo: 命名代码规范
 func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	var (
 		pro Product
@@ -190,6 +192,7 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
+// todo: 保持同一
 func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
 
 	var (
@@ -207,6 +210,7 @@ func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,e
 	return proinfo, nil
 }
 
+// todo: 代码规范 updates
 func (ps *ProductServiceProvider) ChangeCategories(m ChangeCate) error {
 	var (
 		cate Product

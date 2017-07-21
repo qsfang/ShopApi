@@ -63,6 +63,7 @@ func CreateC(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+// todo: 添加错误判断 代码规范
 func GetCategories(c echo.Context) error {
 	var (
 		err        error

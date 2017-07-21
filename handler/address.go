@@ -109,6 +109,7 @@ func ChangeAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+// todo: 代码规范
 func GetAddress(c echo.Context) error {
 	var (
 		err    error
@@ -128,6 +129,7 @@ func GetAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, list)
 }
 
+// todo: 代码规范
 func Alter(c echo.Context) error {
 	var (
 		err 	error
@@ -149,6 +151,7 @@ func Alter(c echo.Context) error {
 	}
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+// todo: 改！！！
 type AddressDfault struct {
 	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 }

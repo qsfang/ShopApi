@@ -65,6 +65,7 @@ func CreateP(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+// todo：代码规范
 func GetProductList(c echo.Context) error {
 	var (
 		err    	error
@@ -111,6 +112,7 @@ func ChangeProStatus(c echo.Context) error {
 }
 
 //根据商品ID获取商品信息
+// todo: 代码规范
 func GetProInfo(c echo.Context) error {
 	var (
 		err error
