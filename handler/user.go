@@ -40,7 +40,6 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-	"strconv"
 )
 
 type Register struct {
@@ -136,9 +135,8 @@ func GetInfo(c echo.Context) error {
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	sess.Get(general.SessionUserID)
-	ID, _ := strconv.Atoi(sess.SessionID())
-	Output, err = models.UserService.GetInfo(ID)
+	numberID := sess.Get(general.SessionUserID).(uint64)
+	Output, err = models.UserService.GetInfo(numberID)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
