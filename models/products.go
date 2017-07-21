@@ -24,7 +24,8 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/21        Ai Hao
+ *		Initial: 2017/07/21			Ai Hao
+ *		Modify: 2017/07/21			Zhu Yaqiang
  */
 
 package models
@@ -40,6 +41,10 @@ type ProductServiceProvider struct {
 }
 
 var ProductService *ProductServiceProvider = &ProductServiceProvider{}
+
+type ProductID struct{
+	ID				uint64 `json:"id"`
+}
 
 type Product struct {
 	ID            uint64    `json:"id"`
@@ -132,3 +137,19 @@ func (prod *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
+func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
+
+	var (
+		err error
+		proinfo   Product
+	)
+
+	db := orm.Conn
+	err = db.Where("id = ?", ProID.ID).First(&proinfo).Error
+
+	if err != nil {
+		return proinfo, err
+	}
+
+	return proinfo, nil
+}
