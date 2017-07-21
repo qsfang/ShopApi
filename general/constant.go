@@ -59,4 +59,5 @@ const (
 	OrderUnfinished = 0xef
 	OrderFinished   = 0xee
 	OrderGetAll		= 0xed // Not order status
+	OrderCanceled   = 0xec
 )
