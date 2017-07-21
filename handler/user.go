@@ -167,6 +167,7 @@ func ChangeMobilePassword(c echo.Context) error {
 		password GetPassword
 		userid uint64
 		err error
+		userpassword string
 	)
 
 	if err = c.Bind(&password); err != nil {

@@ -48,7 +48,7 @@ type Status struct {
 
 type ChangStatus struct {
 	ID 		uint64	`json:"id"`
-	Status  uint8	`json:"status"`1
+	Status  uint8	`json:"status"`
 }
 
 func CreateOrder(c echo.Context) error {
@@ -62,18 +62,14 @@ func CreateOrder(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
+
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	numberID := sess.Get(general.SessionUserID).(uint64)
 
 	err = models.OrderService.Createorder(numberID, order)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("User not found:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
-		}
-		if err == gorm.ErrInvalidTransaction {
-			log.Logger.Error("no valid transaction", err)
+			log.Logger.Error("Product not found:", err)
 
 			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
 		} else {

@@ -90,19 +90,18 @@ func (Orders) TableName() string {
 
 func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
 	var (
-		or  Orders
+		pro Product
 		err error
 	)
 
 	db := orm.Conn
 
-	err = db.Where("name = ? AND size = ? AND color = ?", o.Name, o.Size, o.Color).First(&or).Error
+	err = db.Model(&pro).Where("name = ? AND size = ? AND color = ?", o.Name, o.Size, o.Color).Find(&pro).Error
 	if err != nil {
 		return err
 	}
 
 	order := Orders{
-		ID:         or.ID,
 		UserID:     n,
 		TotalPrice: o.TotalPrice,
 		Payment:    o.Payment,

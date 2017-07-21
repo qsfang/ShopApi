@@ -58,6 +58,8 @@ type Product struct {
 	Detail        string    `json:"detail"`
 	Created       time.Time `json:"created"`
 	Inventory     uint64    `json:"inventory"`
+}
+
 type ProductID struct{
 	ID				uint64 `json:"id"`
 }
