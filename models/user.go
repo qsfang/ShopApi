@@ -145,16 +145,16 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	var (
 		err error
-		s   UserInfo
+		UI   UserInfo
 	)
 
 	db := orm.Conn
-	err = db.Where("UserID = ?", UserID).First(&s).Error
+	err = db.Where("UserID = ?", UserID).First(&UI).Error
 	if err != nil {
-		return s, err
+		return UI, err
 	}
 
-	return s, nil
+	return UI, nil
 }
 
 func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone *string) error{
