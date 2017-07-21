@@ -207,7 +207,7 @@ func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,e
 	return proinfo, nil
 }
 
-func (ps *CategoriesServiceProvider) ChangeCategories(m ChangeCate) error {
+func (ps *ProductServiceProvider) ChangeCategories(m ChangeCate) error {
 	var (
 		cate Product
 	)

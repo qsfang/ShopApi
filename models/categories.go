@@ -24,7 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/21       Yang Zhengtian
+ *     Initial: 2017/07/21        Yang Zhengtian
  *     Modify: 2017/07/21         Li Zebang
  */
 
@@ -60,7 +60,7 @@ func (Categories) TableName() string {
 	return "categories"
 }
 
-func (cps *CategoriesServiceProvider) Create(ca CreateCat) error {
+func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 	cate := Categories{
 		Name:                ca.Name,
 		Pid:                 ca.Pid,
@@ -81,7 +81,7 @@ func (cps *CategoriesServiceProvider) Create(ca CreateCat) error {
 
 func (csp *CategoriesServiceProvider) GetCategories(pid uint64) ([]Categories, error) {
 	var (
-		category  Categories
+		category   Categories
 		categories []Categories
 	)
 
