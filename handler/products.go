@@ -114,21 +114,20 @@ func ChangeProStatus(c echo.Context) error {
 }
 
 //根据商品ID获取商品信息
-// todo: 代码规范
 func GetProInfo(c echo.Context) error {
 	var (
 		err error
-		proid   models.ProductID
-		proinfo models.Product
+		proID   models.ProductID
+		ProInfo models.Product
 	)
 
-	if err = c.Bind(&proid); err != nil {
+	if err = c.Bind(&proID); err != nil {
 		log.Logger.Error("Get crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	proinfo,err = models.ProductService.GetProInfo(proid)
+	ProInfo,err = models.ProductService.GetProInfo(proID.ID)
 
 	if err != nil {
 		log.Logger.Error("error:", err)
@@ -136,7 +135,7 @@ func GetProInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, proinfo)
+	return c.JSON(errcode.ErrSucceed, ProInfo)
 }
 
 func ChangeCategories(c echo.Context) error {

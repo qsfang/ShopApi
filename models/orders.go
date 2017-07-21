@@ -25,7 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Li Zebang
- *	   Modify: 2017/07/21		 Ai Hao 订单状态更改
+ *	   Modify: 2017/07/21		 Ai Hao       订单状态更改
+ *	   Modify: 2017/07/21		 Zhang Zizhao 创建订单
  */
 
 package models
@@ -41,7 +42,7 @@ import (
 type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
-	TotalPrice float64   `json:"totalprice"`
+	TotalPrice float64   `gorm:"column:totalprice"json:"totalprice"`
 	Payment    float64   `json:"payment"`
 	Freight    float64   `json:"freight"`
 	Remark     string    `json:"remark"`
@@ -50,7 +51,7 @@ type Orders struct {
 	Color      string    `json:"color"`
 	Status     uint8     `json:"status"`
 	Created    time.Time `json:"created"`
-	Payway     uint8     `json:"payway"`
+	PayWay     uint8     `gorm:"column:payway"json:"payway"`
 }
 
 type GetOrders struct {
@@ -64,8 +65,12 @@ type GetOrders struct {
 	Created    time.Time `json:"created"`
 	Payway     uint8     `json:"payway"`
 }
+<<<<<<< HEAD
 
 type Registerorder struct {
+=======
+type RegisterOrder struct {
+>>>>>>> a029a34d4c0afd0fff3dedfdc443829734ea4073
 	Name       string  `json:"productname"`
 	TotalPrice float64 `json:"totalprice"`
 	Payment    float64 `json:"payment"`
@@ -101,22 +106,25 @@ func (Orders) TableName() string {
 	return "orders"
 }
 
+<<<<<<< HEAD
 /*
 func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
+=======
+func (osp *OrderServiceProvider) CreateOrder(numberID uint64,o RegisterOrder) error {
+>>>>>>> a029a34d4c0afd0fff3dedfdc443829734ea4073
 	var (
 		pro Product
 		err error
 	)
 
 	db := orm.Conn
-
-	err = db.Model(&pro).Where("name = ? AND size = ? AND color = ?", o.Name, o.Size, o.Color).Find(&pro).Error
+	err = db.Where("name = ? AND size = ? AND color = ?", o.Name, o.Size, o.Color).Find(&pro).Error
 	if err != nil {
 		return err
 	}
 
 	order := Orders{
-		UserID:     n,
+		UserID:     numberID,
 		TotalPrice: o.TotalPrice,
 		Payment:    o.Payment,
 		Freight:    o.Freight,
@@ -126,10 +134,10 @@ func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
 		Color:      o.Color,
 		Status:     general.OrderFinished,
 		Created:    time.Now(),
-		Payway:     o.Payway,
+		PayWay:     o.Payway,
 	}
 
-	err =db.Create(&order).Error
+	err = db.Create(&order).Error
 	if err != nil {
 		return err
 	}
