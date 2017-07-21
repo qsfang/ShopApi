@@ -157,3 +157,5 @@ func GetInfo(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, Output)
 }
+
+
