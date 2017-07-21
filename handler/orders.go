@@ -25,7 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Li Zebang
- *     Modify: 2017/07/21        Zhang Zizhao //添加创建订单
+ *     Modify: 2017/07/21        Zhang Zizhao 添加创建订单
+ *	   Modify: 2017/07/21		 Ai Hao       订单状态更改
  */
 
 package handler
@@ -45,6 +46,10 @@ type Status struct {
 	Status uint8 `json:"status"`
 }
 
+type ChangStatus struct {
+	ID 		uint64	`json:"id"`
+	Status  uint8	`json:"status"`1
+}
 
 func CreateOrder(c echo.Context) error {
 	var (
@@ -108,4 +113,26 @@ func GetOrders(c echo.Context) error {
 	}
 
 	return c.JSON(errcode.ErrSucceed, orders)
+}
+
+func ChangeStatus(c echo.Context) error {
+	var (
+		err		error
+		st		ChangStatus
+	)
+
+	if err = c.Bind(&st); err != nil {
+		log.Logger.Error("Input order status with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.OrderService.ChangeStatus(st.ID, st.Status)
+	if err != nil {
+		log.Logger.Error("Input order status with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
 }

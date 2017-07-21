@@ -41,6 +41,7 @@ const (
 	ErrInvalidOrdersStatus = 0x7
 	ErrGetOrders           = 0x8
 	ErrValidTransaction	   = 0x8 //数据库操作错误
+	ErrGetCategories       = 0x9
 
 	// 需要登录
 	ErrLoginRequired    = 0x800

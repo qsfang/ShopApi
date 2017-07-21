@@ -24,8 +24,9 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/21        Ai Hao
- *     Modify: 2017/07/21         Yu Yi
+ *		Initial: 2017/07/21			Ai Hao
+ *		Modify: 2017/07/21			Zhu Yaqiang
+ *      Modify: 2017/07/21          Yu Yi
  */
 
 package handler
@@ -130,8 +131,6 @@ func GetProInfo(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
-
-	log.Logger.Debug("i got here :%v", proinfo)
 
 	return c.JSON(errcode.ErrSucceed, proinfo)
 }

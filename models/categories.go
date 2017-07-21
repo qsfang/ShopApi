@@ -27,7 +27,6 @@
  *     Initial: 2017/07/21       Yang Zhengtian
  */
 
-
 package models
 
 import (
@@ -42,30 +41,30 @@ type CategoriesServiceProvider struct {
 var CategoriesService *CategoriesServiceProvider = &CategoriesServiceProvider{}
 
 type Categories struct {
-	ID            uint64 		`sql:"auto_increment;primary_key;",json:"id"`
-	Name          string 		`json:"name"`
-	Pid           string 		`json:"pid"`
-	Status        uint64 		`json:"status"`
-	Remark	      string 		`json:"remark"`
-	Created	      time.Time 	`json:"created"`
+	ID      uint64                `sql:"auto_increment;primary_key;",json:"id"`
+	Name    string                `json:"name"`
+	Pid     string                `json:"pid"`
+	Status  uint64                `json:"status"`
+	Remark  string                `json:"remark"`
+	Created time.Time             `json:"created"`
 }
 
 type CreateCat struct {
-	Name          string `json:"name"`
-	Pid           string `json:"pid"`
-	Remark	      string `json:"remark"`
+	Name   string `json:"name"`
+	Pid    string `json:"pid"`
+	Remark string `json:"remark"`
 }
 
 func (Categories) TableName() string {
 	return "categories"
 }
 
-func (ps *CategoriesServiceProvider) Create(ca CreateCat) error {
+func (cps *CategoriesServiceProvider) Create(ca CreateCat) error {
 	cate := Categories{
 		Name:                ca.Name,
 		Pid:                 ca.Pid,
 		Status:              general.CategoriesOnuse,
-		Remark:		     ca.Remark,
+		Remark:              ca.Remark,
 		Created:             time.Now(),
 	}
 
@@ -77,4 +76,20 @@ func (ps *CategoriesServiceProvider) Create(ca CreateCat) error {
 	}
 
 	return nil
+}
+
+func (csp *CategoriesServiceProvider) GetCategories(pid uint64) ([]Categories, error) {
+	var (
+		category  Categories
+		categories []Categories
+	)
+
+	db := orm.Conn
+
+	err := db.Model(&category).Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).Find(&categories).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return categories, nil
 }

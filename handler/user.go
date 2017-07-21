@@ -58,7 +58,7 @@ type GetPassword struct {
 func Create(c echo.Context) error {
 	var (
 		err error
-		u   Register
+		u Register
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -80,7 +80,7 @@ func Create(c echo.Context) error {
 func LoginwithMobile(c echo.Context) error {
 	var (
 		user Register
-		err  error
+		err error
 	)
 
 	if err = c.Bind(&user); err != nil {
@@ -136,7 +136,7 @@ func Logout(c echo.Context) error {
 
 func GetInfo(c echo.Context) error {
 	var (
-		err    error
+		err error
 		Output models.UserInfo
 	)
 
@@ -163,10 +163,10 @@ func GetInfo(c echo.Context) error {
 
 func ChangeMobilePassword(c echo.Context) error {
 	var (
-		password     GetPassword
-		userid       uint64
-		err          error
-		userpassword string
+
+		password GetPassword
+		userid uint64
+		err error
 	)
 
 	if err = c.Bind(&password); err != nil {
@@ -204,7 +204,7 @@ func ChangeMobilePassword(c echo.Context) error {
 
 func ChangeUserinfo(c echo.Context) error {
 	var (
-		err  error
+		err error
 		info models.CUseInfo
 	)
 

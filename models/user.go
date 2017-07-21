@@ -134,7 +134,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	var (
-		u   User
+		u User
 		err error
 	)
 
@@ -156,8 +156,8 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	var (
-		err  error
-		UI   UserInfo
+		err error
+		UI UserInfo
 	)
 
 	db := orm.Conn
@@ -169,7 +169,7 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 	return UI, nil
 }
 
-func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
+func (us *UserServiceProvider)ChangePhone(UserID uint64, Phone string) error {
 	var (
 		err error
 		con Contact
@@ -202,7 +202,7 @@ func (us *UserServiceProvider) IsUserExist(id uint64) (string, error) {
 func (us *UserServiceProvider) ChangeMobilePassword(newpass *string, id uint64) error {
 	var (
 		user User
-		err  error
+		err error
 	)
 
 	db := orm.Conn
