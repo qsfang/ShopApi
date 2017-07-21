@@ -134,3 +134,25 @@ func GetProInfo(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, proinfo)
 }
+
+func ChangeCategories(c echo.Context) error {
+	var (
+		err error
+		m   models.ChangeCate
+	)
+
+	if err = c.Bind(&m); err != nil {
+		log.Logger.Error("Categories change with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.ProductService.ChangeCategories(m)
+	if err != nil {
+		log.Logger.Error("Categories change with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
