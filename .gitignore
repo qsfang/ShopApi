@@ -4,11 +4,3 @@
 server/server
 *.exe
 server/server.exe
-<<<<<<< HEAD
->>>>>>> a96214f93b05e8b310e4ad6265f8d4db8e33e3b0
-server/router/router.go
-server/router/router.go
-server/router/router.go
-server/router/router.go
-=======
->>>>>>> 00fe23e591d0b1f2c6def369e8bba5992e7b405d
