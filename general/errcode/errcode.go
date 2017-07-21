@@ -30,7 +30,7 @@
 package errcode
 
 const (
-	NoInformation          = 0x4
+	ErrInformation         = 0x4
 	ErrSucceed             = 0x0
 	ErrInvalidParams       = 0x1
 	ErrMysql               = 0x2
@@ -40,9 +40,11 @@ const (
 	ErrGetsess             = 0x6
 	ErrInvalidOrdersStatus = 0x7
 	ErrGetOrders           = 0x8
-	ErrValidTransaction	   = 0x8 //数据库操作错误
+	NoOrder                = 0x11
+	ErrAccess              = 0x10
 	ErrGetCategories       = 0x9
 	ErrNotFound		= 0xa
+
 
 	// 需要登录
 	ErrLoginRequired    = 0x800
