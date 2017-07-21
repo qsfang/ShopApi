@@ -108,9 +108,9 @@ func LoginwithMobile(c echo.Context) error {
 		}
 	} else {
 		if flag == false {
-			log.Logger.Error("Name and pass don't match:", err)
+			log.Logger.Debug("Name and pass don't match:")
 
-			return general.NewErrorWithMessage(errcode.ErrLoginRequired, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrLoginRequired, errors.New("Name and pass don't match:").Error())
 		}
 	}
 
@@ -230,6 +230,9 @@ func ChangeUserinfo(c echo.Context) error {
 }
 
 /*func Changephone(c echo.Context) error {
+=======
+func Changephone(c echo.Context) error {
+>>>>>>> 381348791139489194532cc0d0437d2b94e1b974
 	var (
 		err 	error
 		m	models.Phone
@@ -250,4 +253,5 @@ func ChangeUserinfo(c echo.Context) error {
 	}
 
 	return c.JSON(errcode.ErrSucceed, nil)
+<<<<<<< HEAD
 }*/

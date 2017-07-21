@@ -168,7 +168,7 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 	return UI, nil
 }
 
-/*func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone string) error{
+func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone string) error{
 	var (
 		err	error
 		con	Contact
@@ -181,7 +181,7 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 		return err
 	}
 	return  nil
-}*/
+}
 
 func (us *UserServiceProvider) IsUserExist(id uint64) (string,error) {
 	var (

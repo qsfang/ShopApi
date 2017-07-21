@@ -24,32 +24,23 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/21        Zhang Zizhao
  */
 
-package router
+package models
 
 import (
-	"github.com/labstack/echo"
-
-	"ShopApi/handler"
+	"ShopApi/orm"
 )
+// 未完成
+func CreateOrder(name *string) error{
+	var(
+		user User
+		err error
+	)
 
-func InitRouter(server *echo.Echo) {
-	if server == nil {
-		panic("[InitRouter], server couldn't be nil")
-	}
-	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/user/login", handler.LoginwithMobile)
-	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
-	server.GET("/api/v1/user/logout", handler.Logout)
-	server.GET("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
-	server.POST("/api/v1/contact/addaddress", handler.AddAddress, handler.MustLogin)
-	server.GET("/api/vl/contact/alter",handler.Alter)
-	server.POST("/api/v1/contact/change",handler.ChangeAddress)
-	server.POST("/api/v1/user/changemobilepass",handler.ChangeMobilePassword)
-	server.POST("/api/v1/user/changeinfo", handler.ChangeUserinfo)
-	server.POST("/api/v1/user/changepass",handler.ChangeMobilePassword,handler.MustLogin)
-	server.GET("/api/vl/user/changephone",handler.Changephone)
-	server.POST("/api/v1/products/create",handler.CreateP)//创建商品
+
+	db := orm.Conn
+	err = db.Where("name = ?", *name).First(&user).Error
+	return err
 }
