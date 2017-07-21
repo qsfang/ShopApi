@@ -202,7 +202,7 @@ func ChangeMobilePassword (c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func Changephone(c echo.Context) error {
+/*func Changephone(c echo.Context) error {
 	var (
 		err 	error
 		m	models.Phone
@@ -223,4 +223,4 @@ func Changephone(c echo.Context) error {
 	}
 
 	return c.JSON(errcode.ErrSucceed, nil)
-}
+}*/

@@ -139,7 +139,7 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 	return s, nil
 }
 
-func(us *ContactServiceProvider) AlterDefalt(id uint64) error{
+/*func(us *ContactServiceProvider) AlterDefalt(id uint64) error{
 	var(
 		s	Contact
 		a	int8
@@ -160,4 +160,4 @@ func(us *ContactServiceProvider) AlterDefalt(id uint64) error{
 	}
 
 	return nil
-}
+}*/
