@@ -66,7 +66,9 @@ func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 		Name:                ca.Name,
 		Pid:                 ca.Pid,
 		Status:              general.CategoriesOnuse,
+
 		Remark:              ca.Remark,
+
 		Created:             time.Now(),
 	}
 

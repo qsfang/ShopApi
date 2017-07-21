@@ -32,11 +32,13 @@
 package handler
 
 import (
+	"github.com/labstack/echo"
+
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
-	"github.com/labstack/echo"
+
 )
 
 //名称name，totalsale  ，类型categories，价格price，原价originalprice，
@@ -103,7 +105,7 @@ func ChangeProStatus(c echo.Context) error {
 
 	err = models.ProductService.ChangeProStatus(pro)
 	if err != nil {
-		log.Logger.Error("change crash with error:", err)
+		log.Logger.Error("change chanslates with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

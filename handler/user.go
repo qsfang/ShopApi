@@ -34,15 +34,16 @@
 package handler
 
 import (
+	"errors"
+
+	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
+
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-
-	"errors"
-	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo"
 )
 
 type Register struct {
@@ -148,7 +149,7 @@ func GetInfo(c echo.Context) error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User information doesn't exist !", err)
 
-			return general.NewErrorWithMessage(errcode.NoInformation, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
 		}
 
 		log.Logger.Error("Getting information exists errors", err)

@@ -34,6 +34,7 @@ import (
 	"time"
 
 	"ShopApi/general"
+	"ShopApi/log"
 	"ShopApi/orm"
 )
 
@@ -53,6 +54,17 @@ type Orders struct {
 	Payway     uint8     `json:"payway"`
 }
 
+type GetOrders struct {
+	TotalPrice float64   `json:"totalprice"`
+	Payment    float64   `json:"payment"`
+	Freight    float64   `json:"freight"`
+	Discount   uint8     `json:"discount"`
+	Size       string    `json:"size"`
+	Color      string    `json:"color"`
+	Status     uint8     `json:"status"`
+	Created    time.Time `json:"created"`
+	Payway     uint8     `json:"payway"`
+}
 type Registerorder struct {
 	Name       string  `json:"productname"`
 	TotalPrice float64 `json:"totalprice"`
@@ -150,6 +162,29 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 }
 
 // todo: 代码风格
+
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
+	var(
+		err 	error
+		order   GetOrders
+	)
+
+	db := orm.Conn
+	err = db.Where("id = ?", ID).First(&order).Error
+	if err != nil {
+		return order, err, false
+	}
+
+	err = db.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
+	if err != nil {
+		log.Logger.Error("Access with error :", err)
+
+		return order, err, true
+	}
+	return order, nil, false
+
+}
+
 func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha :=Orders{
 		Status:   	status,
@@ -165,3 +200,4 @@ func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 
 	return nil
 }
+
