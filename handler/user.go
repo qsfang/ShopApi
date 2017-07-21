@@ -136,13 +136,6 @@ func GetInfo(c echo.Context) error {
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 
-	err = sess.Delete(general.SessionUserID)
-	if err != nil {
-		log.Logger.Error("Logout with error", err)
-
-		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
-	}
-
 	number := sess.SessionID()
 	ID, _ := strconv.Atoi(number)
 	Output, err = models.UserService.GetInfo(ID)
