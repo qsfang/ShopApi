@@ -149,7 +149,7 @@ func GetInfo(c echo.Context)  error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User information doesn't exist !", err)
 
-			return general.NewErrorWithMessage(errcode.NoInformation, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
 		}
 
 		log.Logger.Error("Getting information exists errors", err)

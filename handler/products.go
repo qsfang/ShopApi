@@ -101,7 +101,7 @@ func ChangeProStatus(c echo.Context) error {
 
 	err = models.ProductService.ChangeProStatus(pro)
 	if err != nil {
-		log.Logger.Error("change crash with error:", err)
+		log.Logger.Error("change chanslates with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
