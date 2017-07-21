@@ -57,5 +57,3 @@ func CreateC(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
-
-
