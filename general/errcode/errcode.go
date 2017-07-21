@@ -41,6 +41,7 @@ const (
 	ErrInvalidOrdersStatus = 0x7
 	ErrGetOrders           = 0x8
 	ErrGetCategories       = 0x9
+	ErrNotFound		= 0xa
 
 	// 需要登录
 	ErrLoginRequired    = 0x800
