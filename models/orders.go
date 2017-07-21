@@ -65,12 +65,9 @@ type GetOrders struct {
 	Created    time.Time `json:"created"`
 	Payway     uint8     `json:"payway"`
 }
-<<<<<<< HEAD
 
-type Registerorder struct {
-=======
 type RegisterOrder struct {
->>>>>>> a029a34d4c0afd0fff3dedfdc443829734ea4073
+
 	Name       string  `json:"productname"`
 	TotalPrice float64 `json:"totalprice"`
 	Payment    float64 `json:"payment"`
@@ -106,12 +103,7 @@ func (Orders) TableName() string {
 	return "orders"
 }
 
-<<<<<<< HEAD
-/*
-func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
-=======
 func (osp *OrderServiceProvider) CreateOrder(numberID uint64,o RegisterOrder) error {
->>>>>>> a029a34d4c0afd0fff3dedfdc443829734ea4073
 	var (
 		pro Product
 		err error
@@ -144,7 +136,6 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64,o RegisterOrder) er
 
 	return nil
 }
-*/
 func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Orders, error) {
 	var (
 		order  Orders
@@ -192,7 +183,6 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) ([]GetOrd
 		Color:			order.Color,
 		Status:     	order.Status,
 		Created:    	order.Created,
-		Payway:			order.Payway,
 	}
 	getOrder = append(getOrder, add)
 

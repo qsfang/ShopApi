@@ -41,13 +41,9 @@ const (
 	ErrInvalidOrdersStatus = 0x7
 	ErrGetOrders           = 0x8
 	ErrGetCategories       = 0x9
-<<<<<<< HEAD
-	ErrAccess              = 0xa
-=======
-	ErrNotFound		= 0xa
+	ErrNotFound		       = 0xa
+	ErrAccess              = 0xb
 
-
->>>>>>> a029a34d4c0afd0fff3dedfdc443829734ea4073
 	// 需要登录
 	ErrLoginRequired    = 0x800
 	ErrPermissionDenied = 0x801

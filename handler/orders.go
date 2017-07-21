@@ -53,12 +53,7 @@ type ChangStatus struct {
 	ID     uint64 `json:"id"`
 	Status uint8  `json:"status"`
 }
-<<<<<<< HEAD
-/*
-//todo: 错误判断
-=======
 
->>>>>>> a029a34d4c0afd0fff3dedfdc443829734ea4073
 func CreateOrder(c echo.Context) error {
 	var (
 		order models.RegisterOrder
@@ -88,7 +83,6 @@ func CreateOrder(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
-*/
 func GetOrders(c echo.Context) error {
 	var (
 		err    error
