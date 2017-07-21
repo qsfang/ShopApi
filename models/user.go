@@ -62,6 +62,7 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
+
 func (User) TableName() string {
 	return "users"
 }
@@ -171,3 +172,25 @@ func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone *string) error{
 	return  nil
 }
 
+func (us *UserServiceProvider) ChangeMobilePassword(oldpass *string ,newpass *string , id uint64) (bool,error) {
+	var(
+		user   User
+		err error
+	)
+	db := orm.Conn
+	err = db.Where("id = ?", id).First(&user).Error
+	if err!=nil {
+		return false,err
+	}
+
+	if !utility.CompareHash([]byte(user.Password), *oldpass)  {
+
+		return false, err
+	}
+	err = db.Model(&user).Where("id = ?", id).Update(user.Password,*newpass).Limit(1).Error
+	if err!=nil{
+		return false,err
+	}
+
+	return true, nil
+}
