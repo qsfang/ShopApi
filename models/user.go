@@ -156,13 +156,10 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	var (
-<<<<<<< HEAD
+
 		err  error
 		ui   UserInfo
-=======
-		err error
-		UI UserInfo
->>>>>>> 3d274202456f9bbfe11def0d2b2dca7d40f43e8d
+
 	)
 
 	db := orm.Conn

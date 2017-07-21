@@ -82,7 +82,7 @@ func GetOrders(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, orders)
 }
 
-<<<<<<< HEAD
+
 func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
@@ -120,7 +120,7 @@ func GetOneOrder(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, OutPut)
 }
-=======
+
 func ChangeStatus(c echo.Context) error {
 	var (
 		err		error
@@ -142,4 +142,4 @@ func ChangeStatus(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
->>>>>>> 3d274202456f9bbfe11def0d2b2dca7d40f43e8d
+

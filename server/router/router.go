@@ -63,12 +63,11 @@ func InitRouter(server *echo.Echo) {
 
 	server.POST("/api/vl/categories/get", handler.GetCategories)
 	server.POST("/api/v1/categoties/create",handler.Create)
-<<<<<<< HEAD
+
 	server.POST("/api/v1/orders/getone", handler.GetOneOrder)
-=======
 
 	server.POST("/api/v1/orders/changestatus",handler.ChangeStatus)
 	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
 
->>>>>>> 3d274202456f9bbfe11def0d2b2dca7d40f43e8d
+
 }

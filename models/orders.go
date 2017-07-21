@@ -99,7 +99,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
-<<<<<<< HEAD
+
 func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
 	var(
 		err 	error
@@ -121,7 +121,7 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrder
 	return order, nil, false
 
 }
-=======
+
 func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha :=Orders{
 		Status:   	status,
@@ -137,4 +137,4 @@ func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 
 	return nil
 }
->>>>>>> 3d274202456f9bbfe11def0d2b2dca7d40f43e8d
+
