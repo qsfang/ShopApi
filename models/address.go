@@ -127,11 +127,14 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 		return s, err
 	}
 
-	for i, c := range list {
-		s[i].Province = c.Province
-		s[i].City = c.City
-		s[i].Street = c.Street
-		s[i].Address = c.Address
+	for _, c := range list {
+		add := Addressget{
+			Province: c.Province,
+			City:c.City,
+			Street:c.Street,
+			Address:c.Address,
+		}
+		s = append(s, add)
 	}
 
 	return s, nil
