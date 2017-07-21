@@ -130,16 +130,25 @@ func GetAddress(c echo.Context) error {
 
 func Alter(c echo.Context) error {
 	var (
-		err error
+		err 	error
+		m	models.AddressDfault
 	)
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	user := session.Get(general.SessionUserID).(uint64)
 
-	err = models.ContactService.AlterDefalt(user)
+	if err = c.Bind(&m); err != nil {
+		log.Logger.Error("Bind with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+
+	err = models.ContactService.AlterDefalt(m.ID)
 	if err != nil {
 		log.Logger.Error("Alter Default with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 	return c.JSON(errcode.ErrSucceed, nil)
+}
+type AddressDfault struct {
+	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 }

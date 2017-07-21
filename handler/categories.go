@@ -24,39 +24,38 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Yusan Kurban
+ *     Initial: 2017/07/21        Yang Zhengtian
  */
 
-package general
+package handler
 
-const (
-	// User Type
-	PhoneUser  = 0xff
-	WechatUser = 0xfe
-
-	// User Status
-	UserActive   = 0xf0
-	UserInactive = 0xf1
-
-	// Login session
-	SessionUserID = "userid"
-
-	// sex
-	Man   = 0x1
-	Woman = 0x2
-
-	//Address  Default
-	Default   = 1
-	Undefault = 0
-
-	//Products Status
-	ProductOnsale = 0xe0
-	ProductUnsale = 0xe1
-	//Categories Status
-	CategoriesOnuse=0xa0
-	CategoriesUnuse=0xa1
-	// Order Status
-	OrderUnfinished = 0xef
-	OrderFinished   = 0xee
-	OrderGetAll     = 0xed // Not order status
+import (
+	"ShopApi/log"
+	"ShopApi/models"
+	"github.com/labstack/echo"
+	"ShopApi/general"
+	"ShopApi/general/errcode"
 )
+
+func CreateC(c echo.Context) error {
+	var (
+		err error
+		cate models.CreateCat
+	)
+	if err = c.Bind(&cate); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.CategoriesService.Create(cate)
+	if err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
+
+

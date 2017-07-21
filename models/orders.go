@@ -51,8 +51,20 @@ type Orders struct {
 	Payway     uint8     `json:"payway"`
 }
 
-type order struct {
-	ID         uint64
+type Registerorder struct {
+	Name       string  `json:"productname"`
+	TotalPrice float64 `json:"totalprice"`
+	Payment    float64 `json:"payment"`
+	Freight    float64 `json:"freight"`
+	Remark     string  `json:"remark"`
+	Discount   uint8   `json:"discount"`
+	Size       string  `json:"size"`
+	Color      string  `json:"color"`
+	Payway     uint8   `json:"payway"`
+}
+
+type Order struct {
+	Name       string
 	UserID     uint64
 	TotalPrice float64
 	Payment    float64
@@ -75,7 +87,7 @@ func (Orders) TableName() string {
 	return "orders"
 }
 
-func (osp *OrderServiceProvider) CreateOrder(name *string, o order) error {
+func (osp *OrderServiceProvider) Createorder(n uint64,o Registerorder) error {
 	var (
 		or  Orders
 		err error
@@ -83,14 +95,14 @@ func (osp *OrderServiceProvider) CreateOrder(name *string, o order) error {
 
 	db := orm.Conn
 
-	err = db.Where("name = ? AND size = ? AND color = ?", *name, o.Size, o.Color).First(&or).Error
+	err = db.Where("name = ? AND size = ? AND color = ?", o.Name, o.Size, o.Color).First(&or).Error
 	if err != nil {
 		return err
 	}
 
 	order := Orders{
 		ID:         or.ID,
-		UserID:     o.UserID,
+		UserID:     n,
 		TotalPrice: o.TotalPrice,
 		Payment:    o.Payment,
 		Freight:    o.Freight,

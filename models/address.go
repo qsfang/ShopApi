@@ -67,6 +67,10 @@ type Change struct {
 	Address  *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
 }
 
+type AddressDfault struct {
+	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
+}
+
 type ContactServiceProvider struct {
 }
 

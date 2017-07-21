@@ -24,7 +24,13 @@
 
 /*
  * Revision History:
+<<<<<<< HEAD
+ *		Initial: 2017/07/21			Ai Hao
+ *		Modify: 2017/07/21			Zhu Yaqiang
+=======
  *     Initial: 2017/07/21        Ai Hao
+ *     Modify: 2017/07/21         Yu Yi
+>>>>>>> 7a2dbef65b4bdcdef5eaab60548b91f3cc430d34
  */
 
 package models
@@ -56,6 +62,23 @@ type Product struct {
 	Detail        string    `json:"detail"`
 	Created       time.Time `json:"created"`
 	Inventory     uint64    `json:"inventory"`
+type ProductID struct{
+	ID				uint64 `json:"id"`
+}
+
+type GetCategories struct {
+	Categories	    uint64 		`json:"categories" validate:"required, alphanum, min = 2, max= 30"`
+}
+
+type GetProList struct {
+	Name          string
+	TotalSale     uint64
+	Price         float64
+	Originalprice float64
+	Status        uint64
+	Imageid       uint64
+	Detail        string
+	Inventory     uint64
 }
 
 type CreatePro struct {
@@ -69,6 +92,11 @@ type CreatePro struct {
 	Imageids      string  `json:"imageids"`
 	Detail        string  `json:"detail"`
 	Inventory     uint64  `json:"inventory"`
+}
+
+type ChangePro struct {
+	ID     uint64 `json:"id" validate:"numeric"`
+	Status uint64 `json:"status" validate:"numeric"`
 }
 
 func (Product) TableName() string {
@@ -100,3 +128,77 @@ func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 
 	return nil
 }
+
+func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, error) {
+	var (
+		ware  Product
+		list  []Product
+		s     []GetProList
+	)
+
+	db :=orm.Conn
+	err :=db.Model(&ware).Where("categories = ?", m.Categories).Find(&list).Error
+
+	if err != nil {
+		return s, err
+	}
+
+	for _, c := range list {
+		if c.Status == general.ProductOnsale {
+			pro := GetProList{
+				Name:          c.Name,
+				TotalSale:     c.Totalsale,
+				Price:         c.Price,
+				Originalprice: c.Originalprice,
+				Status:        c.Status,
+				Imageid:       c.Imageid,
+				Detail:        c.Detail,
+				Inventory:     c.Inventory,
+			}
+			s = append(s, pro)
+		}
+	}
+
+	return s, nil
+}
+
+func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
+	var (
+		pro Product
+		err error
+	)
+
+	changemap := map[string]interface{}{
+		"status": m.Status,
+	}
+
+	if m.Status == general.ProductOnsale {
+		m.Status = general.ProductUnsale
+	} else {
+		m.Status = general.ProductUnsale
+	}
+
+	db := orm.Conn
+	err = db.Model(&pro).Where("status = ?", m.ID).Updates(changemap).Limit(1).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
+
+	var (
+		err error
+		proinfo   Product
+	)
+
+	db := orm.Conn
+	err = db.Where("id = ?", ProID.ID).First(&proinfo).Error
+
+	if err != nil {
+		return proinfo, err
+	}
+
+	return proinfo, nil
+}
+
