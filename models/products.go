@@ -28,13 +28,13 @@
  *     Modify: 2017/07/21         Yu Yi
  */
 
-
 package models
 
 import (
-	"time"
-	"ShopApi/orm"
 	"ShopApi/general"
+	"ShopApi/orm"
+	"time"
+
 )
 
 type ProductServiceProvider struct {
@@ -60,32 +60,37 @@ type Product struct {
 	Inventory		uint64 		`json:"inventory"`
 }
 
-type CreatePro struct {
-	Name			string		`json:"name"`
-	Categories		uint64 		`json:"categories"`
-	Price			float64 	`json:"price"`
-	Originalprice	float64 	`json:"originalprice"`
-	Size            string 		`json:"size"`
-	Color           string 		`json:"color"`
-	Imageid			uint64 		`json:"imageid"`
-	Imageids		string 		`json:"imageids"`
-	Detail			string 		`json:"detail"`
-	Inventory		uint64 		`json:"inventory"`
-}
-
 type GetCategories struct {
 	Categories	    uint64 		`json:"categories" validate:"required, alphanum, min = 2, max= 30"`
 }
 
 type GetProList struct {
-	Name     			string
-	TotalSale  		    uint64
-	Price        		float64
-	Originalprice 		float64
-	Status       		uint64
-	Imageid      		uint64
-	Detail       		string
-	Inventory    		uint64
+	Name          string
+	TotalSale     uint64
+	Price         float64
+	Originalprice float64
+	Status        uint64
+	Imageid       uint64
+	Detail        string
+	Inventory     uint64
+}
+
+type CreatePro struct {
+	Name          string  `json:"name"`
+	Categories    uint64  `json:"categories"`
+	Price         float64 `json:"price"`
+	Originalprice float64 `json:"originalprice"`
+	Size          string  `json:"size"`
+	Color         string  `json:"color"`
+	Imageid       uint64  `json:"imageid"`
+	Imageids      string  `json:"imageids"`
+	Detail        string  `json:"detail"`
+	Inventory     uint64  `json:"inventory"`
+}
+
+type ChangePro struct {
+	ID     uint64 `json:"id" validate:"numeric"`
+	Status uint64 `json:"status" validate:"numeric"`
 }
 
 func (Product) TableName() string {
@@ -94,18 +99,18 @@ func (Product) TableName() string {
 
 func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 	pro := Product{
-		Name:   		pr.Name,
-		Categories:		pr.Categories,
-		Price:			pr.Price,
-		Originalprice:	pr.Originalprice,
-		Status:         general.ProductOnsale,
-		Size:           pr.Size,
-		Color:          pr.Color,
-		Imageid:		pr.Imageid,
-		Imageids:		pr.Imageids,
-		Detail:			pr.Detail,
-		Created:		time.Now(),
-		Inventory:		pr.Inventory,
+		Name:          pr.Name,
+		Categories:    pr.Categories,
+		Price:         pr.Price,
+		Originalprice: pr.Originalprice,
+		Status:        general.ProductOnsale,
+		Size:          pr.Size,
+		Color:         pr.Color,
+		Imageid:       pr.Imageid,
+		Imageids:      pr.Imageids,
+		Detail:        pr.Detail,
+		Created:       time.Now(),
+		Inventory:     pr.Inventory,
 	}
 
 	db := orm.Conn
@@ -149,4 +154,28 @@ func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, err
 	}
 
 	return s, nil
+}
+
+func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
+	var (
+		pro Product
+		err error
+	)
+
+	changemap := map[string]interface{}{
+		"status": m.Status,
+	}
+
+	if m.Status == general.ProductOnsale {
+		m.Status = general.ProductUnsale
+	} else {
+		m.Status = general.ProductUnsale
+	}
+
+	db := orm.Conn
+	err = db.Model(&pro).Where("status = ?", m.ID).Updates(changemap).Limit(1).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

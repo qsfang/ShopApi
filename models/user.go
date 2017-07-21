@@ -156,7 +156,7 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	var (
-		err error
+		err  error
 		UI   UserInfo
 	)
 

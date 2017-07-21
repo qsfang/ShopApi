@@ -24,39 +24,57 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/19        Yusan Kurban
+ *     Initial: 2017/07/21       Yang Zhengtian
  */
 
-package general
 
-const (
-	// User Type
-	PhoneUser  = 0xff
-	WechatUser = 0xfe
+package models
 
-	// User Status
-	UserActive   = 0xf0
-	UserInactive = 0xf1
-
-	// Login session
-	SessionUserID = "userid"
-
-	// sex
-	Man   = 0x1
-	Woman = 0x2
-
-	//Address  Default
-	Default		=1
-	Undefault	=0
-
-	//Products Status
-	ProductOnsale = 0xe0
-	ProductUnsale = 0xe1
-	//Categories Status
-	CategoriesOnuse=0xa0
-	CategoriesUnuse=0xa1
-	// Order Status
-	OrderUnfinished = 0xef
-	OrderFinished   = 0xee
-	OrderGetAll		= 0xed // Not order status
+import (
+	"time"
+	"ShopApi/orm"
+	"ShopApi/general"
 )
+
+type CategoriesServiceProvider struct {
+}
+
+var CategoriesService *CategoriesServiceProvider = &CategoriesServiceProvider{}
+
+type Categories struct {
+	ID            uint64 		`sql:"auto_increment;primary_key;",json:"id"`
+	Name          string 		`json:"name"`
+	Pid           string 		`json:"pid"`
+	Status        uint64 		`json:"status"`
+	Remark	      string 		`json:"remark"`
+	Created	      time.Time 	`json:"created"`
+}
+
+type CreateCat struct {
+	Name          string `json:"name"`
+	Pid           string `json:"pid"`
+	Remark	      string `json:"remark"`
+}
+
+func (Categories) TableName() string {
+	return "categories"
+}
+
+func (ps *CategoriesServiceProvider) Create(ca CreateCat) error {
+	cate := Categories{
+		Name:                ca.Name,
+		Pid:                 ca.Pid,
+		Status:              general.CategoriesOnuse,
+		Remark:		     ca.Remark,
+		Created:             time.Now(),
+	}
+
+	db := orm.Conn
+
+	err := db.Create(&cate).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
