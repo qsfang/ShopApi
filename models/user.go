@@ -172,25 +172,38 @@ func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone *string) error{
 	return  nil
 }
 
-func (us *UserServiceProvider) ChangeMobilePassword(oldpass *string ,newpass *string , id uint64) (bool,error) {
-	var(
-		user   User
+func (us *UserServiceProvider) IsUserExist(id uint64) (string,error) {
+	var (
+		user User
 		err error
 	)
+
 	db := orm.Conn
 	err = db.Where("id = ?", id).First(&user).Error
-	if err!=nil {
-		return false,err
+	if err != nil {
+		return user.Password,err
 	}
 
-	if !utility.CompareHash([]byte(user.Password), *oldpass)  {
+	return user.Password,nil
+}
 
-		return false, err
-	}
-	err = db.Model(&user).Where("id = ?", id).Update(user.Password,*newpass).Limit(1).Error
-	if err!=nil{
-		return false,err
+func (us *UserServiceProvider) ChangeMobilePassword(newpass *string,id uint64) error {
+	var(
+		user   User
+		err    error
+	)
+
+	db := orm.Conn
+	hashpass, err:=utility.GenerateHash(*newpass)
+	if err != nil{
+		return err
 	}
 
-	return true, nil
+	updater := map[string]interface{}{"password": hashpass}
+	err = db.Model(&user).Where("id =? ",id).Update(updater).Limit(1).Error
+	if err != nil{
+		return err
+	}
+
+	return nil
 }

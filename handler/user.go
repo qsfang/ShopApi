@@ -40,6 +40,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
+	"errors"
 )
 
 type Register struct {
@@ -49,7 +50,7 @@ type Register struct {
 
 type GetPassword struct{
 	Pass *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-	NewPass *string `json:"new_pass" validate:"required,alphanum,min=6,max=30"`
+	NewPass *string `json:"newpass" validate:"required,alphanum,min=6,max=30"`
 }
 
 func Create(c echo.Context) error {
@@ -161,9 +162,10 @@ func GetInfo(c echo.Context)  error {
 
 func ChangeMobilePassword (c echo.Context) error {
 	var(
-		password GetPassword
-		userid uint64
-		err  error
+		password  	GetPassword
+		userid    	uint64
+		err       	error
+		userpassword 	string
 	)
 
 	if err = c.Bind(&password); err != nil {
@@ -171,32 +173,30 @@ func ChangeMobilePassword (c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
+
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	s := sess.Get(general.SessionUserID)
 	userid = s.(uint64)
-	flag,err := models.UserService.ChangeMobilePassword(password.Pass,password.NewPass,userid)
+
+	userpassword, err = models.UserService.IsUserExist(userid)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("User not found:", err)
+		log.Logger.Error("User not found:", err)
 
-			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
-		} else {
-			log.Logger.Error("Mysql error:", err)
+		return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
+	}
 
-			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-		}
-	} else {
-		if flag == false {
-			log.Logger.Error("oldpass pass don't match:", err)
+	if !utility.CompareHash([]byte(userpassword), *password.Pass){
+		log.Logger.Debug("Password doesn't match:", *password.Pass)
 
-			return general.NewErrorWithMessage(errcode.ErrLoginRequired, err.Error())
-		}
+		return general.NewErrorWithMessage(errcode.ErrNamefound, errors.New("password").Error())
+	}
+
+	err = models.UserService.ChangeMobilePassword(password.NewPass, userid)
+	if err != nil {
+		log.Logger.Error("change faluse:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
-
-
-
-
-
