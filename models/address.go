@@ -38,7 +38,6 @@ import (
 )
 
 type Contact struct {
-	// todo: uint8
 	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Name      string    `json:"name"`

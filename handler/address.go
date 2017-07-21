@@ -42,12 +42,12 @@ import (
 )
 
 type Add struct {
-	Name      *string `json:"name"`
-	Phone     *string `json:"phone"`
-	Province  *string `json:"province"`
-	City      *string `json:"city"`
-	Street    *string `json:"street"`
-	Address   *string `json:"address"`
+	Name      *string `json:"name" validate:"required, alphanum, min=6, max=100"`
+	Phone     *string `json:"phone" validate:"required, alphanum, min=6, max=20"`
+	Province  *string `json:"province" validate:"required, alphanum, min=6, max=100"`
+	City      *string `json:"city" validate:"required, alphanum, min=6, max=100"`
+	Street    *string `json:"street" validate:"required, alphanum, min=6, max=100"`
+	Address   *string `json:"address" validate:"required, alphanum, min=6, max=200"`
 	IsDefault uint8   `json:"isdefault"`
 }
 
