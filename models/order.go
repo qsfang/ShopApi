@@ -24,28 +24,23 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Feng Yifei
+ *     Initial: 2017/07/21        Zhang Zizhao
  */
 
-package errcode
+package models
 
-const (
-	NoInformation          = 0x4
-	ErrSucceed             = 0x0
-	ErrInvalidParams       = 0x1
-	ErrMysql               = 0x2
-	ErrDelete              = 0x3 //用户登出错误
-	ErrNamefound           = 0x4
-	ErrNameFormat          = 0x5
-	ErrGetsess             = 0x6
-	ErrInvalidOrdersStatus = 0x7
-	ErrGetOrders           = 0x8
-
-	// 需要登录
-	ErrLoginRequired    = 0x800
-	ErrPermissionDenied = 0x801
-
-	// 严重错误
-	ErrNoConnection      = 0x1000
-	ErrDBOperationFailed = 0x1001
+import (
+	"ShopApi/orm"
 )
+// 未完成
+func CreateOrder(name *string) error{
+	var(
+		user User
+		err error
+	)
+
+
+	db := orm.Conn
+	err = db.Where("name = ?", *name).First(&user).Error
+	return err
+}

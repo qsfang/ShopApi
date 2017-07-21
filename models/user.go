@@ -25,7 +25,9 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *	   Modify: 2017/07/20		  Zhang Zizhao  登录检查
+ *    Modify: 2017/07/21      Xu Haosheng   更改用户信息
+ *     Modify: 2017/07/20	  Zhang Zizhao  登录检查
+ *     Modify: 2017/07/21         Yang Zhengtian  添加判断用户是否存在和修改密码
  */
 
 package models
@@ -60,6 +62,17 @@ type UserInfo struct {
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
 	Sex      uint8  `json:"sex"`
+}
+
+type CUseInfo struct {
+	Avatar   string `json:"avatar"`
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Sex      uint8  `json:"sex"`
+}
+type Phone struct {
+	Phone    string `json:"phone"`
 }
 
 func (User) TableName() string {
@@ -108,7 +121,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	err = tx.Create(&info).Error
 	if err != nil {
-		return nil
+		return err
 	}
 
 	err = tx.Commit().Error
@@ -137,26 +150,26 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 		return false, 0, nil
 	}
 
-	return true, u.UserID, err
+	return true, u.UserID, nil
 }
 
 func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	var (
-		err error
-		s   UserInfo
+		err  error
+		UI   UserInfo
 	)
 
 	db := orm.Conn
-	err = db.Where("UserID = ?", UserID).First(&s).Error
+	err = db.Where("UserID = ?", UserID).First(&UI).Error
 	if err != nil {
-		return s, err
+		return UI, err
 	}
 
-	return s, nil
+	return UI, nil
 }
 
-func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone *string) error{
+func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone string) error{
 	var (
 		err	error
 		con	Contact
@@ -171,3 +184,53 @@ func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone *string) error{
 	return  nil
 }
 
+func (us *UserServiceProvider) IsUserExist(id uint64) (string,error) {
+	var (
+		user User
+		err error
+	)
+
+	db := orm.Conn
+	err = db.Where("id = ?", id).First(&user).Error
+	if err != nil {
+		return user.Password,err
+	}
+
+	return user.Password,nil
+}
+
+func (us *UserServiceProvider) ChangeMobilePassword(newpass *string,id uint64) error {
+	var(
+		user   User
+		err    error
+	)
+
+	db := orm.Conn
+	hashpass, err:=utility.GenerateHash(*newpass)
+	if err != nil{
+		return err
+	}
+
+	updater := map[string]interface{}{"password": hashpass}
+	err = db.Model(&user).Where("id =? ",id).Update(updater).Limit(1).Error
+	if err != nil{
+		return err
+	}
+
+	return nil
+}
+
+func (us *UserServiceProvider) ChangeUserInfo(info CUseInfo, CuserID uint64) error {
+	var con Contact
+
+	changMap := map[string]interface{} {"avatar": info.Avatar, "nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
+
+	db := orm.Conn
+	err := db.Model(&con).Where("userid = ?", CuserID ).Updates(changMap).Limit(1).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

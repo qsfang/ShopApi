@@ -24,28 +24,50 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Feng Yifei
+ *     Initial: 2017/07/21       Li Zebang
  */
 
-package errcode
+package handler
 
-const (
-	NoInformation          = 0x4
-	ErrSucceed             = 0x0
-	ErrInvalidParams       = 0x1
-	ErrMysql               = 0x2
-	ErrDelete              = 0x3 //用户登出错误
-	ErrNamefound           = 0x4
-	ErrNameFormat          = 0x5
-	ErrGetsess             = 0x6
-	ErrInvalidOrdersStatus = 0x7
-	ErrGetOrders           = 0x8
+import (
+	"github.com/labstack/echo"
 
-	// 需要登录
-	ErrLoginRequired    = 0x800
-	ErrPermissionDenied = 0x801
-
-	// 严重错误
-	ErrNoConnection      = 0x1000
-	ErrDBOperationFailed = 0x1001
+	"ShopApi/general"
+	"ShopApi/general/errcode"
+	"ShopApi/log"
+	"ShopApi/models"
+	"ShopApi/utility"
 )
+
+type Status struct {
+	Status uint8 `json:"status"`
+}
+
+func GetOrders(c echo.Context) error {
+	var (
+		err    error
+		status Status
+		orders []models.Orders
+	)
+
+	if err = c.Bind(&status); err != nil {
+		log.Logger.Error("Bind with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if status.Status != general.OrderUnfinished && status.Status != general.OrderFinished && status.Status != general.OrderGetAll {
+		return general.NewErrorWithMessage(errcode.ErrInvalidOrdersStatus, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID).(uint64)
+
+	orders, err = models.OrderService.GetOrders(userID, status.Status)
+	if err != nil {
+		log.Logger.Error("Get orders with error:", err)
+		return general.NewErrorWithMessage(errcode.ErrGetOrders, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, orders)
+}
