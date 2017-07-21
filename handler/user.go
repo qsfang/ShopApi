@@ -230,13 +230,10 @@ func ChangeUserinfo(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-/*func Changephone(c echo.Context) error {
-=======
 func Changephone(c echo.Context) error {
->>>>>>> 381348791139489194532cc0d0437d2b94e1b974
 	var (
-		err 	error
-		m	models.Phone
+		err error
+		m models.Phone
 	)
 	if err = c.Bind(&m); err != nil {
 		log.Logger.Error("ChangePhone crash with error:", err)
@@ -246,7 +243,7 @@ func Changephone(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	user := session.Get(general.SessionUserID).(uint64)
 
-	err = models.UserService.ChangePhone(user,m.Phone)
+	err = models.UserService.ChangePhone(user, m.Phone)
 	if err != nil {
 		log.Logger.Error("changephone crash with error:", err)
 
@@ -254,5 +251,4 @@ func Changephone(c echo.Context) error {
 	}
 
 	return c.JSON(errcode.ErrSucceed, nil)
-<<<<<<< HEAD
-}*/
+}
