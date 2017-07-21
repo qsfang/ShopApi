@@ -156,3 +156,18 @@ func (us *UserServiceProvider) GetInfo(UserID int) (UserInfo, error) {
 	return s, nil
 }
 
+func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone *string) error{
+	var (
+		err	error
+		con	Contact
+	)
+	change := map[string]interface{}{"phone": Phone}
+
+	db := orm.Conn
+	err = db.Model(&con).Where("userid=?",UserID).Update(change).Limit(1).Error
+	if err != nil{
+		return err
+	}
+	return  nil
+}
+
