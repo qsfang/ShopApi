@@ -40,9 +40,9 @@ import (
 	"ShopApi/models"
 	"ShopApi/utility"
 
+	"errors"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-	"errors"
 )
 
 type Register struct {
@@ -163,6 +163,7 @@ func GetInfo(c echo.Context) error {
 
 func ChangeMobilePassword(c echo.Context) error {
 	var (
+
 		password GetPassword
 		userid uint64
 		err error
@@ -232,7 +233,7 @@ func ChangeUserinfo(c echo.Context) error {
 func Changephone(c echo.Context) error {
 	var (
 		err error
-		m models.Phone
+		m   models.Phone
 	)
 	if err = c.Bind(&m); err != nil {
 		log.Logger.Error("ChangePhone crash with error:", err)

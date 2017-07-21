@@ -49,21 +49,19 @@ func InitRouter(server *echo.Echo) {
 	server.POST("/api/vl/user/changephone",handler.Changephone)
 	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
 	server.GET("/api/v1/user/logout", handler.Logout)
-
 	server.POST("/api/v1/contact/add", handler.AddAddress, handler.MustLogin)
 	server.POST("/api/vl/contact/alter",handler.Alter)
 	server.POST("/api/v1/contact/change",handler.ChangeAddress)
 	server.GET("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
-
 	server.POST("/api/v1/products/create",handler.CreateP)//创建商品
 	server.POST("/api/v1/product/getinfo",handler.GetProInfo,handler.MustLogin)
 	server.POST("/api/v1/products/changestatus", handler.ChangeProStatus)
+	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
+	server.POST("/api/v1/orders/create", handler.CreateOrder, handler.MustLogin)
 	server.POST("/api/v1/products/getlist", handler.GetProductList)
 	server.POST("/api/v1/products/changecate",handler.ChangeCategories)
-
 	server.POST("/api/vl/categories/get", handler.GetCategories)
-	server.POST("/api/v1/categoties/create",handler.CreateC)
-
+	server.POST("/api/v1/categoties/create",handler.Create)
 	server.POST("/api/v1/orders/changestatus",handler.ChangeStatus)
 	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
 

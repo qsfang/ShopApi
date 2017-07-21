@@ -32,11 +32,11 @@
 package handler
 
 import (
+	"ShopApi/general"
+	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
 	"github.com/labstack/echo"
-	"ShopApi/general"
-	"ShopApi/general/errcode"
 )
 
 //名称name，totalsale  ，类型categories，价格price，原价originalprice，
@@ -45,8 +45,8 @@ import (
 
 func CreateP(c echo.Context) error {
 	var (
-		err 	error
-		p		models.CreatePro
+		err error
+		p   models.CreatePro
 	)
 
 	if err = c.Bind(&p); err != nil {
@@ -147,7 +147,7 @@ func ChangeCategories(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CategoriesService.ChangeCategories(m)
+	err = models.ProductService.ChangeCategories(m)
 	if err != nil {
 		log.Logger.Error("Categories change with error:", err)
 
