@@ -98,6 +98,11 @@ type ChangePro struct {
 	Status uint64 `json:"status" validate:"numeric"`
 }
 
+type ChangeCate struct {
+	ID             uint64     `json:"id"`
+	Categories     uint64     `json:"categories"`
+}
+
 func (Product) TableName() string {
 	return "products"
 }
@@ -200,4 +205,21 @@ func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,e
 	}
 
 	return proinfo, nil
+}
+
+func (ps *CategoriesServiceProvider) ChangeCategories(m ChangeCate) error {
+	var (
+		cate Product
+	)
+
+	change := map[string]uint64{"categories":m.Categories}
+
+	db := orm.Conn
+	err := db.Model(&cate).Where("ID = ?", m.ID).Updates(change).Limit(1).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
