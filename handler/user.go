@@ -133,7 +133,6 @@ func GetInfo(c echo.Context) error {
 	var (
 		err    error
 		Output models.UserInfo
-		number string
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
