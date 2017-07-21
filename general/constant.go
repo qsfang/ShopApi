@@ -52,9 +52,11 @@ const (
 	//Products Status
 	ProductOnsale = 0xe0
 	ProductUnsale = 0xe1
+
 	//Categories Status
 	CategoriesOnuse=0xa0
 	CategoriesUnuse=0xa1
+
 	// Order Status
 	OrderUnfinished = 0xef
 	OrderFinished   = 0xee
