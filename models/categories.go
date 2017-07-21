@@ -32,6 +32,7 @@ package models
 
 import (
 	"time"
+
 	"ShopApi/orm"
 	"ShopApi/general"
 )
@@ -65,7 +66,9 @@ func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 		Name:                ca.Name,
 		Pid:                 ca.Pid,
 		Status:              general.CategoriesOnuse,
+
 		Remark:              ca.Remark,
+
 		Created:             time.Now(),
 	}
 

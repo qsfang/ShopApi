@@ -32,11 +32,13 @@
 package handler
 
 import (
+	"github.com/labstack/echo"
+
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
-	"github.com/labstack/echo"
+
 )
 
 //名称name，totalsale  ，类型categories，价格price，原价originalprice，
@@ -65,6 +67,7 @@ func CreateP(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+// todo：代码规范
 func GetProductList(c echo.Context) error {
 	var (
 		err    	error
@@ -102,7 +105,7 @@ func ChangeProStatus(c echo.Context) error {
 
 	err = models.ProductService.ChangeProStatus(pro)
 	if err != nil {
-		log.Logger.Error("change crash with error:", err)
+		log.Logger.Error("change chanslates with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -111,6 +114,7 @@ func ChangeProStatus(c echo.Context) error {
 }
 
 //根据商品ID获取商品信息
+// todo: 代码规范
 func GetProInfo(c echo.Context) error {
 	var (
 		err error

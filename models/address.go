@@ -49,7 +49,7 @@ type Contact struct {
 	Created   time.Time `json:"created"`
 	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
 }
-
+// todo: 命名
 type Addressget struct {
 	Province string `json:"province"`
 	City     string `json:"city"`
@@ -66,11 +66,11 @@ type Change struct {
 	Street   *string `json:"street" validate:"required, alphaunicode, min=2,max=30"`
 	Address  *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
 }
-
+// todo:命名 sql
 type AddressDfault struct {
 	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 }
-
+// todo: 放到最前面
 type ContactServiceProvider struct {
 }
 
@@ -80,6 +80,7 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
+// todo: 赋值
 func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
 	contact.Created = time.Now()
 
@@ -92,7 +93,7 @@ func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
 
 	return nil
 }
-
+// todo : 命名和 ID
 func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
 	var (
 		con Contact
@@ -117,6 +118,7 @@ func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
 	return nil
 }
 
+// todo: 修改接受者 保持同一
 func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error) {
 	var (
 		cont Contact
@@ -143,11 +145,12 @@ func (us *ContactServiceProvider) GetAddress(userid uint64) ([]Addressget, error
 	return s, nil
 }
 
-func (us *ContactServiceProvider) AlterDefalt(id uint64) error {
-	var (
-		s   Contact
-		a   int8
-		con Contact
+// todo: 命名
+func(us *ContactServiceProvider) AlterDefalt(id uint64) error{
+	var(
+		s	Contact
+		a	int8
+		con	Contact
 	)
 	db := orm.Conn
 	err := db.Where("id=?", id).Find(&s).Error
