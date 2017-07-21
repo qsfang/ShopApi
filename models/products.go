@@ -190,7 +190,7 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
-func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
+func (ps *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
 
 	var (
 		err error
