@@ -200,3 +200,26 @@ func ChangeMobilePassword (c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+
+func Changephone(c echo.Context) error {
+	var (
+		err 	error
+		m	models.Phone
+	)
+	if err = c.Bind(&m); err != nil {
+		log.Logger.Error("ChangePhone crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	user := session.Get(general.SessionUserID).(uint64)
+
+	err = models.UserService.ChangePhone(user,m.Phone)
+	if err != nil {
+		log.Logger.Error("changephone crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
