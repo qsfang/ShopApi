@@ -50,6 +50,7 @@ func startServer() {
 	server = echo.New()
 
 	server.HTTPErrorHandler = general.EchoRestfulErrorHandler
+	server.Validator = general.NewEchoValidator()
 
 	router.InitRouter(server)
 	log.Logger.Debug("Router already init")

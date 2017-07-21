@@ -27,7 +27,7 @@
  *     Initial: 2017/05/22        Feng Yifei
  */
 
-package utility
+package general
 
 import (
 	"github.com/labstack/echo"

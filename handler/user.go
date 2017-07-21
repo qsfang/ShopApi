@@ -130,18 +130,16 @@ func Logout(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func GetInfo(c echo.Context) error {
-
+func GetInfo(c echo.Context)  error {
 	var (
 		err    error
 		Output models.UserInfo
-
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	numberID := sess.Get(general.SessionUserID).(uint64)
-	Output, err = models.UserService.GetInfo(numberID)
 
+	Output, err = models.UserService.GetInfo(numberID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("User information doesn't exist !", err)
@@ -152,7 +150,6 @@ func GetInfo(c echo.Context) error {
 		log.Logger.Error("Getting information exists errors", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-
 	}
 
 	log.Logger.Debug("have returned UserInformation.")
@@ -200,6 +197,7 @@ func ChangeMobilePassword (c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+
 
 
 
