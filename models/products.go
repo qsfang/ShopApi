@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21        Ai Hao
+ *     Modify: 2017/07/21         Yu Yi
  */
 
 package models
@@ -42,21 +43,36 @@ type ProductServiceProvider struct {
 var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 
 type Product struct {
-	ID            uint64    `json:"id"`
-	Name          string    `json:"name"`
-	Totalsale     uint64    `json:"totalsale"`
-	Categories    uint64    `json:"categories"`
-	Price         float64   `json:"price"`
-	Originalprice float64   `json:"originalprice"`
-	Status        uint64    `json:"status"`
-	Size          string    `json:"size"`
-	Color         string    `json:"color"`
-	Imageid       uint64    `json:"imageid"`
-	Imageids      string    `json:"imageids"`
-	Remark        string    `json:"remark"`
-	Detail        string    `json:"detail"`
-	Created       time.Time `json:"created"`
-	Inventory     uint64    `json:"inventory"`
+	ID				uint64 		`json:"id"`
+	Name			string		`json:"name"`
+	Totalsale   	uint64		`json:"totalsale"`
+	Categories		uint64 		`json:"categories"`
+	Price			float64 	`json:"price"`
+	Originalprice	float64 	`json:"originalprice"`
+	Status          uint64 		`json:"status"`
+	Size            string 		`json:"size"`
+	Color           string 		`json:"color"`
+	Imageid			uint64 		`json:"imageid"`
+	Imageids		string 		`json:"imageids"`
+	Remark			string 		`json:"remark"`
+	Detail			string 		`json:"detail"`
+	Created			time.Time 	`json:"created"`
+	Inventory		uint64 		`json:"inventory"`
+}
+
+type GetCategories struct {
+	Categories	    uint64 		`json:"categories" validate:"required, alphanum, min = 2, max= 30"`
+}
+
+type GetProList struct {
+	Name          string
+	TotalSale     uint64
+	Price         float64
+	Originalprice float64
+	Status        uint64
+	Imageid       uint64
+	Detail        string
+	Inventory     uint64
 }
 
 type CreatePro struct {
@@ -107,6 +123,39 @@ func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 	return nil
 }
 
+func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, error) {
+	var (
+		ware  Product
+		list  []Product
+		s     []GetProList
+	)
+
+	db :=orm.Conn
+	err :=db.Model(&ware).Where("categories = ?", m.Categories).Find(&list).Error
+
+	if err != nil {
+		return s, err
+	}
+
+	for _, c := range list {
+		if c.Status == general.ProductOnsale {
+			pro := GetProList{
+				Name:          c.Name,
+				TotalSale:     c.Totalsale,
+				Price:         c.Price,
+				Originalprice: c.Originalprice,
+				Status:        c.Status,
+				Imageid:       c.Imageid,
+				Detail:        c.Detail,
+				Inventory:     c.Inventory,
+			}
+			s = append(s, pro)
+		}
+	}
+
+	return s, nil
+}
+
 func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	var (
 		pro Product
@@ -130,4 +179,3 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	}
 	return nil
 }
-

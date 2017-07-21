@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21        Ai Hao
+ *     Modify: 2017/07/21         Yu Yi
  */
 
 package handler
@@ -63,6 +64,29 @@ func CreateP(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+func GetProductList(c echo.Context) error {
+	var (
+		err    	error
+		m       models.GetCategories
+		list 	[]models.GetProList
+	)
+
+	if err = c.Bind(&m); err != nil {
+	log.Logger.Error("Get categories with error:", err)
+
+	return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
+	}
+
+	list, err = models.ProductService.GetProduct(m)
+	if err != nil {
+	log.Logger.Error("Error", err)
+
+	return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, list)
+}
+
 func ChangeProStatus(c echo.Context) error {
 	var(
 		err		error
@@ -84,4 +108,3 @@ func ChangeProStatus(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
-
