@@ -83,7 +83,6 @@ func CreateOrder(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
-
 func GetOrders(c echo.Context) error {
 	var (
 		err    error
@@ -118,7 +117,7 @@ func GetOneOrder(c echo.Context) error {
 		err    error
 		order  ID
 		judge  bool
-		OutPut models.GetOrders
+		OutPut []models.GetOrders
 	)
 	if err = c.Bind(&order); err != nil {
 		log.Logger.Error("Bind with error:", err)
