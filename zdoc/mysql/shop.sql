@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
 CREATE TABLE IF NOT EXISTS `products` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) NOT NULL DEFAULT '',
-  `totalsale` int(11) NOT NULL DEFAULT '0',
+  `totalsale` INT(10) NOT NULL DEFAULT '0',
   `categories` int(11) NOT NULL,
   `price` double NOT NULL,
   `originalprice` double NOT NULL,
