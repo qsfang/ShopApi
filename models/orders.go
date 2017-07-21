@@ -32,8 +32,8 @@ package models
 import (
 	"time"
 
-	"ShopApi/orm"
 	"ShopApi/general"
+	"ShopApi/orm"
 )
 
 type Orders struct {
@@ -43,12 +43,27 @@ type Orders struct {
 	Payment    float64   `json:"payment"`
 	Freight    float64   `json:"freight"`
 	Remark     string    `json:"remark"`
-	Discount   uint8    `json:"discount"`
+	Discount   uint8     `json:"discount"`
 	Size       string    `json:"size"`
 	Color      string    `json:"color"`
 	Status     uint8     `json:"status"`
 	Created    time.Time `json:"created"`
 	Payway     uint8     `json:"payway"`
+}
+
+type order struct {
+	ID         uint64
+	UserID     uint64
+	TotalPrice float64
+	Payment    float64
+	Freight    float64
+	Remark     string
+	Discount   uint8
+	Size       string
+	Color      string
+	Status     uint8
+	Created    time.Time
+	Payway     uint8
 }
 
 type OrderServiceProvider struct {
@@ -58,6 +73,42 @@ var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 
 func (Orders) TableName() string {
 	return "orders"
+}
+
+func (osp *OrderServiceProvider) CreateOrder(name *string, o order) error {
+	var (
+		or  Orders
+		err error
+	)
+
+	db := orm.Conn
+
+	err = db.Where("name = ? AND size = ? AND color = ?", *name, o.Size, o.Color).First(&or).Error
+	if err != nil {
+		return err
+	}
+
+	order := Orders{
+		ID:         or.ID,
+		UserID:     o.UserID,
+		TotalPrice: o.TotalPrice,
+		Payment:    o.Payment,
+		Freight:    o.Freight,
+		Remark:     o.Remark,
+		Discount:   o.Discount,
+		Size:       o.Size,
+		Color:      o.Color,
+		Status:     general.OrderFinished,
+		Created:    time.Now(),
+		Payway:     o.Payway,
+	}
+
+	err =db.Create(&order).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Orders, error) {

@@ -72,7 +72,7 @@ type CUseInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 type Phone struct {
-	Phone    string `json:"phone"`
+	Phone string `json:"phone"`
 }
 
 func (User) TableName() string {
@@ -140,12 +140,12 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 
 	db := orm.Conn
 	err = db.Where("name = ?", *name).First(&u).Error
-	if err!=nil {
+	if err != nil {
 
 		return false, 0, err
 	}
 
-	if !utility.CompareHash([]byte(u.Password), *pass)  {
+	if !utility.CompareHash([]byte(u.Password), *pass) {
 
 		return false, 0, nil
 	}
@@ -157,7 +157,7 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	var (
 		err error
-		UI   UserInfo
+		UI  UserInfo
 	)
 
 	db := orm.Conn
@@ -169,51 +169,51 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 	return UI, nil
 }
 
-func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone string) error{
+func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 	var (
-		err	error
-		con	Contact
+		err error
+		con Contact
 	)
 	change := map[string]interface{}{"phone": Phone}
 
 	db := orm.Conn
-	err = db.Model(&con).Where("userid=?",UserID).Update(change).Limit(1).Error
-	if err != nil{
+	err = db.Model(&con).Where("userid=?", UserID).Update(change).Limit(1).Error
+	if err != nil {
 		return err
 	}
-	return  nil
+	return nil
 }
 
-func (us *UserServiceProvider) IsUserExist(id uint64) (string,error) {
+func (us *UserServiceProvider) IsUserExist(id uint64) (string, error) {
 	var (
 		user User
-		err error
+		err  error
 	)
 
 	db := orm.Conn
 	err = db.Where("id = ?", id).First(&user).Error
 	if err != nil {
-		return user.Password,err
+		return user.Password, err
 	}
 
-	return user.Password,nil
+	return user.Password, nil
 }
 
-func (us *UserServiceProvider) ChangeMobilePassword(newpass *string,id uint64) error {
-	var(
-		user   User
-		err    error
+func (us *UserServiceProvider) ChangeMobilePassword(newpass *string, id uint64) error {
+	var (
+		user User
+		err  error
 	)
 
 	db := orm.Conn
-	hashpass, err:=utility.GenerateHash(*newpass)
-	if err != nil{
+	hashpass, err := utility.GenerateHash(*newpass)
+	if err != nil {
 		return err
 	}
 
 	updater := map[string]interface{}{"password": hashpass}
-	err = db.Model(&user).Where("id =? ",id).Update(updater).Limit(1).Error
-	if err != nil{
+	err = db.Model(&user).Where("id =? ", id).Update(updater).Limit(1).Error
+	if err != nil {
 		return err
 	}
 
@@ -223,10 +223,10 @@ func (us *UserServiceProvider) ChangeMobilePassword(newpass *string,id uint64) e
 func (us *UserServiceProvider) ChangeUserInfo(info CUseInfo, CuserID uint64) error {
 	var con Contact
 
-	changMap := map[string]interface{} {"avatar": info.Avatar, "nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
+	changMap := map[string]interface{}{"avatar": info.Avatar, "nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
 
 	db := orm.Conn
-	err := db.Model(&con).Where("userid = ?", CuserID ).Updates(changMap).Limit(1).Error
+	err := db.Model(&con).Where("userid = ?", CuserID).Updates(changMap).Limit(1).Error
 
 	if err != nil {
 		return err

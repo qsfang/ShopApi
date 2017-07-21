@@ -40,9 +40,9 @@ import (
 	"ShopApi/models"
 	"ShopApi/utility"
 
+	"errors"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-	"errors"
 )
 
 type Register struct {
@@ -50,8 +50,8 @@ type Register struct {
 	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
 
-type GetPassword struct{
-	Pass *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
+type GetPassword struct {
+	Pass    *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
 	NewPass *string `json:"newpass" validate:"required,alphanum,min=6,max=30"`
 }
 
@@ -118,7 +118,6 @@ func LoginwithMobile(c echo.Context) error {
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	sess.Set(general.SessionUserID, userID)
 
-
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
@@ -135,7 +134,7 @@ func Logout(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func GetInfo(c echo.Context)  error {
+func GetInfo(c echo.Context) error {
 	var (
 		err    error
 		Output models.UserInfo
@@ -162,12 +161,12 @@ func GetInfo(c echo.Context)  error {
 	return c.JSON(errcode.ErrSucceed, Output)
 }
 
-func ChangeMobilePassword (c echo.Context) error {
-	var(
-		password  	GetPassword
-		userid    	uint64
-		err       	error
-		userpassword 	string
+func ChangeMobilePassword(c echo.Context) error {
+	var (
+		password     GetPassword
+		userid       uint64
+		err          error
+		userpassword string
 	)
 
 	if err = c.Bind(&password); err != nil {
@@ -187,7 +186,7 @@ func ChangeMobilePassword (c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
 	}
 
-	if !utility.CompareHash([]byte(userpassword), *password.Pass){
+	if !utility.CompareHash([]byte(userpassword), *password.Pass) {
 		log.Logger.Debug("Password doesn't match:", *password.Pass)
 
 		return general.NewErrorWithMessage(errcode.ErrNamefound, errors.New("password").Error())
@@ -233,7 +232,7 @@ func ChangeUserinfo(c echo.Context) error {
 func Changephone(c echo.Context) error {
 	var (
 		err error
-		m models.Phone
+		m   models.Phone
 	)
 	if err = c.Bind(&m); err != nil {
 		log.Logger.Error("ChangePhone crash with error:", err)

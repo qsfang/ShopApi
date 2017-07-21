@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Li Zebang
+ *     Modify: 2017/07/21        Zhang Zizhao //添加创建订单
  */
 
 package handler
@@ -41,6 +42,45 @@ import (
 
 type Status struct {
 	Status uint8 `json:"status"`
+}
+
+type Registerorder struct {
+	name       *string  `json:"productname"`
+	TotalPrice float64 `json:"totalprice"`
+	Payment    float64 `json:"payment"`
+	Freight    float64 `json:"freight"`
+	Remark     string  `json:"remark"`
+	Discount   uint8   `json:"discount"`
+	Size       string  `json:"size"`
+	Color      string  `json:"color"`
+	Payway     uint8   `json:"payway"`
+}
+
+type  orderregist struct {
+	name       *string
+	TotalPrice float64
+	Payment    float64
+	Freight    float64
+	Remark     string
+	Discount   uint8
+	Size       string
+	Color      string
+	Payway     uint8
+}
+func CreateOrder(c echo.Context) error {
+	var (
+		order Registerorder
+		err   error
+	)
+
+	if err = c.Bind(&order); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.OrderServiceProvider.CreateOrder(order.name,)
+	return nil
 }
 
 func GetOrders(c echo.Context) error {

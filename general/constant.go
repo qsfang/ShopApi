@@ -46,8 +46,8 @@ const (
 	Woman = 0x2
 
 	//Address  Default
-	Default		=1
-	Undefault	=0
+	Default   = 1
+	Undefault = 0
 
 	//Products Status
 	ProductOnsale = 0xe0
@@ -56,5 +56,5 @@ const (
 	// Order Status
 	OrderUnfinished = 0xef
 	OrderFinished   = 0xee
-	OrderGetAll		= 0xed // Not order status
+	OrderGetAll     = 0xed // Not order status
 )

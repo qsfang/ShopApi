@@ -30,11 +30,11 @@
 package handler
 
 import (
+	"ShopApi/general"
+	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
 	"github.com/labstack/echo"
-	"ShopApi/general"
-	"ShopApi/general/errcode"
 )
 
 //名称name，totalsale  ，类型categories，价格price，原价originalprice，
@@ -43,8 +43,8 @@ import (
 
 func CreateP(c echo.Context) error {
 	var (
-		err 	error
-		p		models.CreatePro
+		err error
+		p   models.CreatePro
 	)
 
 	if err = c.Bind(&p); err != nil {
@@ -62,4 +62,3 @@ func CreateP(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
-
