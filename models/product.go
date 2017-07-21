@@ -24,28 +24,55 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/07/20        Zhu Yaqiang
  */
-
-package router
+package models
 
 import (
-	"github.com/labstack/echo"
-
-	"ShopApi/handler"
+	"ShopApi/orm"
+	"time"
 )
 
-func InitRouter(server *echo.Echo) {
-	if server == nil {
-		panic("[InitRouter], server couldn't be nil")
+
+type ProductServiceProvider struct {
+}
+
+var ProductService *ProductServiceProvider = &ProductServiceProvider{}
+
+
+type ProductID struct{
+	ID				uint64 `json:"id"`
+}
+
+type Products struct {
+	ID				uint64 `sql:"primary_key" gorm:"column:id" json:"id"`
+	Name			string `json:"name"`
+	Totalsale   	uint64 `json:"totalsale"`
+	Categories		uint64 `json:"categories"`
+	Price			float64 `json:"price"`
+	Originalprice	float64 `json:"originalprice"`
+	Status          uint64 `json:"status"`
+	Size            string `json:"size"`
+	Color           string `json:"color"`
+	Imageid			uint64 `json:"imageid"`
+	Imageids		string `json:"imageids"`
+	Remark			string `json:"remark"`
+	Detail			string `json:"detail"`
+	Created			time.Time `json:"created"`
+	Inventory		uint64 `json:"inventory"`
+}
+
+func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Products,error) {
+
+	var (
+		err error
+		proinfo   Products
+	)
+
+	db := orm.Conn
+	err = db.Where("id = ?", ProID.ID).First(&proinfo).Error
+	if err != nil {
+		return proinfo, err
 	}
-	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/user/login", handler.LoginwithMobile)
-	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
-	server.GET("/api/v1/user/logout", handler.Logout)
-	server.GET("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
-	server.POST("/api/v1/contact/add",handler.AddAddress)
-	server.GET("/api/vl/contact/alter",handler.Alter)
-	server.POST("/api/v1/contact/change",handler.ChangeAddress)
-	server.POST("/api/v1/product/getinfo",handler.GetProInfo)
+	return proinfo, nil
 }
