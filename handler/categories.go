@@ -31,19 +31,20 @@
 package handler
 
 import (
+	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
+
 	"ShopApi/log"
 	"ShopApi/models"
-	"github.com/labstack/echo"
 	"ShopApi/general"
 	"ShopApi/general/errcode"
-	"github.com/jinzhu/gorm"
 )
 
 type Pid struct {
 	Pid uint64 `json:"pid"`
 }
 
-func CreateC (c echo.Context) error {
+func CreateCategories (c echo.Context) error {
 	var (
 		err error
 		cate models.CreateCat

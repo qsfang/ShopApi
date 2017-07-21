@@ -109,18 +109,18 @@ func ChangeAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-// todo: 代码规范
 func GetAddress(c echo.Context) error {
 	var (
 		err    error
-		userid uint64
+		userId uint64
 		list   []models.Addressget
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	s := sess.Get(general.SessionUserID)
-	userid = s.(uint64)
-	list, err = models.ContactService.GetAddress(userid)
+	userId = s.(uint64)
+
+	list, err = models.ContactService.GetAddress(userId)
 	if err != nil {
 		log.Logger.Error("error:", err)
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())

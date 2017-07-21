@@ -60,6 +60,7 @@ type CreateCat struct {
 func (Categories) TableName() string {
 	return "categories"
 }
+
 func (cps *CategoriesServiceProvider) CheckPid(pid uint64) error {
 	var(
 		category Categories
@@ -69,6 +70,7 @@ func (cps *CategoriesServiceProvider) CheckPid(pid uint64) error {
 	if err!=nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -77,9 +79,7 @@ func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 		Name:                ca.Name,
 		Pid:                 ca.Pid,
 		Status:              general.CategoriesOnuse,
-
 		Remark:              ca.Remark,
-
 		Created:             time.Now(),
 	}
 
