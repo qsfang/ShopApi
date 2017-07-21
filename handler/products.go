@@ -24,8 +24,13 @@
 
 /*
  * Revision History:
+<<<<<<< HEAD
  *		Initial: 2017/07/21			Ai Hao
  *		Modify: 2017/07/21			Zhu Yaqiang
+=======
+ *     Initial: 2017/07/21        Ai Hao
+ *     Modify: 2017/07/21         Yu Yi
+>>>>>>> 7a2dbef65b4bdcdef5eaab60548b91f3cc430d34
  */
 
 package handler
@@ -64,6 +69,29 @@ func CreateP(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+func GetProductList(c echo.Context) error {
+	var (
+		err    	error
+		m       models.GetCategories
+		list 	[]models.GetProList
+	)
+
+	if err = c.Bind(&m); err != nil {
+	log.Logger.Error("Get categories with error:", err)
+
+	return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
+	}
+
+	list, err = models.ProductService.GetProduct(m)
+	if err != nil {
+	log.Logger.Error("Error", err)
+
+	return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, list)
+}
+
 func ChangeProStatus(c echo.Context) error {
 	var(
 		err		error
@@ -85,6 +113,7 @@ func ChangeProStatus(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+<<<<<<< HEAD
 
 //根据商品ID获取商品信息
 func GetProInfo(c echo.Context) error {
@@ -112,3 +141,5 @@ func GetProInfo(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, proinfo)
 }
+=======
+>>>>>>> 7a2dbef65b4bdcdef5eaab60548b91f3cc430d34
