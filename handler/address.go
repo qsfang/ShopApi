@@ -128,7 +128,7 @@ func GetAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, list)
 }
 
-func Alter(c echo.Context) error {
+/*func Alter(c echo.Context) error {
 	var (
 		err error
 	)
@@ -142,4 +142,4 @@ func Alter(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 	return c.JSON(errcode.ErrSucceed, nil)
-}
+}*/
