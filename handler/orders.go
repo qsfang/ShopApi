@@ -32,16 +32,14 @@
 package handler
 
 import (
-	"github.com/labstack/echo"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
 
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-
-
 )
 
 type Status struct {
@@ -52,14 +50,13 @@ type ID struct {
 }
 
 type ChangStatus struct {
-	ID 		uint64	`json:"id"`
-	Status  uint8	`json:"status"`
+	ID     uint64 `json:"id"`
+	Status uint8  `json:"status"`
 }
 
-//todo: 错误判断
 func CreateOrder(c echo.Context) error {
 	var (
-		order models.Registerorder
+		order models.RegisterOrder
 		err   error
 	)
 
@@ -72,17 +69,16 @@ func CreateOrder(c echo.Context) error {
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	numberID := sess.Get(general.SessionUserID).(uint64)
 
-	err = models.OrderService.Createorder(numberID, order)
+	err = models.OrderService.CreateOrder(numberID, order)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Product not found:", err)
 
-			return general.NewErrorWithMessage(errcode.ErrNamefound, err.Error())
-		} else {
-			log.Logger.Error("Mysql error:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 		}
+		log.Logger.Error("Mysql error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, nil)
@@ -117,7 +113,6 @@ func GetOrders(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, orders)
 }
 
-
 func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
@@ -148,18 +143,18 @@ func GetOneOrder(c echo.Context) error {
 			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
 		}
 
-			log.Logger.Error("Get Order with error:", err)
+		log.Logger.Error("Get Order with error:", err)
 
-			return general.NewErrorWithMessage(errcode.ErrGetOrders, err.Error())
-		}
+		return general.NewErrorWithMessage(errcode.ErrGetOrders, err.Error())
+	}
 
 	return c.JSON(errcode.ErrSucceed, OutPut)
 }
 
 func ChangeStatus(c echo.Context) error {
 	var (
-		err		error
-		st		ChangStatus
+		err error
+		st  ChangStatus
 	)
 
 	if err = c.Bind(&st); err != nil {
@@ -177,4 +172,3 @@ func ChangeStatus(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
-

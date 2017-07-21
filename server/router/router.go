@@ -42,7 +42,7 @@ func InitRouter(server *echo.Echo) {
 		panic("[InitRouter], server couldn't be nil")
 	}
 	server.POST("/api/v1/user/create", handler.Create)
-	server.POST("/api/v1/user/login", handler.LoginwithMobile)
+	server.POST("/api/v1/user/login", handler.Login)
 	server.POST("/api/v1/user/changemobilepass",handler.ChangeMobilePassword)
 	server.POST("/api/v1/user/changeinfo", handler.ChangeUserinfo)
 	server.POST("/api/v1/user/changepass",handler.ChangeMobilePassword,handler.MustLogin)
