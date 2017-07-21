@@ -147,7 +147,7 @@ func ChangeCategories(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CategoriesService.ChangeCategories(m)
+	err = models.ProductService.ChangeCategories(m)
 	if err != nil {
 		log.Logger.Error("Categories change with error:", err)
 
