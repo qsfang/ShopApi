@@ -1,3 +1,4 @@
+
 /*
  * MIT License
  *
@@ -37,6 +38,13 @@ import (
 
 type CartsID struct {
 	ID			uint64		`json:"id"`
+}
+
+type CartPro struct {
+	ID		uint64		`json:"id"`
+	Count		uint64		`json:"count"`
+	Size		string		`json:"size"`
+	Color		string		`json:"color"`
 }
 
 type Carts struct {
@@ -88,3 +96,23 @@ func (cs *CartsServiceProvider) CartsDelete (CartsID uint64) error {
 
 	return nil
 }
+
+func (cs *CartsServiceProvider) AlterCartPro (CartsID uint64,Count uint64,Size string,Color string) error {
+	var (
+		cart 	Carts
+	)
+	updater := map[string]interface{} {
+		"count": 	Count,
+		"size":		Size,
+		"color":	Color,
+	}
+
+	db := orm.Conn
+	err := db.Model(&cart).Where("id = ?",CartsID).Update(updater).Limit(1).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
