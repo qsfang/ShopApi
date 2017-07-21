@@ -66,9 +66,8 @@ type Change struct {
 	Street   *string `json:"street" validate:"required, alphaunicode, min=2,max=30"`
 	Address  *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
 }
-// todo:命名 sql
-type AddressDfault struct {
-	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
+type AddressDefault struct {
+	ID        uint64
 }
 // todo: 放到最前面
 type ContactServiceProvider struct {
@@ -145,8 +144,8 @@ func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, erro
 	return s, nil
 }
 
-// todo: 命名
-func(us *ContactServiceProvider) AlterDefalt(id uint64) error{
+
+func(us *ContactServiceProvider) AlterDefault(id uint64) error{
 	var(
 		s	Contact
 		a	int8
