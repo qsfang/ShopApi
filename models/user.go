@@ -109,7 +109,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	err = tx.Create(&info).Error
 	if err != nil {
-		return nil
+		return err
 	}
 
 	err = tx.Commit().Error
@@ -138,7 +138,7 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 		return false, 0, nil
 	}
 
-	return true, u.UserID, err
+	return true, u.UserID, nil
 }
 
 func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
@@ -185,7 +185,7 @@ func (us *UserServiceProvider) ChangeMobilePassword(oldpass *string ,newpass *st
 
 	if !utility.CompareHash([]byte(user.Password), *oldpass)  {
 
-		return false, err
+		return false, nil
 	}
 	err = db.Model(&user).Where("id = ?", id).Update(user.Password,*newpass).Limit(1).Error
 	if err!=nil{
