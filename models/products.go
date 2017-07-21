@@ -33,9 +33,10 @@ package models
 
 // todo: 导入包的顺序和风格
 import (
+	"time"
+
 	"ShopApi/general"
 	"ShopApi/orm"
-	"time"
 )
 
 type ProductServiceProvider struct {
@@ -191,16 +192,15 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
-// todo: 保持同一
-func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
 
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product,error) {
 	var (
 		err error
 		proinfo   Product
 	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", ProID.ID).First(&proinfo).Error
+	err = db.Where("id = ?", ProID).First(&proinfo).Error
 
 	if err != nil {
 		return proinfo, err

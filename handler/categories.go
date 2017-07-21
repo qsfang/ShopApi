@@ -31,8 +31,8 @@
 package handler
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
+	"github.com/jinzhu/gorm"
 
 	"ShopApi/log"
 	"ShopApi/models"
