@@ -75,7 +75,7 @@ func ChangeProStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductsService.ChangeProStatus(pro)
+	err = models.ProductService.ChangeProStatus(pro)
 	if err != nil {
 		log.Logger.Error("change crash with error:", err)
 
@@ -84,3 +84,4 @@ func ChangeProStatus(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+

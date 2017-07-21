@@ -107,12 +107,8 @@ type ChangePro struct {
 	Status uint64 `json:"status" validate:"numeric"`
 }
 
-type ProductsServiceProvider struct {
-}
 
-var ProductsService *ProductsServiceProvider = &ProductsServiceProvider{}
-
-func (prod *ProductsServiceProvider) ChangeProStatus(m ChangePro) error {
+func (prod *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	var (
 		pro Product
 		err error
@@ -121,11 +117,13 @@ func (prod *ProductsServiceProvider) ChangeProStatus(m ChangePro) error {
 	changemap := map[string]interface{}{
 		"status": m.Status,
 	}
+
 	if m.Status == general.ProductOnsale {
 		m.Status = general.ProductUnsale
 	} else {
 		m.Status = general.ProductUnsale
 	}
+
 	db := orm.Conn
 	err = db.Model(&pro).Where("status = ?", m.ID).Updates(changemap).Limit(1).Error
 	if err != nil {
@@ -133,3 +131,4 @@ func (prod *ProductsServiceProvider) ChangeProStatus(m ChangePro) error {
 	}
 	return nil
 }
+
