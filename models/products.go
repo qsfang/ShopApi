@@ -192,14 +192,14 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 }
 
 
-func (ps *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product,error) {
 	var (
 		err error
 		proinfo   Product
 	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", ProID.ID).First(&proinfo).Error
+	err = db.Where("id = ?", ProID).First(&proinfo).Error
 
 	if err != nil {
 		return proinfo, err
