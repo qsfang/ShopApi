@@ -62,6 +62,9 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
+type Phone struct {
+	Phone    string `json:"phone"`
+}
 
 func (User) TableName() string {
 	return "users"
@@ -157,7 +160,7 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 	return s, nil
 }
 
-func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone *string) error{
+func (us *UserServiceProvider)ChangePhone(UserID uint64,Phone string) error{
 	var (
 		err	error
 		con	Contact
