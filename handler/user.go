@@ -204,10 +204,10 @@ func ChangeMobilePassword(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func ChangeUserinfo(c echo.Context) error {
+func ChangeUserInfo(c echo.Context) error {
 	var (
 		err error
-		info models.CUseInfo
+		info models.ChangeUseInfo
 	)
 
 	if err = c.Bind(&info); err != nil {
@@ -217,9 +217,8 @@ func ChangeUserinfo(c echo.Context) error {
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	cuserID := session.Get(general.SessionUserID)
-	id := cuserID.(uint64)
-	log.Logger.Debug("id %d", id)
+	userID := session.Get(general.SessionUserID)
+	id := userID.(uint64)
 
 	err = models.UserService.ChangeUserInfo(info, id)
 	if err != nil {

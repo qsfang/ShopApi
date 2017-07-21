@@ -44,7 +44,7 @@ func InitRouter(server *echo.Echo) {
 	server.POST("/api/v1/user/create", handler.Create)
 	server.POST("/api/v1/user/login", handler.LoginwithMobile)
 	server.POST("/api/v1/user/changemobilepass",handler.ChangeMobilePassword)
-	server.POST("/api/v1/user/changeinfo", handler.ChangeUserinfo)
+	server.POST("/api/v1/user/changeinfo", handler.ChangeUserInfo)
 	server.POST("/api/v1/user/changepass",handler.ChangeMobilePassword,handler.MustLogin)
 	server.POST("/api/vl/user/changephone",handler.Changephone)
 	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
