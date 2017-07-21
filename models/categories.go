@@ -45,7 +45,7 @@ var CategoriesService *CategoriesServiceProvider = &CategoriesServiceProvider{}
 type Categories struct {
 	ID      uint64                `sql:"auto_increment;primary_key;",json:"id"`
 	Name    string                `json:"name"`
-	Pid     string                `json:"pid"`
+	Pid     uint64                `json:"pid"`
 	Status  uint64                `json:"status"`
 	Remark  string                `json:"remark"`
 	Created time.Time             `json:"created"`
@@ -53,7 +53,7 @@ type Categories struct {
 
 type CreateCat struct {
 	Name   string `json:"name"`
-	Pid    string `json:"pid"`
+	Pid    uint64 `json:"pid"`
 	Remark string `json:"remark"`
 }
 
@@ -61,14 +61,25 @@ func (Categories) TableName() string {
 	return "categories"
 }
 
+func (cps *CategoriesServiceProvider) CheckPid(pid uint64) error {
+	var(
+		category Categories
+	)
+	db := orm.Conn
+	err:=db.Where("id =? ",pid).First(&category).Error
+	if err!=nil {
+		return err
+	}
+
+	return nil
+}
+
 func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 	cate := Categories{
 		Name:                ca.Name,
 		Pid:                 ca.Pid,
 		Status:              general.CategoriesOnuse,
-
 		Remark:              ca.Remark,
-
 		Created:             time.Now(),
 	}
 

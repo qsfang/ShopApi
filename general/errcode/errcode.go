@@ -43,6 +43,7 @@ const (
 	NoOrder                = 0x11
 	ErrAccess              = 0x10
 	ErrGetCategories       = 0x9
+	ErrNotFound		= 0xa
 
 
 	// 需要登录

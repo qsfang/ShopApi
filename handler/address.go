@@ -51,6 +51,7 @@ type Add struct {
 	IsDefault uint8   `json:"isdefault"`
 }
 
+
 func AddAddress(c echo.Context) error {
 	var (
 		err  error
@@ -109,18 +110,18 @@ func ChangeAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-// todo: 代码规范
 func GetAddress(c echo.Context) error {
 	var (
 		err    error
-		userid uint64
+		userId uint64
 		list   []models.Addressget
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	s := sess.Get(general.SessionUserID)
-	userid = s.(uint64)
-	list, err = models.ContactService.GetAddress(userid)
+	userId = s.(uint64)
+
+	list, err = models.ContactService.GetAddress(userId)
 	if err != nil {
 		log.Logger.Error("error:", err)
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
@@ -129,11 +130,11 @@ func GetAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, list)
 }
 
-// todo: 代码规范
+
 func Alter(c echo.Context) error {
 	var (
 		err 	error
-		m	models.AddressDfault
+		m	models.AddressDefault
 	)
 
 	if err = c.Bind(&m); err != nil {
@@ -142,16 +143,11 @@ func Alter(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-
-	err = models.ContactService.AlterDefalt(m.ID)
+	err = models.ContactService.AlterDefault(m.ID)
 	if err != nil {
 		log.Logger.Error("Alter Default with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 	return c.JSON(errcode.ErrSucceed, nil)
-}
-// todo: 改！！！
-type AddressDfault struct {
-	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 }

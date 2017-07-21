@@ -31,9 +31,11 @@
 package handler
 
 import (
+	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
+
 	"ShopApi/log"
 	"ShopApi/models"
-	"github.com/labstack/echo"
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 )
@@ -42,7 +44,7 @@ type Pid struct {
 	Pid uint64 `json:"pid"`
 }
 
-func CreateC(c echo.Context) error {
+func CreateCategories (c echo.Context) error {
 	var (
 		err error
 		cate models.CreateCat
@@ -52,7 +54,19 @@ func CreateC(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
+	if cate.Pid != 0{
+		err=models.CategoriesService.CheckPid(cate.Pid)
+		if err != nil{
+			if err==gorm.ErrRecordNotFound{
+				log.Logger.Error("Pid is invalid:",err)
 
+				return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+			}
+			log.Logger.Error("Mysql error:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		}
+	}
 	err = models.CategoriesService.Create(cate)
 	if err != nil {
 		log.Logger.Error("Create crash with error:", err)
