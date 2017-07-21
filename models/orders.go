@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Li Zebang
+ *	   Modify: 2017/07/21		 Ai Hao 订单状态更改
  */
 
 package models
