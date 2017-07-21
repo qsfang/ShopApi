@@ -89,19 +89,19 @@ func AddAddress(c echo.Context) error {
 
 func ChangeAddress(c echo.Context) error {
 	var (
-		err error
-		m   models.Change
+		err 	error
+		addr    models.Change
 	)
 
-	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("Change crash with error:", err)
+	if err = c.Bind(&addr); err != nil {
+		log.Logger.Error("Bind change with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ContactService.ChangeAddress(m)
+	err = models.ContactService.ChangeAddress(addr)
 	if err != nil {
-		log.Logger.Error("change crash with error:", err)
+		log.Logger.Error("Change address with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -109,7 +109,6 @@ func ChangeAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-// todo: 代码规范
 func GetAddress(c echo.Context) error {
 	var (
 		err    error

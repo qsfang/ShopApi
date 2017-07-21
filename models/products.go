@@ -132,8 +132,8 @@ func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 
 	return nil
 }
-// todo: 代码规范
-func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, error) {
+
+func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
 		ware  Product
 		list  []Product
@@ -141,8 +141,7 @@ func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, err
 	)
 
 	db :=orm.Conn
-	err :=db.Model(&ware).Where("categories = ?", m.Categories).Find(&list).Error
-
+	err :=db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
 	if err != nil {
 		return s, err
 	}
@@ -209,16 +208,15 @@ func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,e
 	return proinfo, nil
 }
 
-// todo: 代码规范 updates
-func (ps *ProductServiceProvider) ChangeCategories(m ChangeCate) error {
+func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {
 	var (
-		cate Product
+		pro Product
 	)
 
-	change := map[string]uint64{"categories": m.Categories}
+	change := map[string]uint64{"categories": cate.Categories}
 
 	db := orm.Conn
-	err := db.Model(&cate).Where("ID = ?", m.ID).Updates(change).Limit(1).Error
+	err := db.Model(&pro).Where("id = ?", cate.ID).Update(change).Limit(1).Error
 
 	if err != nil {
 		return err
