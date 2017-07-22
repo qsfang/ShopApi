@@ -31,22 +31,22 @@
 package handler
 
 import (
-	"github.com/labstack/echo"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
 
-	"ShopApi/log"
-	"ShopApi/models"
 	"ShopApi/general"
 	"ShopApi/general/errcode"
+	"ShopApi/log"
+	"ShopApi/models"
 )
 
 type Pid struct {
 	Pid uint64 `json:"pid"`
 }
 
-func CreateCategories (c echo.Context) error {
+func CreateCategories(c echo.Context) error {
 	var (
-		err error
+		err  error
 		cate models.CreateCat
 	)
 
@@ -56,12 +56,12 @@ func CreateCategories (c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if cate.Pid != 0{
+	if cate.Pid != 0 {
 		err = models.CategoriesService.CheckPid(cate.Pid)
-		if err != nil{
+		if err != nil {
 
-			if err == gorm.ErrRecordNotFound{
-				log.Logger.Error("Pid is invalid:",err)
+			if err == gorm.ErrRecordNotFound {
+				log.Logger.Error("Pid is invalid:", err)
 
 				return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 			}
@@ -96,15 +96,15 @@ func GetCategories(c echo.Context) error {
 
 	categories, err = models.CategoriesService.GetCategories(pid.Pid)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("Categories not found:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrCategoriesNotFound, err.Error())
+		}
+
 		log.Logger.Error("Mysql error in get categories:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	if len(categories) == 0 {
-		log.Logger.Error("Categories not found:",err)
-
-		return general.NewErrorWithMessage(errcode.ErrCategoriesNotFound, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, categories)
