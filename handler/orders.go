@@ -105,8 +105,15 @@ func GetOrders(c echo.Context) error {
 
 	orders, err = models.OrderService.GetOrders(userID, status.Status)
 	if err != nil {
-		log.Logger.Error("Get orders with error:", err)
-		return general.NewErrorWithMessage(errcode.ErrGetOrders, err.Error())
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("Orders not found:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
+		}
+
+		log.Logger.Error("Mysql error in get orders:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, orders)
@@ -144,7 +151,7 @@ func GetOneOrder(c echo.Context) error {
 
 		log.Logger.Error("Get Order with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrGetOrders, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, OutPut)
