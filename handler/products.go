@@ -74,20 +74,19 @@ func GetProductList(c echo.Context) error {
 		log.Logger.Error("Bind get categories with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
 
-		list, err = models.ProductService.GetProduct(cate.Categories)
-		if err != nil {
+	list, err = models.ProductService.GetProduct(cate.Categories)
+	if err != nil {
 
-			if err == gorm.ErrRecordNotFound {
-				log.Logger.Error("Categories not exist", err)
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("Categories not exist", err)
 
-				return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-			}
-
-			log.Logger.Error("Get categories with error", err)
-
-			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 		}
+		log.Logger.Error("Get categories with error", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, list)
