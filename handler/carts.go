@@ -24,8 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/21        Yang Zhengtian
- *     Modify: 2017/07/21         Li Zebang
+ *     Initial: 2017/07/21        Zhu Yaqiang
  */
 
 package handler
@@ -34,45 +33,36 @@ import (
 	"github.com/labstack/echo"
 	"github.com/jinzhu/gorm"
 
-	"ShopApi/log"
-	"ShopApi/models"
 	"ShopApi/general"
 	"ShopApi/general/errcode"
+	"ShopApi/log"
+	"ShopApi/models"
 )
 
-type Pid struct {
-	Pid uint64 `json:"pid"`
-}
-
-func CreateCategories (c echo.Context) error {
+func Cartsdel(c echo.Context) error {
 	var (
 		err error
-		cate models.CreateCat
+		cartid   models.CartsID
 	)
 
-	if err = c.Bind(&cate); err != nil {
-		log.Logger.Error("Create crash with error:", err)
+	if err = c.Bind(&cartid); err != nil {
+		log.Logger.Error("Get crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if cate.Pid != 0{
-		err = models.CategoriesService.CheckPid(cate.Pid)
-		if err != nil{
-			if err == gorm.ErrRecordNotFound{
-				log.Logger.Error("Pid is invalid:",err)
+	err = models.CartsService.CartsWhether(cartid.ID)
 
-				return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
-			}
-			log.Logger.Error("Mysql error:", err)
+	if err == gorm.ErrRecordNotFound {
+		log.Logger.Error("The product doesn't exist !", err)
 
-			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-		}
+		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
-	err = models.CategoriesService.Create(cate)
+	err = models.CartsService.CartsDelete(cartid.ID)
+
 	if err != nil {
-		log.Logger.Error("Create crash with error:", err)
+		log.Logger.Error("Delete product with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -80,32 +70,33 @@ func CreateCategories (c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func GetCategories(c echo.Context) error {
+func AlterCartPro (c echo.Context) error {
 	var (
-		err        error
-		pid        Pid
-		categories []models.Categories
+		err		error
+		cartpro		models.CartPro
 	)
 
-	if err = c.Bind(&pid); err != nil {
-		log.Logger.Error("Bind with error:", err)
+	if err = c.Bind(&cartpro); err != nil {
+		log.Logger.Error("Get crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	categories, err = models.CategoriesService.GetCategories(pid.Pid)
+	err = models.CartsService.CartsWhether(cartpro.ID)
+
+	if err == gorm.ErrRecordNotFound {
+		log.Logger.Error("The product doesn't exist !", err)
+
+		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+	}
+
+	err = models.CartsService.AlterCartPro(cartpro.ID,cartpro.Count,cartpro.Size,cartpro.Color)
 
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Categories not found:",err)
-
-			return general.NewErrorWithMessage(errcode.ErrCategoriesNotFound, err.Error())
-		}
-
-		log.Logger.Error("Mysql error in get categories:", err)
+		log.Logger.Error("Alter product with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, categories)
+	return c.JSON(errcode.ErrSucceed, nil)
 }

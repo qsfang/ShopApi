@@ -33,9 +33,10 @@ package models
 
 // todo: 导入包的顺序和风格
 import (
+	"time"
+
 	"ShopApi/general"
 	"ShopApi/orm"
-	"time"
 )
 
 type ProductServiceProvider struct {
@@ -43,17 +44,18 @@ type ProductServiceProvider struct {
 
 var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 
-type ProductID struct{
-	ID				uint64 `json:"id"`
+type ProductID struct {
+	ID uint64 `json:"id"`
 }
+
 // todo:sql
 type Product struct {
 	ID            uint64        `json:"id"`
 	Name          string        `json:"name"`
 	Totalsale     uint64        `json:"totalsale"`
 	Categories    uint64        `json:"categories"`
-	Price         float64    `json:"price"`
-	Originalprice float64    `json:"originalprice"`
+	Price         float64    	`json:"price"`
+	Originalprice float64    	`json:"originalprice"`
 	Status        uint64        `json:"status"`
 	Size          string        `json:"size"`
 	Color         string        `json:"color"`
@@ -61,12 +63,12 @@ type Product struct {
 	Imageids      string        `json:"imageids"`
 	Remark        string        `json:"remark"`
 	Detail        string        `json:"detail"`
-	Created       time.Time    `json:"created"`
+	Created       time.Time     `json:"created"`
 	Inventory     uint64        `json:"inventory"`
 }
 
 type GetCategories struct {
-	Categories	    uint64 		`json:"categories" validate:"required, alphanum, min = 2, max= 30"`
+	Categories uint64 `json:"categories" validate:"required, alphanum, min = 2, max= 30"`
 }
 
 type GetProList struct {
@@ -99,8 +101,8 @@ type ChangePro struct {
 }
 
 type ChangeCate struct {
-	ID             uint64     `json:"id"`
-	Categories     uint64     `json:"categories"`
+	ID         uint64 `json:"id"`
+	Categories uint64 `json:"categories"`
 }
 
 func (Product) TableName() string {
@@ -132,16 +134,16 @@ func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 
 	return nil
 }
-// todo: 代码规范
-func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, error) {
+
+func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
-		ware  Product
-		list  []Product
-		s     []GetProList
+		ware Product
+		list []Product
+		s    []GetProList
 	)
 
 	db :=orm.Conn
-	err :=db.Model(&ware).Where("categories = ?", m.Categories).Find(&list).Error
+	err :=db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
 
 	if err != nil {
 		return s, err
@@ -191,16 +193,14 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
-// todo: 保持同一
-func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,error) {
-
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product, error) {
 	var (
-		err error
-		proinfo   Product
+		err     error
+		proinfo Product
 	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", ProID.ID).First(&proinfo).Error
+	err = db.Where("id = ?", ProID).First(&proinfo).Error
 
 	if err != nil {
 		return proinfo, err
@@ -209,16 +209,15 @@ func (proinfoser *ProductServiceProvider) GetProInfo(ProID ProductID) (Product,e
 	return proinfo, nil
 }
 
-// todo: 代码规范 updates
-func (ps *ProductServiceProvider) ChangeCategories(m ChangeCate) error {
+func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {
 	var (
-		cate Product
+		pro Product
 	)
 
-	change := map[string]uint64{"categories": m.Categories}
+	change := map[string]uint64{"categories": cate.Categories}
 
 	db := orm.Conn
-	err := db.Model(&cate).Where("ID = ?", m.ID).Updates(change).Limit(1).Error
+	err := db.Model(&pro).Where("id = ?", cate.ID).Update(change).Limit(1).Error
 
 	if err != nil {
 		return err

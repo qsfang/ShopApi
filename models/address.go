@@ -37,6 +37,11 @@ import (
 	"ShopApi/orm"
 )
 
+type ContactServiceProvider struct {
+}
+
+var ContactService *ContactServiceProvider = &ContactServiceProvider{}
+
 type Contact struct {
 	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
@@ -49,8 +54,18 @@ type Contact struct {
 	Created   time.Time `json:"created"`
 	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
 }
-// todo: 命名
-type Addressget struct {
+
+type Add struct {
+	Name      *string `json:"name" validate:"required,alphanum,min=6,max=100"`
+	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=20"`
+	Province  *string `json:"province" validate:"required,alphanum,min=6,max=100"`
+	City      *string `json:"city" validate:"required,alphanum,min=6,max=100"`
+	Street    *string `json:"street" validate:"required,alphanum,min=6,max=100"`
+	Address   *string `json:"address" validate:"required,alphanum,min=6,max=200"`
+	IsDefault uint8   `json:"isdefault"`
+}
+
+type AddressGet struct {
 	Province string `json:"province"`
 	City     string `json:"city"`
 	Street   string `json:"street"`
@@ -67,21 +82,25 @@ type Change struct {
 	Address  *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
 }
 type AddressDefault struct {
-	ID        uint64
+	ID uint64
 }
-// todo: 放到最前面
-type ContactServiceProvider struct {
-}
-
-var ContactService *ContactServiceProvider = &ContactServiceProvider{}
 
 func (Contact) TableName() string {
 	return "contact"
 }
 
-// todo: 赋值
-func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
-	contact.Created = time.Now()
+func (csp *ContactServiceProvider) AddAddress(addr Add, userID uint64) error {
+	contact := Contact{
+		UserID:    userID,
+		Name:      *addr.Name,
+		Phone:     *addr.Phone,
+		Province:  *addr.Province,
+		City:      *addr.City,
+		Street:    *addr.Street,
+		Address:   *addr.Address,
+		Created:   time.Now(),
+		IsDefault: addr.IsDefault,
+	}
 
 	db := orm.Conn
 
@@ -92,24 +111,23 @@ func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
 
 	return nil
 }
-// todo : 命名和 ID
-func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
+
+func (csp *ContactServiceProvider) ChangeAddress(addr Change) error {
 	var (
 		con Contact
 	)
 
-	changemap := map[string]interface{}{
-		"name":     *m.Name,
-		"phone":    *m.Phone,
-		"province": *m.Province,
-		"city":     *m.City,
-		"street":   *m.Street,
-		"address":  *m.Address,
+	changeMap := map[string]interface{}{
+		"name":     *addr.Name,
+		"phone":    *addr.Phone,
+		"province": *addr.Province,
+		"city":     *addr.City,
+		"street":   *addr.Street,
+		"address":  *addr.Address,
 	}
 
 	db := orm.Conn
-	err := db.Model(&con).Where("ID = ?", m.ID).Updates(changemap).Limit(1).Error
-
+	err := db.Model(&con).Where("id = ?", addr.ID).Updates(changeMap).Limit(1).Error
 	if err != nil {
 		return err
 	}
@@ -117,7 +135,7 @@ func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
 	return nil
 }
 
-// todo: 修改接受者 保持同一
+
 func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, error) {
 	var (
 		cont Contact
@@ -144,12 +162,11 @@ func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, erro
 	return s, nil
 }
 
-
-func(us *ContactServiceProvider) AlterDefault(id uint64) error{
-	var(
-		s	Contact
-		a	int8
-		con	Contact
+func (us *ContactServiceProvider) AlterDefault(id uint64) error {
+	var (
+		s   Contact
+		a   int8
+		con Contact
 	)
 	db := orm.Conn
 	err := db.Where("id=?", id).Find(&s).Error

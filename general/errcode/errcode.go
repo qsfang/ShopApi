@@ -35,16 +35,15 @@ const (
 	ErrInvalidParams       = 0x1
 	ErrMysql               = 0x2
 	ErrDelete              = 0x3 //用户登出错误
-	ErrNamefound           = 0x4
+	ErrMysqlfound          = 0x4
 	ErrNameFormat          = 0x5
 	ErrGetsess             = 0x6
 	ErrInvalidOrdersStatus = 0x7
-	ErrGetOrders           = 0x8
+	ErrOrdersNotFound      = 0x8
 	NoOrder                = 0x11
-	ErrAccess              = 0x10
-	ErrGetCategories       = 0x9
-	ErrNotFound		= 0xa
-
+	ErrCategoriesNotFound  = 0x9
+	ErrNotFound		       = 0xa
+	ErrAccess              = 0xb
 
 	// 需要登录
 	ErrLoginRequired    = 0x800
