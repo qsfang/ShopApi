@@ -102,7 +102,7 @@ func (csp *CategoriesServiceProvider) GetCategories(pid uint64) ([]Categories, e
 
 	db := orm.Conn
 
-	err := db.Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).Find(&categories).Error
+	err := db.Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).First(&categories).Error
 	if err != nil {
 		return nil, err
 	}

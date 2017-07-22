@@ -142,7 +142,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	db := orm.Conn
 
 	if status == general.OrderUnfinished || status == general.OrderFinished {
-		err := db.Where("userid = ? AND status = ?", userID, status).Find(&orders).Error
+		err := db.Where("userid = ? AND status = ?", userID, status).First(&orders).Error
 		if err != nil {
 			return nil, err
 		}
