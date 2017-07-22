@@ -50,7 +50,7 @@ type Contact struct {
 	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
 }
 // todo: 命名
-type Addressget struct {
+type AddressGet struct {
 	Province string `json:"province"`
 	City     string `json:"city"`
 	Street   string `json:"street"`
@@ -117,11 +117,11 @@ func (csp *ContactServiceProvider) ChangeAddress(addr Change) error {
 }
 
 
-func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, error) {
+func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]AddressGet, error) {
 	var (
 		cont Contact
 		list []Contact
-		getAdd    []Addressget
+		getAdd    []AddressGet
 	)
 
 	db := orm.Conn
@@ -131,7 +131,7 @@ func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, erro
 	}
 
 	for _, c := range list {
-		add := Addressget{
+		add := AddressGet{
 			Province: c.Province,
 			City:     c.City,
 			Street:   c.Street,
