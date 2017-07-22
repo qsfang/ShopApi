@@ -37,12 +37,13 @@ import (
 	"ShopApi/general"
 	"ShopApi/orm"
 )
-
+// todo: 代码风格
 type ProductServiceProvider struct {
 }
 
 var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 
+// todo: 定义到函数内部
 type ProductID struct {
 	ID uint64 `json:"id"`
 }
@@ -64,7 +65,7 @@ type Product struct {
 	Created       time.Time `json:"created"`
 	Inventory     uint64    `json:"inventory"`
 }
-
+// todo: 参数检查
 type GetCategories struct {
 	Categories uint64 `json:"categories" validate:"required, alphanum, min = 0, max= 30"`
 }
@@ -106,7 +107,7 @@ type ChangeCate struct {
 func (Product) TableName() string {
 	return "products"
 }
-
+// todo：返回错误 参数
 func (ps *ProductServiceProvider) CreateProduct(pr CreatePro) error {
 	pro := Product{
 		Name:          pr.Name,
@@ -132,7 +133,7 @@ func (ps *ProductServiceProvider) CreateProduct(pr CreatePro) error {
 
 	return nil
 }
-
+// todo: 分页
 func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
 		ware Product
@@ -147,7 +148,7 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 		return s, err
 	}
 
-	for _, c := range list {
+	for _, c := range list { // todo: 放到 sql 中
 		if c.Status == general.ProductOnsale {
 			pro := GetProList{
 				Name:          c.Name,
@@ -166,6 +167,7 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 	return s, nil
 }
 
+// todo: 返回错误 数据库操作
 func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	var (
 		pro Product
@@ -190,6 +192,7 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
+// todo: 返回值
 func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product, error) {
 	var (
 		err     error
@@ -211,6 +214,7 @@ func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {
 		pro Product
 	)
 
+	// todo: 复数
 	change := map[string]uint64{"categories": cate.Categories}
 
 	db := orm.Conn

@@ -42,6 +42,7 @@ type ContactServiceProvider struct {
 
 var ContactService *ContactServiceProvider = &ContactServiceProvider{}
 
+// todo：结构
 type Contact struct {
 	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
@@ -90,6 +91,7 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
+// todo: 结构传地址 返回值直接返回
 func (csp *ContactServiceProvider) AddAddress(addr Add, userID uint64) error {
 	contact := Contact{
 		UserID:    userID,
@@ -150,6 +152,7 @@ func (csp *ContactServiceProvider) FindAddressId(ID uint64) error {
 	return nil
 }
 
+// todo: 完善函数名
 func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]AddressGet, error) {
 	var (
 		list	  []Contact
@@ -175,6 +178,7 @@ func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]AddressGet, erro
 	return getAdd, nil
 }
 
+// todo:sql 语句合并
 func (csp *ContactServiceProvider) AlterDefault(id uint64) error {
 	var (
 		s   Contact

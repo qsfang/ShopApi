@@ -38,6 +38,7 @@ import (
 	"ShopApi/orm"
 )
 
+// todo：参数检查 结构
 type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
@@ -92,6 +93,7 @@ type Order struct {
 	Payway     uint8
 }
 
+// todo: 代码风格
 type OrderServiceProvider struct {
 }
 
@@ -101,6 +103,7 @@ func (Orders) TableName() string {
 	return "orders"
 }
 
+// todo：命名
 func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) error {
 	var (
 		pro Product
@@ -133,7 +136,7 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) e
 	}
 
 	return nil
-}
+} // todo: 代码风格 数据库操作
 func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Orders, error) {
 	var (
 		orders []Orders
@@ -158,45 +161,19 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
-func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (Orders, error) {
 	var (
-		judge    bool
 		err      error
-		order    []Orders
-		getOrder GetOrders
+		order    Orders
 	)
 
-	judge = false
 	db := orm.Conn
-	err = db.Where("userid = ?", UserID).Find(&order).Error
+	err = db.Where("userid = ? and id = ?", UserID, ID).First(&order).Error
 	if err != nil {
-		return getOrder, err, judge
+		return nil, err
 	}
 
-	for _, v := range order {
-
-		if v.ID == ID {
-			judge = true
-			var getOrder  = GetOrders {
-				TotalPrice: v.TotalPrice,
-				Payment:    v.Payment,
-				Freight:    v.Freight,
-				Discount:   v.Discount,
-				Size:       v.Size,
-				Color:      v.Color,
-				Status:     v.Status,
-				Created:    v.Created,
-			}
-
-			if judge == true {
-				return getOrder, err, judge
-			}
-
-			break
-		}
-	}
-
-	return getOrder, err, judge
+	return order, nil
 }
 
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {

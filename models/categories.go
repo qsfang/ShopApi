@@ -61,6 +61,7 @@ func (Categories) TableName() string {
 	return "categories"
 }
 
+// todo: 代码风格 直接返回错误
 func (csp *CategoriesServiceProvider) CheckPid(pid uint64) error {
 	var(
 		category Categories
@@ -95,6 +96,7 @@ func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 	return nil
 }
 
+// todo: 数据库操作
 func (csp *CategoriesServiceProvider) GetCategories(pid uint64) ([]Categories, error) {
 	var (
 		categories []Categories
