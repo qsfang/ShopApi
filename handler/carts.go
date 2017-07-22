@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21        Zhu Yaqiang
+ *     Modify:2017/07/22      Xu Haosheng    添加购物车
  */
 
 package handler
@@ -37,31 +38,55 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
+	"ShopApi/utility"
 )
+
+func CartsPutIn(c echo.Context) error {
+	var (
+		err   error
+		carts models.Carts
+	)
+
+	if err = c.Bind(&carts); err != nil {
+		log.Logger.Error("Bind with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID)
+	id := userID.(uint64)
+
+	err = models.CartsService.CreateInCarts(carts, id)
+	if err != nil {
+		log.Logger.Error("Mysql error in add address:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
 
 func Cartsdel(c echo.Context) error {
 	var (
-		err    error
-		cartid models.CartsID
+		err  error
+		cart models.CartsDel
 	)
 
-	if err = c.Bind(&cartid); err != nil {
+	if err = c.Bind(&cart); err != nil {
 		log.Logger.Error("Analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.WhetherInCart(cartid.ID)
-
-	if err == gorm.ErrRecordNotFound {
-		log.Logger.Error("The product doesn't exist !", err)
-
-		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
-	}
-
-	err = models.CartsService.CartsDelete(cartid.ID)
-
+	err = models.CartsService.CartsDelete(cart.ID, cart.ProID)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("This product doesn't exist !", err)
+
+			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
+		}
+
 		log.Logger.Error("Delete product with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
@@ -82,8 +107,7 @@ func AlterCartPro(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.WhetherInCart(cartpro.ID)
-
+	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count, cartpro.Size, cartpro.Color)
 	if err == gorm.ErrRecordNotFound {
 		log.Logger.Error("The product doesn't exist !", err)
 

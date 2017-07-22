@@ -71,6 +71,7 @@ type ChangeUseInfo struct {
 	Phone    string `json:"phone"`
 	Sex      uint8  `json:"sex"`
 }
+
 type Phone struct {
 	Phone string `json:"phone"`
 }

@@ -55,7 +55,7 @@ func CreateProduct(c echo.Context) error {
 
 	err = models.ProductService.CreateProduct(p)
 	if err != nil {
-		log.Logger.Error("Create crash with error:", err)
+		log.Logger.Error("Create product with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -77,6 +77,7 @@ func GetProductList(c echo.Context) error {
 	}
 
 	list, err = models.ProductService.GetProduct(cate.Categories)
+
 	if err != nil {
 
 		if err == gorm.ErrRecordNotFound {
