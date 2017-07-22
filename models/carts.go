@@ -46,11 +46,6 @@ type CartsDel struct {
 	ProID uint64 `json:"productid"`
 }
 
-type Test struct {
-	ID     uint64 `gorm:"column:id" json:"id"`
-	UserID uint64 `json:"userid"`
-}
-
 type Browse struct {
 	Name    string    `json:"name"`
 	Count   uint64    `json:"count"`
@@ -181,9 +176,9 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Browse, error) {
 	var (
 		err         error
 		carts       []Carts
-		browsecart  []Cart
+		browseCart  []Cart
 		browse      []Browse
-		browseimage Images
+		browseImage Images
 	)
 
 
@@ -197,7 +192,8 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Browse, error) {
 		add := Cart {
 			ImageID:  v.ImageID,
 		}
-		browsecart = append(browsecart, add)
+		browseCart = append(browseCart, add)
+
 		add1 := Browse{
 			Status:  v.Status,
 			Created: v.Created,
@@ -208,15 +204,15 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Browse, error) {
 		}
 		browse = append(browse, add1)
 
-		browseimage, err = cs.GetImage(add.ImageID)
+		browseImage, err = cs.GetImage(add.ImageID)
 		if err != nil {
 			return browse, err
 		}
 		add2 := Browse{
-			Url:   browseimage.Url,
-			Image: browseimage.Image,
-			Type:  browseimage.Type,
-			Title: browseimage.Title,
+			Url:   browseImage.Url,
+			Image: browseImage.Image,
+			Type:  browseImage.Type,
+			Title: browseImage.Title,
 		}
 		browse = append(browse, add2)
 	}
