@@ -43,8 +43,8 @@ type ProductServiceProvider struct {
 
 var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 
-type ProductID struct{
-	ID				uint64 `json:"id"`
+type ProductID struct {
+	ID uint64 `json:"id"`
 }
 
 type Product struct {
@@ -66,7 +66,7 @@ type Product struct {
 }
 
 type GetCategories struct {
-	Categories	    uint64 		`json:"categories" validate:"required, alphanum, min = 2, max= 30"`
+	Categories uint64 `json:"categories" validate:"required, alphanum, min = 2, max= 30"`
 }
 
 type GetProList struct {
@@ -99,8 +99,8 @@ type ChangePro struct {
 }
 
 type ChangeCate struct {
-	ID             uint64     `json:"id"`
-	Categories     uint64     `json:"categories"`
+	ID         uint64 `json:"id"`
+	Categories uint64 `json:"categories"`
 }
 
 func (Product) TableName() string {
@@ -135,13 +135,14 @@ func (ps *ProductServiceProvider) CreateProduct(pr CreatePro) error {
 
 func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
-		ware  Product
-		list  []Product
-		s     []GetProList
+		ware Product
+		list []Product
+		s    []GetProList
 	)
 
 	db :=orm.Conn
 	err :=db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
+
 	if err != nil {
 		return s, err
 	}
@@ -190,21 +191,20 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
-
 func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product,error) {
 	var (
 		err error
-		proinfo   Product
+		ProInfo   Product
 	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", ProID).First(&proinfo).Error
+	err = db.Where("id = ?", ProID).First(&ProInfo).Error
 
 	if err != nil {
-		return proinfo, err
+		return ProInfo, err
 	}
 
-	return proinfo, nil
+	return ProInfo, nil
 }
 
 func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {

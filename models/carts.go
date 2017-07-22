@@ -46,28 +46,28 @@ type CartsID struct {
 }
 
 type CartPro struct {
-	ID		uint64		`json:"id"`
+	ID			uint64		`json:"id"`
 	Count		uint64		`json:"count"`
 	Size		string		`json:"size"`
 	Color		string		`json:"color"`
 }
 
 type Carts struct {
-	ID			                   uint64		     `json:"id"`
-	Productid	           uint64		     `json:"productid"`
-	Name		               string		     `json:"name"`
-	Count		               uint64		     `json:"count"`
-	Size		                   string		     `json:"size"`
-	Color		               string		     `json:"color"`
-	Imagineid	           uint64		     `json:"imageid"`
-	Userid		               uint64		     `json:"userid"`
-	Status		               uint64		     `gorm:"column:status" json:"status"`
-	Created		           time.Time 	 `json:"created"`
+	ID			uint64		`sql:"primary_key;" gorm:"column:status" json:"id"`
+	Productid	uint64		`json:"productid"`
+	Name		string		`json:"name"`
+	Count		uint64		`json:"count"`
+	Size		string		`json:"size"`
+	Color		string		`json:"color"`
+	Imagineid	uint64		`json:"imageid"`
+	Userid		uint64		`json:"userid"`
+	Created		time.Time 	`json:"created"`
+	Status		uint64		`json:"status"`
 }
 
 
 
-func (cs *CartsServiceProvider) CartsWhether (CartsID uint64)  error {
+func (cs *CartsServiceProvider) WhetherInCart (CartsID uint64)  error {
 	var (
 		err error
 		cart Carts
@@ -83,7 +83,7 @@ func (cs *CartsServiceProvider) CartsWhether (CartsID uint64)  error {
 	return nil
 }
 
-//状态1表示商品在购物车，状态0表示商品不在购物车
+// 状态1表示商品在购物车，状态0表示商品不在购物车
 func (cs *CartsServiceProvider) CartsDelete (CartsID uint64) error {
 	var (
 		cart Carts

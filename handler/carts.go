@@ -46,12 +46,12 @@ func Cartsdel(c echo.Context) error {
 	)
 
 	if err = c.Bind(&cartid); err != nil {
-		log.Logger.Error("Get crash with error:", err)
+		log.Logger.Error("Analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.CartsWhether(cartid.ID)
+	err = models.CartsService.WhetherInCart(cartid.ID)
 
 	if err == gorm.ErrRecordNotFound {
 		log.Logger.Error("The product doesn't exist !", err)
@@ -82,7 +82,7 @@ func AlterCartPro (c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.CartsWhether(cartpro.ID)
+	err = models.CartsService.WhetherInCart(cartpro.ID)
 
 	if err == gorm.ErrRecordNotFound {
 		log.Logger.Error("The product doesn't exist !", err)

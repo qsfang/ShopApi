@@ -52,7 +52,7 @@ func CreateProduct(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.CreateP(p)
+	err = models.ProductService.CreateProduct(p)
 	if err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
@@ -108,30 +108,29 @@ func ChangeProStatus(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-//根据商品ID获取商品信息
-// todo: 代码规范
+// 根据商品ID获取商品信息
 func GetProInfo(c echo.Context) error {
 	var (
-		err error
-		proid   models.ProductID
-		proinfo models.Product
+		err			error
+		ProID		models.ProductID
+		ProInfo		models.Product
 	)
 
-	if err = c.Bind(&proid); err != nil {
-		log.Logger.Error("Get crash with error:", err)
+	if err = c.Bind(&ProID); err != nil {
+		log.Logger.Error("Analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	proinfo,err = models.ProductService.GetProInfo(proid)
+	ProInfo, err = models.ProductService.GetProInfo(ProID.ID)
 
 	if err != nil {
-		log.Logger.Error("error:", err)
+		log.Logger.Error("Get info with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, proinfo)
+	return c.JSON(errcode.ErrSucceed, ProInfo)
 }
 
 func ChangeCategories(c echo.Context) error {
