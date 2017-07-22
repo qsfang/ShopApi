@@ -87,22 +87,6 @@ func (cs *CartsServiceProvider) CreatInCarts(carts Carts, userID uint64) error {
 	return nil
 }
 
-func (cs *CartsServiceProvider) WhetherInCart(ID uint64, ProID uint64) error {
-	var (
-		err  error
-		cart Carts
-	)
-
-	db := orm.Conn
-	err = db.Where("id = ? and productid = ?", ID, ProID).First(&cart).Error
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // 状态1表示商品在购物车，状态0表示商品不在购物车
 func (cs *CartsServiceProvider) CartsDelete (ID uint64, ProID uint64) error {
 	var (
@@ -111,8 +95,13 @@ func (cs *CartsServiceProvider) CartsDelete (ID uint64, ProID uint64) error {
 	)
 
 	db := orm.Conn
-	err = db.Model(&cart).Where("id = ? and productid = ?", ID, ProID).Update("status", 0).Limit(1).Error
 
+	err = db.Where("id = ? and productid = ?", ID, ProID).First(&cart).Error
+	if err != nil {
+		return err
+	}
+
+	err = db.Model(&cart).Where("id = ? and productid = ?", ID, ProID).Update("status", 0).Limit(1).Error
 	if err != nil {
 		return err
 	}
