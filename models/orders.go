@@ -66,7 +66,6 @@ type GetOrders struct {
 }
 
 type RegisterOrder struct {
-
 	Name       string  `json:"productname"`
 	TotalPrice float64 `json:"totalprice"`
 	Payment    float64 `json:"payment"`
@@ -102,7 +101,7 @@ func (Orders) TableName() string {
 	return "orders"
 }
 
-func (osp *OrderServiceProvider) CreateOrder(numberID uint64,o RegisterOrder) error {
+func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) error {
 	var (
 		pro Product
 		err error
@@ -159,15 +158,15 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
-func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) ([]GetOrders, error, bool) {
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
 	var (
 		judge    bool
 		err      error
 		order    []Orders
-		getOrder []GetOrders
+		getOrder GetOrders
 	)
 
-	judge = true
+	judge = false
 	db := orm.Conn
 	err = db.Where("userid = ?", UserID).Find(&order).Error
 	if err != nil {
@@ -177,27 +176,26 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) ([]GetOrd
 	for _, v := range order {
 
 		if v.ID == ID {
-			judge = false
-			add := GetOrders{
-			TotalPrice: v.TotalPrice,
-			Payment:    v.Payment,
-			Freight:    v.Freight,
-			Discount:   v.Discount,
-			Size:       v.Size,
-			Color:      v.Color,
-			Status:     v.Status,
-			Created:    v.Created,
+			judge = true
+			var getOrder  = GetOrders {
+				TotalPrice: v.TotalPrice,
+				Payment:    v.Payment,
+				Freight:    v.Freight,
+				Discount:   v.Discount,
+				Size:       v.Size,
+				Color:      v.Color,
+				Status:     v.Status,
+				Created:    v.Created,
 			}
-			getOrder = append(getOrder, add)
 
-			if judge == false {
+			if judge == true {
 				return getOrder, err, judge
 			}
 
 			break
 		}
 	}
-	
+
 	return getOrder, err, judge
 }
 
