@@ -60,18 +60,20 @@ type Carts struct {
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
+	ImageID uint64    `gorm:"column:imageid"json:"imageid"`
 	Status    uint64    `json:"status"`
 	Created   time.Time `json:"created"`
 }
 
-func (cs *CartsServiceProvider) CreatInCarts(carts Carts, userID uint64) error {
+func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error {
 	cartsPutIn := Carts {
 		UserID:                       userID,
 		ProductID:                 carts.ProductID,
-	    Name:                        carts.Name,
+		Name:                        carts.Name,
 		Count:                        carts.Count,
 		Size:                            carts.Size,
 		Color:                          carts.Color,
+		ImageID:                    carts.ImageID,
 		Status:                        carts.Status,
 		Created:                     time.Now(),
 	}

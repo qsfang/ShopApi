@@ -56,7 +56,7 @@ func CartsPutIn(c echo.Context) error {
 	userID := session.Get(general.SessionUserID)
 	id := userID.(uint64)
 
-		err = models.CartsService.CreatInCarts(carts, id)
+		err = models.CartsService.CreateInCarts(carts, id)
 	if err != nil {
 		log.Logger.Error("Mysql error in add address:", err)
 
