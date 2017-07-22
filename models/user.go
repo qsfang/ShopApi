@@ -65,11 +65,14 @@ type UserInfo struct {
 }
 
 type ChangeUseInfo struct {
-	Avatar   string `json:"avatar"`
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
 	Sex      uint8  `json:"sex"`
+}
+
+type ChangeAvatar struct {
+	Avatar   string `json:"avatar"`
 }
 
 type Phone struct {
@@ -226,7 +229,22 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 func (us *UserServiceProvider) ChangeUserInfo(info ChangeUseInfo, userID uint64) error {
 	var con Contact
 
-	changMap := map[string]interface{}{"avatar": info.Avatar, "nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
+	changMap := map[string]interface{}{ "nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
+
+	db := orm.Conn
+	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (us *UserServiceProvider) ChangeAvatar(info ChangeAvatar, userID uint64) error {
+	var con Contact
+
+	changMap := map[string]interface{}{"avatar": info.Avatar}
 
 	db := orm.Conn
 	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error

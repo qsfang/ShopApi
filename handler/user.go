@@ -266,3 +266,29 @@ func Changephone(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+
+func ChangeAvatar(c echo.Context) error {
+	var (
+		err error
+		Ava models.ChangeUseInfo
+	)
+
+	if err = c.Bind(&Ava); err != nil {
+		log.Logger.Error("Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID)
+	id := userID.(uint64)
+
+	err = models.UserService.ChangeUserInfo(Ava, id)
+	if err != nil {
+		log.Logger.Error("create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
