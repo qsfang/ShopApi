@@ -138,8 +138,8 @@ func (csp *ContactServiceProvider) ChangeAddress(addr Change) error {
 
 func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]AddressGet, error) {
 	var (
-		cont Contact
-		list []Contact
+		cont 	  Contact
+		list	  []Contact
 		getAdd    []AddressGet
 	)
 
