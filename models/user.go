@@ -79,6 +79,7 @@ type Phone struct {
 	Phone string `json:"phone"`
 }
 
+// todo: 接收者
 func (User) TableName() string {
 	return "users"
 }
@@ -135,7 +136,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	return nil
 }
-
+// todo: 代码风格
 func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	var (
 		u User
@@ -174,7 +175,7 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	return ui, nil
 }
-
+// todo: 参数 代码风格
 func (us *UserServiceProvider)ChangePhone(UserID uint64, Phone string) error {
 	var (
 		err error
@@ -190,6 +191,7 @@ func (us *UserServiceProvider)ChangePhone(UserID uint64, Phone string) error {
 	return nil
 }
 
+// todo：函数命名
 func (us *UserServiceProvider) IsUserExist(id uint64) (string, error) {
 	var (
 		user User
@@ -204,7 +206,7 @@ func (us *UserServiceProvider) IsUserExist(id uint64) (string, error) {
 
 	return user.Password, nil
 }
-
+// todo: 函数权限
 func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) error {
 	var (
 		user User
@@ -226,6 +228,7 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 	return nil
 }
 
+// todo: 代码风格 业务逻辑设计
 func (us *UserServiceProvider) ChangeUserInfo(info ChangeUseInfo, userID uint64) error {
 	var con Contact
 

@@ -38,6 +38,7 @@ import (
 	"ShopApi/orm"
 )
 
+// todo：参数检查 结构
 type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
@@ -92,6 +93,7 @@ type Order struct {
 	Payway     uint8
 }
 
+// todo: 代码风格
 type OrderServiceProvider struct {
 }
 
@@ -101,6 +103,7 @@ func (Orders) TableName() string {
 	return "orders"
 }
 
+// todo：命名
 func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) error {
 	var (
 		pro Product
@@ -133,7 +136,7 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) e
 	}
 
 	return nil
-}
+} // todo: 代码风格 数据库操作
 func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Orders, error) {
 	var (
 		orders []Orders
@@ -158,6 +161,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
+// todo: 马超 重写
 func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
 	var (
 		judge    bool
@@ -199,6 +203,7 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrder
 	return getOrder, err, judge
 }
 
+// todo: 状态
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha := Orders{
 		Status: status,

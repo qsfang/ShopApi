@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+// todo:对齐
 /*
  * Revision History:
  *     Initial: 2017/07/21        Zhu Yaqiang
@@ -113,6 +113,7 @@ type Carts struct {
 	Created   time.Time `json:"created"`
 }
 
+// todo:变量
 func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error {
 	cartsPutIn := Carts{
 		UserID:    userID,
@@ -137,6 +138,7 @@ func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error 
 }
 
 // 状态0表示商品在购物车，状态1表示商品不在购物车
+// todo: 常量定义  数据库操作
 func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	var (
 		cart Carts
@@ -158,6 +160,7 @@ func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	return nil
 }
 
+// todo: 返回错误
 func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size string, Color string) error {
 	var (
 		cart Carts
@@ -177,6 +180,7 @@ func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size 
 	return nil
 }
 
+// todo: 命名
 func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Browse, error) {
 	var (
 		err         error
