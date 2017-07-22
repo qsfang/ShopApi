@@ -26,14 +26,14 @@
  * Revision History:
  *		Initial: 2017/07/21			Ai Hao
  *		Modify: 2017/07/21			Zhu Yaqiang
- *      Modify: 2017/07/21          Yu Yi
+ * 		Modify: 2017/07/21			Yu Yi
  */
 
 package handler
 
 import (
-	"github.com/labstack/echo"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
 
 	"ShopApi/general"
 	"ShopApi/general/errcode"
@@ -77,7 +77,6 @@ func GetProductList(c echo.Context) error {
 	}
 
 	list, err = models.ProductService.GetProduct(cate.Categories)
-
 	if err != nil {
 
 		if err == gorm.ErrRecordNotFound {
@@ -159,12 +158,12 @@ func ChangeCategories(c echo.Context) error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Product not exist", err)
 
-			return general.NewErrorWithMessage(errcode.ErrNotFound,err.Error())
+			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 		}
 
 		log.Logger.Error("Mysql error", err)
 
-		return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	err = models.ProductService.ChangeCategories(m)
