@@ -65,38 +65,38 @@ func CreateProduct(c echo.Context) error {
 
 func GetProductList(c echo.Context) error {
 	var (
-		err    	error
-		cate    models.GetCategories
-		list 	[]models.GetProList
+		err  error
+		cate models.GetCategories
+		list []models.GetProList
 	)
 
 	if err = c.Bind(&cate); err != nil {
 		log.Logger.Error("Bind get categories with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
-	}
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 
-	list, err = models.ProductService.GetProduct(cate.Categories)
-	if err != nil {
+		list, err = models.ProductService.GetProduct(cate.Categories)
+		if err != nil {
 
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Categories not exist",err)
+			if err == gorm.ErrRecordNotFound {
+				log.Logger.Error("Categories not exist", err)
 
-			return general.NewErrorWithMessage(errcode.ErrInvalidParams,err.Error())
+				return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+			}
+
+			log.Logger.Error("Get categories with error", err)
+
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 		}
-
-		log.Logger.Error("Get categories with error", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, list)
 }
 
 func ChangeProStatus(c echo.Context) error {
-	var(
-		err		error
-		pro		models.ChangePro
+	var (
+		err error
+		pro models.ChangePro
 	)
 
 	if err = c.Bind(&pro); err != nil {
@@ -118,9 +118,9 @@ func ChangeProStatus(c echo.Context) error {
 // 根据商品ID获取商品信息
 func GetProInfo(c echo.Context) error {
 	var (
-		err			error
-		ProID		models.ProductID
-		ProInfo		models.Product
+		err     error
+		ProID   models.ProductID
+		ProInfo models.Product
 	)
 
 	if err = c.Bind(&ProID); err != nil {

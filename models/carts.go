@@ -1,4 +1,3 @@
-
 /*
  * MIT License
  *
@@ -41,47 +40,33 @@ type CartsServiceProvider struct {
 
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 
-type CartsInfo struct {
-    ProductId	       uint64		    `gorm:"colum:productid"json:"productid"`
-    Name		           string		    `json:"name"`
-    Count		           uint64		    `json:"count"`
-    Size		               string		    `json:"size"`
-    Color		           string		    `json:"color"`
-    ImagineId	       uint64		    `gorm:"colum:imagineid" json:"imageid"`
-    UserId		           uint64		    `gorm:"colum:userid"json:"userid"`
-    Status		           uint64		    `json:"status"`
-    Created		       time.Time 	`json:"created"`
-}
-
 type CartsID struct {
-	ID			uint64		`json:"id"`
+	ID uint64 `json:"id"`
 }
 
 type CartPro struct {
-	ID			uint64		`json:"id"`
-	Count		uint64		`json:"count"`
-	Size		string		`json:"size"`
-	Color		string		`json:"color"`
+	ID    uint64 `json:"id"`
+	Count uint64 `json:"count"`
+	Size  string `json:"size"`
+	Color string `json:"color"`
 }
 
 type Carts struct {
-	ID			uint64		`sql:"primary_key;" gorm:"column:status" json:"id"`
-	Productid	uint64		`json:"productid"`
-	Name		string		`json:"name"`
-	Count		uint64		`json:"count"`
-	Size		string		`json:"size"`
-	Color		string		`json:"color"`
-	Imagineid	uint64		`json:"imageid"`
-	Userid		uint64		`json:"userid"`
-	Status		uint64		`json:"status"`
-	Created		time.Time 	`json:"created"`
+	ID        uint64    `sql:"primary_key;" gorm:"column:status" json:"id"`
+	ProductID uint64    `gorm:"column:imageID" json:"productid"`
+	Name      string    `json:"name"`
+	Count     uint64    `json:"count"`
+	Size      string    `json:"size"`
+	Color     string    `json:"color"`
+	ImagineID uint64    `gorm:"column:imageid" json:"imageid"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
+	Status    uint64    `json:"status"`
+	Created   time.Time `json:"created"`
 }
 
-
-
-func (cs *CartsServiceProvider) WhetherInCart (CartsID uint64)  error {
+func (cs *CartsServiceProvider) WhetherInCart(CartsID uint64) error {
 	var (
-		err error
+		err  error
 		cart Carts
 	)
 
@@ -96,7 +81,7 @@ func (cs *CartsServiceProvider) WhetherInCart (CartsID uint64)  error {
 }
 
 // 状态1表示商品在购物车，状态0表示商品不在购物车
-func (cs *CartsServiceProvider) CartsDelete (CartsID uint64) error {
+func (cs *CartsServiceProvider) CartsDelete(CartsID uint64) error {
 	var (
 		cart Carts
 	)
@@ -111,22 +96,21 @@ func (cs *CartsServiceProvider) CartsDelete (CartsID uint64) error {
 	return nil
 }
 
-func (cs *CartsServiceProvider) AlterCartPro (CartsID uint64,Count uint64,Size string,Color string) error {
+func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size string, Color string) error {
 	var (
-		cart 	Carts
+		cart Carts
 	)
-	updater := map[string]interface{} {
-		"count": 	Count,
-		"size":		Size,
-		"color":	Color,
+	updater := map[string]interface{}{
+		"count": Count,
+		"size":  Size,
+		"color": Color,
 	}
 
 	db := orm.Conn
-	err := db.Model(&cart).Where("id = ?",CartsID).Update(updater).Limit(1).Error
+	err := db.Model(&cart).Where("id = ?", CartsID).Update(updater).Limit(1).Error
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-

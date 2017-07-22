@@ -48,21 +48,21 @@ type ProductID struct {
 }
 
 type Product struct {
-	ID            uint64        `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
-	Name          string        `json:"name"`
-	TotalSale     uint64        `gorm:"column:totalsale"json:"totalsale"`
-	Categories    uint64        `json:"categories"`
-	Price         float64    	`json:"price"`
-	OriginalPrice float64    	`json:"originalprice"`
-	Status        uint64        `json:"status"`
-	Size          string        `json:"size"`
-	Color         string        `json:"color"`
-	ImageID       uint64        `json:"imageid"`
-	ImageIDs      string        `json:"imageids"`
-	Remark        string        `json:"remark"`
-	Detail        string        `json:"detail"`
-	Created       time.Time     `json:"created"`
-	Inventory     uint64        `json:"inventory"`
+	ID            uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
+	Name          string    `json:"name"`
+	TotalSale     uint64    `gorm:"column:totalsale"json:"totalsale"`
+	Categories    uint64    `json:"categories"`
+	Price         float64   `json:"price"`
+	OriginalPrice float64   `json:"originalprice"`
+	Status        uint64    `json:"status"`
+	Size          string    `json:"size"`
+	Color         string    `json:"color"`
+	ImageID       uint64    `json:"imageid"`
+	ImageIDs      string    `json:"imageids"`
+	Remark        string    `json:"remark"`
+	Detail        string    `json:"detail"`
+	Created       time.Time `json:"created"`
+	Inventory     uint64    `json:"inventory"`
 }
 
 type GetCategories struct {
@@ -140,8 +140,8 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 		s    []GetProList
 	)
 
-	db :=orm.Conn
-	err :=db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
+	db := orm.Conn
+	err := db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
 
 	if err != nil {
 		return s, err
@@ -191,10 +191,10 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
-func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product,error) {
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product, error) {
 	var (
-		err error
-		ProInfo   Product
+		err     error
+		ProInfo Product
 	)
 
 	db := orm.Conn
