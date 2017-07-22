@@ -30,8 +30,8 @@
 package handler
 
 import (
-	"github.com/labstack/echo"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
 
 	"ShopApi/general"
 	"ShopApi/general/errcode"
@@ -41,8 +41,8 @@ import (
 
 func Cartsdel(c echo.Context) error {
 	var (
-		err error
-		cartid   models.CartsID
+		err    error
+		cartid models.CartsID
 	)
 
 	if err = c.Bind(&cartid); err != nil {
@@ -70,10 +70,10 @@ func Cartsdel(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func AlterCartPro (c echo.Context) error {
+func AlterCartPro(c echo.Context) error {
 	var (
-		err		error
-		cartpro		models.CartPro
+		err     error
+		cartpro models.CartPro
 	)
 
 	if err = c.Bind(&cartpro); err != nil {
@@ -90,7 +90,7 @@ func AlterCartPro (c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
-	err = models.CartsService.AlterCartPro(cartpro.ID,cartpro.Count,cartpro.Size,cartpro.Color)
+	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count, cartpro.Size, cartpro.Color)
 
 	if err != nil {
 		log.Logger.Error("Alter product with error:", err)
