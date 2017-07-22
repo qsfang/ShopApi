@@ -52,7 +52,7 @@ func CreateProduct(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.CreateP(p)
+	err = models.ProductService.CreateProduct(p)
 	if err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
