@@ -152,13 +152,12 @@ func (csp *ContactServiceProvider) FindAddressId(ID uint64) error {
 
 func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]AddressGet, error) {
 	var (
-		cont 	  Contact
 		list	  []Contact
 		getAdd    []AddressGet
 	)
 
 	db := orm.Conn
-	err := db.Model(&cont).Where("userid=?", userId).Find(&list).Error
+	err := db.Where("userid=?", userId).Find(&list).Error
 	if err != nil {
 		return getAdd, err
 	}

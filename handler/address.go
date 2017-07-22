@@ -116,7 +116,13 @@ func GetAddress(c echo.Context) error {
 
 	list, err = models.ContactService.GetAddress(userId)
 	if err != nil {
-		log.Logger.Error("error:", err)
+		if err==gorm.ErrRecordNotFound{
+			log.Logger.Error("Id not find:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+		}
+		log.Logger.Error("Mysql err", err)
+
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 

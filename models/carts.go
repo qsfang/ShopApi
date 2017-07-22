@@ -136,7 +136,7 @@ func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error 
 	return nil
 }
 
-// 状态1表示商品在购物车，状态0表示商品不在购物车
+// 状态0表示商品在购物车，状态1表示商品不在购物车
 func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	var (
 		cart Carts
@@ -150,7 +150,7 @@ func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 		return err
 	}
 
-	err = db.Model(&cart).Where("id = ? and productid = ?", ID, ProID).Update("status", 0).Limit(1).Error
+	err = db.Model(&cart).Where("id = ? and productid = ?", ID, ProID).Update("status", 1).Limit(1).Error
 	if err != nil {
 		return err
 	}

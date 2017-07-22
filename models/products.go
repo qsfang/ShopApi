@@ -73,9 +73,9 @@ type GetProList struct {
 	Name          string
 	TotalSale     uint64
 	Price         float64
-	Originalprice float64
+	OriginalPrice float64
 	Status        uint64
-	Imageid       uint64
+	ImageId       uint64
 	Detail        string
 	Inventory     uint64
 }
@@ -153,9 +153,9 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 				Name:          c.Name,
 				TotalSale:     c.TotalSale,
 				Price:         c.Price,
-				Originalprice: c.OriginalPrice,
+				OriginalPrice: c.OriginalPrice,
 				Status:        c.Status,
-				Imageid:       c.ImageID,
+				ImageId:       c.ImageID,
 				Detail:        c.Detail,
 				Inventory:     c.Inventory,
 			}
