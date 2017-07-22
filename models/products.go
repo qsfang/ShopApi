@@ -152,7 +152,7 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 				Name:          c.Name,
 				TotalSale:     c.TotalSale,
 				Price:         c.Price,
-				Originalprice: c.OriginalpPrice,
+				Originalprice: c.OriginalPrice,
 				Status:        c.Status,
 				Imageid:       c.ImageID,
 				Detail:        c.Detail,

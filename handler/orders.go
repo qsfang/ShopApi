@@ -164,7 +164,7 @@ func ChangeStatus(c echo.Context) error {
 
 	err = models.OrderService.ChangeStatus(st.ID, st.Status)
 	if err != nil {
-		log.Logger.Error("Input order status with error:", err)
+		log.Logger.Error("Change status with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
