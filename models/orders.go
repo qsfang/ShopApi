@@ -161,49 +161,21 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
-// todo: 马超 重写
-func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (Orders, error) {
 	var (
-		judge    bool
 		err      error
-		order    []Orders
-		getOrder GetOrders
+		order    Orders
 	)
 
-	judge = false
 	db := orm.Conn
-	err = db.Where("userid = ?", UserID).Find(&order).Error
+	err = db.Where("userid = ? and id = ?", UserID, ID).First(&order).Error
 	if err != nil {
-		return getOrder, err, judge
+		return nil, err
 	}
 
-	for _, v := range order {
-
-		if v.ID == ID {
-			judge = true
-			var getOrder  = GetOrders {
-				TotalPrice: v.TotalPrice,
-				Payment:    v.Payment,
-				Freight:    v.Freight,
-				Discount:   v.Discount,
-				Size:       v.Size,
-				Color:      v.Color,
-				Status:     v.Status,
-				Created:    v.Created,
-			}
-
-			if judge == true {
-				return getOrder, err, judge
-			}
-
-			break
-		}
-	}
-
-	return getOrder, err, judge
+	return order, nil
 }
 
-// todo: 状态
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha := Orders{
 		Status: status,
