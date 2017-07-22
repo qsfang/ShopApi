@@ -46,30 +46,58 @@ type CartsDel struct {
 	ProID uint64 `json:"productid"`
 }
 
+type Test struct {
+	ID  uint64 `gorm:"column:id" json:"id"`
+	UserID uint64  `json:"userid"`
+}
+
+type Browse struct {
+	ProductID uint64    `gorm:"column:productid" json:"productid"`
+	Name      string    `json:"name"`
+	Count     uint64    `json:"count"`
+	Size      string    `json:"size"`
+	Color     string    `json:"color"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
+	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
+	Status    uint64    `json:"status"`
+	Created   time.Time `json:"created"`
+	Type      string    `json:"type"`
+	Title     string    `json:"title"`
+	Image     string    `json:"image"`
+	Url       string    `json:"url"`
+}
+type Cart struct {
+	ProductID uint64    `gorm:"column:productid" json:"productid"`
+	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
+	Status    uint64    `json:"status"`
+	Created   time.Time `json:"created"`
+	Count     uint64    `json:"count"`
+}
+
+type Images struct {
+	Type  string `json:"type"`
+	Title string `json:"title"`
+	Image string `json:"image"`
+	Url   string `json:"url"`
+}
+
+type Image struct {
+	Type  string `json:"type"`
+	Title string `json:"title"`
+	Image string `json:"image"`
+	Url   string `json:"url"`
+	ID    uint64 `json:"id"`
+}
+
+func (Image) TableName() string {
+	return "image"
+}
+
 type CartPro struct {
 	ID    uint64 `json:"id"`
 	Count uint64 `json:"count"`
 	Size  string `json:"size"`
 	Color string `json:"color"`
-}
-
-type Image struct {
-	ID   uint64 `json:"id"`
-	Url  *string `json:"url"`
-	Image *string `json:"image"`
-	Type  *string `json:"type"`
-	Title *string `json:"title"`
-}
-
-type Images struct {
-	Url  *string `json:"url"`
-	Image *string `json:"image"`
-	Type  *string `json:"type"`
-	Title *string `json:"title"`
-}
-
-func (Image) TableName() string {
-	return "image"
 }
 
 type Carts struct {
@@ -80,56 +108,23 @@ type Carts struct {
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
-	ImageID uint64    `gorm:"column:imageid"json:"imageid"`
+	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
 	Status    uint64    `json:"status"`
 	Created   time.Time `json:"created"`
 }
 
-<<<<<<< HEAD
-type Cart struct {
-	ProductID uint64    `gorm:"column:imageID" json:"productid"`
-	ImagineID uint64    `gorm:"column:imageid" json:"imageid"`
-	Count     uint64    `json:"count"`
-	Status    uint64    `json:"status"`
-	Created   time.Time `json:"created"`
-}
-
-type Browse struct {
-	Name      string    `json:"name"`
-	Size      string    `json:"size"`
-	Color     string    `json:"color"`
-	Count     uint64    `json:"count"`
-	Status    uint64    `json:"status"`
-	Created   time.Time `json:"created"`
-	Url  *string `json:"url"`
-	Image *string `json:"image"`
-	Type  *string `json:"type"`
-	Title *string `json:"title"`
-}
-
-func (Carts) TableName() string {
-	return "carts"
-}
-
-func (cs *CartsServiceProvider) WhetherInCart(CartsID uint64) error {
-	var (
-		err  error
-		cart Carts
-	)
-=======
 func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error {
-	cartsPutIn := Carts {
-		UserID:                       userID,
-		ProductID:                 carts.ProductID,
-		Name:                        carts.Name,
-		Count:                        carts.Count,
-		Size:                            carts.Size,
-		Color:                          carts.Color,
-		ImageID:                    carts.ImageID,
-		Status:                        carts.Status,
-		Created:                     time.Now(),
+	cartsPutIn := Carts{
+		UserID:    userID,
+		ProductID: carts.ProductID,
+		Name:      carts.Name,
+		Count:     carts.Count,
+		Size:      carts.Size,
+		Color:     carts.Color,
+		ImageID:   carts.ImageID,
+		Status:    carts.Status,
+		Created:   time.Now(),
 	}
->>>>>>> 9b3a594449314b1bc769c4216c23fdbba9529f8f
 
 	db := orm.Conn
 
@@ -142,7 +137,7 @@ func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error 
 }
 
 // 状态1表示商品在购物车，状态0表示商品不在购物车
-func (cs *CartsServiceProvider) CartsDelete (ID uint64, ProID uint64) error {
+func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	var (
 		cart Carts
 		err  error
@@ -182,6 +177,78 @@ func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size 
 	return nil
 }
 
+func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Browse, error) {
+	var (
+		err         error
+		carts       Carts
+		browse      []Browse
+		browsepro   []Product
+		browseimage []Images
+	)
 
+	db := orm.Conn
+	err = db.Where("userid = ?", UserID).Find(&carts).Error
+	if err != nil {
+		return browse, err
+	}
+	var cart = Cart{
+		ProductID: carts.ProductID,
+		ImageID:   carts.ImageID,
+		Status:    carts.Status,
+		Created:   carts.Created,
+		Count:     carts.Count,
+	}
 
+	browsepro, err = cs.GetProduct(cart.ProductID)
+	if err != nil {
+		return browse, err
+	}
 
+	for _, x := range browsepro {
+		add := Browse{
+			Name:  x.Name,
+			Size:  x.Size,
+			Color: x.Color,
+		}
+		browse = append(browse, add)
+	}
+
+	browseimage, err = cs.GetImage(cart.ImageID)
+	if err != nil {
+		return browse, err
+	}
+
+	for _, s := range browseimage {
+		add := Browse{
+			Url:   s.Url,
+			Image: s.Image,
+			Type:  s.Type,
+			Title: s.Title,
+		}
+		browse = append(browse, add)
+	}
+
+	return browse, err
+}
+
+func (cs *CartsServiceProvider) GetProduct(ProductID uint64) ([]Product, error) {
+	var product []Product
+	db := orm.Conn
+	err := db.Where("id = ?", ProductID).Find(&product).Error
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (cs *CartsServiceProvider) GetImage(ImageID uint64) ([]Images, error) {
+	var image []Images
+	db := orm.Conn
+	err := db.Where("id = ?", ImageID).Find(&image).Error
+	if err != nil {
+		return image, err
+	}
+
+	return image, nil
+}
