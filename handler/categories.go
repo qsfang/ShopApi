@@ -59,6 +59,7 @@ func CreateCategories (c echo.Context) error {
 	if cate.Pid != 0{
 		err = models.CategoriesService.CheckPid(cate.Pid)
 		if err != nil{
+
 			if err == gorm.ErrRecordNotFound{
 				log.Logger.Error("Pid is invalid:",err)
 

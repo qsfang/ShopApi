@@ -94,7 +94,7 @@ func GetAddress(c echo.Context) error {
 	var (
 		err    error
 		userId uint64
-		list   []models.Addressget
+		list   []models.AddressGet
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())

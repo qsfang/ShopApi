@@ -193,7 +193,7 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
-func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product, error) {
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product,error) {
 	var (
 		err     error
 		proinfo Product

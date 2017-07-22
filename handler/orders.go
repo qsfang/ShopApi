@@ -151,7 +151,7 @@ func GetOneOrder(c echo.Context) error {
 
 		log.Logger.Error("Get Order with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrGetOrders, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, OutPut)

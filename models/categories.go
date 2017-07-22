@@ -65,7 +65,9 @@ func (cps *CategoriesServiceProvider) CheckPid(pid uint64) error {
 	var(
 		category Categories
 	)
+
 	db := orm.Conn
+
 	err:=db.Where("id =? ",pid).First(&category).Error
 	if err!=nil {
 		return err

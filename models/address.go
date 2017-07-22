@@ -81,6 +81,7 @@ type Change struct {
 	Street   *string `json:"street" validate:"required, alphaunicode, min=2,max=30"`
 	Address  *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
 }
+
 type AddressDefault struct {
 	ID uint64
 }
@@ -104,7 +105,7 @@ func (csp *ContactServiceProvider) AddAddress(addr Add, userID uint64) error {
 
 	db := orm.Conn
 
-	err := db.Create(contact).Error
+	err := db.Create(&contact).Error
 	if err != nil {
 		return err
 	}
@@ -135,31 +136,30 @@ func (csp *ContactServiceProvider) ChangeAddress(addr Change) error {
 	return nil
 }
 
-
-func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, error) {
+func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]AddressGet, error) {
 	var (
 		cont Contact
 		list []Contact
-		s    []Addressget
+		getAdd    []AddressGet
 	)
 
 	db := orm.Conn
 	err := db.Model(&cont).Where("userid=?", userId).Find(&list).Error
 	if err != nil {
-		return s, err
+		return getAdd, err
 	}
 
 	for _, c := range list {
-		add := Addressget{
+		add := AddressGet{
 			Province: c.Province,
 			City:     c.City,
 			Street:   c.Street,
 			Address:  c.Address,
 		}
-		s = append(s, add)
+		getAdd = append(getAdd, add)
 	}
 
-	return s, nil
+	return getAdd, nil
 }
 
 func (us *ContactServiceProvider) AlterDefault(id uint64) error {
