@@ -6,6 +6,23 @@ import (
 	"ShopApi/orm"
 )
 
+type CartsServiceProvider struct {
+}
+
+var CartsService *CartsServiceProvider = &CartsServiceProvider{}
+
+type CartsInfo struct {
+    ProductId	       uint64		    `gorm:"colum:productid"json:"productid"`
+    Name		           string		    `json:"name"`
+    Count		           uint64		    `json:"count"`
+    Size		               string		    `json:"size"`
+    Color		           string		    `json:"color"`
+    ImagineId	       uint64		    `gorm:"colum:imagineid" json:"imageid"`
+    UserId		           uint64		    `gorm:"colum:userid"json:"userid"`
+    Status		           uint64		    `json:"status"`
+    Created		       time.Time 	`json:"created"`
+}
+
 type CartsID struct {
 	ID			uint64		`json:"id"`
 }
@@ -23,10 +40,7 @@ type Carts struct {
 	Created		time.Time 	`json:"created"`
 }
 
-type CartsServiceProvider struct {
-}
 
-var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 
 func (cs *CartsServiceProvider) CartsWhether (CartsID uint64)  error {
 	var (
