@@ -58,6 +58,7 @@ type Browse struct {
 	Image   string    `json:"image"`
 	Url     string    `json:"url"`
 }
+
 type Cart struct {
 	ProductID uint64    `gorm:"column:productid" json:"productid"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
@@ -216,6 +217,7 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Browse, error) {
 		}
 		browse = append(browse, add2)
 	}
+
 	return browse, err
 }
 
