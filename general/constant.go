@@ -50,16 +50,16 @@ const (
 	Undefault = 0
 
 	//Products Status
-	ProductOnsale = 0xe0
-	ProductUnsale = 0xe1
+	ProductOnsale = 0xe0 // 224
+	ProductUnsale = 0xe1 // 225
 
 	//Categories Status
-	CategoriesOnuse=0xa0
-	CategoriesUnuse=0xa1
+	CategoriesOnuse = 0xa0 // 160
+	CategoriesUnuse = 0xa1 // 161
 
 	// Order Status
-	OrderUnfinished = 0xef
-	OrderFinished   = 0xee
-	OrderGetAll		= 0xed // Not order status
-	OrderCanceled   = 0xec
+	OrderUnfinished = 0xef // 239
+	OrderFinished   = 0xee // 238
+	OrderGetAll		= 0xed // 237, Not order status
+	OrderCanceled   = 0xec // 236
 )

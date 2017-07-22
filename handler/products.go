@@ -55,7 +55,7 @@ func CreateProduct(c echo.Context) error {
 
 	err = models.ProductService.CreateProduct(p)
 	if err != nil {
-		log.Logger.Error("Create crash with error:", err)
+		log.Logger.Error("Create product with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -77,6 +77,7 @@ func GetProductList(c echo.Context) error {
 	}
 
 	list, err = models.ProductService.GetProduct(cate.Categories)
+
 	if err != nil {
 
 		if err == gorm.ErrRecordNotFound {
@@ -84,6 +85,7 @@ func GetProductList(c echo.Context) error {
 
 			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 		}
+
 		log.Logger.Error("Get categories with error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
@@ -151,14 +153,22 @@ func ChangeCategories(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.ChangeCategories(m)
+	_, err = models.ProductService.GetProInfo(m.ID)
 	if err != nil {
 
-		if err == gorm.ErrRecordNotFound{
-			log.Logger.Error("Categories not exist", err)
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("Product not exist", err)
 
-			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrNotFound,err.Error())
 		}
+
+		log.Logger.Error("Mysql error", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
+	}
+
+	err = models.ProductService.ChangeCategories(m)
+	if err != nil {
 
 		log.Logger.Error("Categories change with error:", err)
 

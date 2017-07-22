@@ -95,17 +95,16 @@ func GetCategories(c echo.Context) error {
 	}
 
 	categories, err = models.CategoriesService.GetCategories(pid.Pid)
-
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Categories not found:",err)
-
-			return general.NewErrorWithMessage(errcode.ErrCategoriesNotFound, err.Error())
-		}
-
 		log.Logger.Error("Mysql error in get categories:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	if len(categories) == 0 {
+		log.Logger.Error("Categories not found:",err)
+
+		return general.NewErrorWithMessage(errcode.ErrCategoriesNotFound, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, categories)

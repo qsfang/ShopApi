@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21        Zhu Yaqiang
+ *     Modify: 2017/07/22     Xu Haosheng    添加购物车
  */
 
 package models
@@ -40,8 +41,9 @@ type CartsServiceProvider struct {
 
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 
-type CartsID struct {
-	ID uint64 `json:"id"`
+type CartsDel struct {
+	ID    uint64 `gorm:"column:id" json:"id"`
+	ProID uint64 `json:"productid"`
 }
 
 type CartPro struct {
@@ -71,18 +73,19 @@ func (Image) TableName() string {
 }
 
 type Carts struct {
-	ID        uint64    `sql:"primary_key;" gorm:"column:status" json:"id"`
-	ProductID uint64    `gorm:"column:imageID" json:"productid"`
+	ID        uint64    `sql:"primary_key;" gorm:"column:id" json:"id"`
+	ProductID uint64    `gorm:"column:productid" json:"productid"`
 	Name      string    `json:"name"`
 	Count     uint64    `json:"count"`
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
-	ImagineID uint64    `gorm:"column:imageid" json:"imageid"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
+	ImageID uint64    `gorm:"column:imageid"json:"imageid"`
 	Status    uint64    `json:"status"`
 	Created   time.Time `json:"created"`
 }
 
+<<<<<<< HEAD
 type Cart struct {
 	ProductID uint64    `gorm:"column:imageID" json:"productid"`
 	ImagineID uint64    `gorm:"column:imageid" json:"imageid"`
@@ -113,10 +116,24 @@ func (cs *CartsServiceProvider) WhetherInCart(CartsID uint64) error {
 		err  error
 		cart Carts
 	)
+=======
+func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error {
+	cartsPutIn := Carts {
+		UserID:                       userID,
+		ProductID:                 carts.ProductID,
+		Name:                        carts.Name,
+		Count:                        carts.Count,
+		Size:                            carts.Size,
+		Color:                          carts.Color,
+		ImageID:                    carts.ImageID,
+		Status:                        carts.Status,
+		Created:                     time.Now(),
+	}
+>>>>>>> 9b3a594449314b1bc769c4216c23fdbba9529f8f
 
 	db := orm.Conn
-	err = db.Where("id = ?", CartsID).First(&cart).Error
 
+	err := db.Create(&cartsPutIn).Error
 	if err != nil {
 		return err
 	}
@@ -125,14 +142,20 @@ func (cs *CartsServiceProvider) WhetherInCart(CartsID uint64) error {
 }
 
 // 状态1表示商品在购物车，状态0表示商品不在购物车
-func (cs *CartsServiceProvider) CartsDelete(CartsID uint64) error {
+func (cs *CartsServiceProvider) CartsDelete (ID uint64, ProID uint64) error {
 	var (
 		cart Carts
+		err  error
 	)
 
 	db := orm.Conn
-	err := db.Model(&cart).Where("id = ?", CartsID).Update("status", 0).Limit(1).Error
 
+	err = db.Where("id = ? and productid = ?", ID, ProID).First(&cart).Error
+	if err != nil {
+		return err
+	}
+
+	err = db.Model(&cart).Where("id = ? and productid = ?", ID, ProID).Update("status", 0).Limit(1).Error
 	if err != nil {
 		return err
 	}
