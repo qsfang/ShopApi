@@ -61,22 +61,22 @@ type Carts struct {
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
-	ImageID uint64    `gorm:"column:imageid"json:"imageid"`
+	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
 	Status    uint64    `json:"status"`
 	Created   time.Time `json:"created"`
 }
 
 func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error {
-	cartsPutIn := Carts {
-		UserID:                       userID,
-		ProductID:                 carts.ProductID,
-		Name:                        carts.Name,
-		Count:                        carts.Count,
-		Size:                            carts.Size,
-		Color:                          carts.Color,
-		ImageID:                    carts.ImageID,
-		Status:                        carts.Status,
-		Created:                     time.Now(),
+	cartsPutIn := Carts{
+		UserID:    userID,
+		ProductID: carts.ProductID,
+		Name:      carts.Name,
+		Count:     carts.Count,
+		Size:      carts.Size,
+		Color:     carts.Color,
+		ImageID:   carts.ImageID,
+		Status:    carts.Status,
+		Created:   time.Now(),
 	}
 
 	db := orm.Conn
@@ -90,7 +90,7 @@ func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error 
 }
 
 // 状态1表示商品在购物车，状态0表示商品不在购物车
-func (cs *CartsServiceProvider) CartsDelete (ID uint64, ProID uint64) error {
+func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	var (
 		cart Carts
 		err  error
