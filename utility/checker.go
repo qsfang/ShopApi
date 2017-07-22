@@ -43,7 +43,7 @@ func IsValidAccount(name string) bool {
 
 // 手机号是否合法
 func IsValidPhone(phone string) bool {
-	reg := `^(13[0-9]|14[579]|15[0-3,5-9]|17[0135678]|18[0-9])\\d{8}$`
+	reg := `^1(3[0-9]|4[579]|5[^4]|7[0135678]|8[0-9])\d{8}$`
 	rgx := regexp.MustCompile(reg)
 	match := rgx.MatchString(phone)
 	return match
