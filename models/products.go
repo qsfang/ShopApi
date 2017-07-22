@@ -66,7 +66,7 @@ type Product struct {
 }
 
 type GetCategories struct {
-	Categories uint64 `json:"categories" validate:"required, alphanum, min = 2, max= 30"`
+	Categories uint64 `json:"categories" validate:"required, alphanum, min = 0, max= 30"`
 }
 
 type GetProList struct {
