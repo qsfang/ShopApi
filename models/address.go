@@ -128,7 +128,21 @@ func (csp *ContactServiceProvider) ChangeAddress(addr Change) error {
 	}
 
 	db := orm.Conn
-	err := db.Model(&con).Where("id = ?", addr.ID).Updates(changeMap).Limit(1).Error
+	err := db.Model(&con).Where("id = ?", addr.ID).Update(changeMap).Limit(1).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (csp *ContactServiceProvider) FindAddressId(ID uint64) error {
+	var (
+		con  Contact
+	)
+
+	db := orm.Conn
+	err := db.Where("id = ?", ID).First(&con).Error
 	if err != nil {
 		return err
 	}

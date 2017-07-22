@@ -33,6 +33,7 @@ package handler
 
 import (
 	"github.com/labstack/echo"
+	"github.com/jinzhu/gorm"
 
 	"ShopApi/general"
 	"ShopApi/general/errcode"
@@ -76,6 +77,19 @@ func ChangeAddress(c echo.Context) error {
 		log.Logger.Error("Bind change with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.ContactService.FindAddressId(addr.ID)
+	if err != nil{
+
+		if err == gorm.ErrRecordNotFound{
+			log.Logger.Error("Address id not find", err)
+
+			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+		}
+		log.Logger.Error("Mysql error", err)
+
+		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
 	err = models.ContactService.ChangeAddress(addr)
