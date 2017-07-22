@@ -121,13 +121,13 @@ func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, erro
 	var (
 		cont Contact
 		list []Contact
-		s    []Addressget
+		getAdd    []Addressget
 	)
 
 	db := orm.Conn
 	err := db.Model(&cont).Where("userid=?", userId).Find(&list).Error
 	if err != nil {
-		return s, err
+		return getAdd, err
 	}
 
 	for _, c := range list {
@@ -137,10 +137,10 @@ func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, erro
 			Street:   c.Street,
 			Address:  c.Address,
 		}
-		s = append(s, add)
+		getAdd = append(getAdd, add)
 	}
 
-	return s, nil
+	return getAdd, nil
 }
 
 
