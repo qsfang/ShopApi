@@ -30,8 +30,8 @@
 package handler
 
 import (
-	"github.com/labstack/echo"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
 
 	"ShopApi/general"
 	"ShopApi/general/errcode"
@@ -41,17 +41,17 @@ import (
 
 func Cartsdel(c echo.Context) error {
 	var (
-		err error
-		cartid   models.CartsID
+		err    error
+		cartid models.CartsID
 	)
 
 	if err = c.Bind(&cartid); err != nil {
-		log.Logger.Error("Get crash with error:", err)
+		log.Logger.Error("Analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.CartsWhether(cartid.ID)
+	err = models.CartsService.WhetherInCart(cartid.ID)
 
 	if err == gorm.ErrRecordNotFound {
 		log.Logger.Error("The product doesn't exist !", err)
@@ -70,10 +70,10 @@ func Cartsdel(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func AlterCartPro (c echo.Context) error {
+func AlterCartPro(c echo.Context) error {
 	var (
-		err		error
-		cartpro		models.CartPro
+		err     error
+		cartpro models.CartPro
 	)
 
 	if err = c.Bind(&cartpro); err != nil {
@@ -82,7 +82,7 @@ func AlterCartPro (c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.CartsWhether(cartpro.ID)
+	err = models.CartsService.WhetherInCart(cartpro.ID)
 
 	if err == gorm.ErrRecordNotFound {
 		log.Logger.Error("The product doesn't exist !", err)
@@ -90,7 +90,7 @@ func AlterCartPro (c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
-	err = models.CartsService.AlterCartPro(cartpro.ID,cartpro.Count,cartpro.Size,cartpro.Color)
+	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count, cartpro.Size, cartpro.Color)
 
 	if err != nil {
 		log.Logger.Error("Alter product with error:", err)

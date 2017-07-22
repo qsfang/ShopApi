@@ -65,7 +65,9 @@ func (cps *CategoriesServiceProvider) CheckPid(pid uint64) error {
 	var(
 		category Categories
 	)
+
 	db := orm.Conn
+
 	err:=db.Where("id =? ",pid).First(&category).Error
 	if err!=nil {
 		return err
@@ -95,13 +97,12 @@ func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 
 func (csp *CategoriesServiceProvider) GetCategories(pid uint64) ([]Categories, error) {
 	var (
-		category   Categories
 		categories []Categories
 	)
 
 	db := orm.Conn
 
-	err := db.Model(&category).Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).Find(&categories).Error
+	err := db.Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).Find(&categories).Error
 	if err != nil {
 		return nil, err
 	}

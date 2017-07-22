@@ -137,14 +137,13 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64,o RegisterOrder) er
 }
 func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Orders, error) {
 	var (
-		order  Orders
 		orders []Orders
 	)
 
 	db := orm.Conn
 
 	if status == general.OrderUnfinished || status == general.OrderFinished {
-		err := db.Model(&order).Where("userid = ? AND status = ?", userID, status).Find(&orders).Error
+		err := db.Where("userid = ? AND status = ?", userID, status).Find(&orders).Error
 		if err != nil {
 			return nil, err
 		}
@@ -152,7 +151,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 		return orders, nil
 	}
 
-	err := db.Model(&order).Where("userid = ?", userID).Find(&orders).Error
+	err := db.Where("userid = ?", userID).Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}

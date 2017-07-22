@@ -39,8 +39,9 @@ const (
 	ErrNameFormat          = 0x5
 	ErrGetsess             = 0x6
 	ErrInvalidOrdersStatus = 0x7
-	ErrGetOrders           = 0x8
-	ErrGetCategories       = 0x9
+	ErrOrdersNotFound      = 0x8
+	NoOrder                = 0x11
+	ErrCategoriesNotFound  = 0x9
 	ErrNotFound		       = 0xa
 	ErrAccess              = 0xb
 

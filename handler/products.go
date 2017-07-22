@@ -39,14 +39,9 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
-
 )
 
-//名称name，totalsale  ，类型categories，价格price，原价originalprice，
-// 状态status，尺码siez，颜色color,封面图片imageid，图片集imageids，评论remark,
-//详细信息 detail ，创建日期 created，存货量inventory
-
-func CreateP(c echo.Context) error {
+func CreateProduct(c echo.Context) error {
 	var (
 		err error
 		p   models.CreatePro
@@ -58,7 +53,7 @@ func CreateP(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.CreateP(p)
+	err = models.ProductService.CreateProduct(p)
 	if err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
@@ -70,37 +65,38 @@ func CreateP(c echo.Context) error {
 
 func GetProductList(c echo.Context) error {
 	var (
-		err    	error
-		cate    models.GetCategories
-		list 	[]models.GetProList
+		err  error
+		cate models.GetCategories
+		list []models.GetProList
 	)
 
 	if err = c.Bind(&cate); err != nil {
-		log.Logger.Error("Bind categories with error:", err)
+		log.Logger.Error("Bind get categories with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
-	}
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 
-	list, err = models.ProductService.GetProduct(cate.Categories)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound{
-			log.Logger.Error("Categories not exist", err)
+		list, err = models.ProductService.GetProduct(cate.Categories)
+		if err != nil {
 
-			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+			if err == gorm.ErrRecordNotFound {
+				log.Logger.Error("Categories not exist", err)
+
+				return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+			}
+
+			log.Logger.Error("Get categories with error", err)
+
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 		}
-
-		log.Logger.Error("Get categories with error",err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, list)
 }
 
 func ChangeProStatus(c echo.Context) error {
-	var(
-		err		error
-		pro		models.ChangePro
+	var (
+		err error
+		pro models.ChangePro
 	)
 
 	if err = c.Bind(&pro); err != nil {
@@ -119,24 +115,24 @@ func ChangeProStatus(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-//根据商品ID获取商品信息
+// 根据商品ID获取商品信息
 func GetProInfo(c echo.Context) error {
 	var (
-		err error
-		proID   models.ProductID
+		err     error
+		ProID   models.ProductID
 		ProInfo models.Product
 	)
 
-	if err = c.Bind(&proID); err != nil {
-		log.Logger.Error("Get crash with error:", err)
+	if err = c.Bind(&ProID); err != nil {
+		log.Logger.Error("Analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	ProInfo,err = models.ProductService.GetProInfo(proID.ID)
+	ProInfo, err = models.ProductService.GetProInfo(ProID.ID)
 
 	if err != nil {
-		log.Logger.Error("error:", err)
+		log.Logger.Error("Get info with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -146,20 +142,23 @@ func GetProInfo(c echo.Context) error {
 
 func ChangeCategories(c echo.Context) error {
 	var (
-		err 	error
-		cate    models.ChangeCate
+		err error
+		m   models.ChangeCate
 	)
 
-	if err = c.Bind(&cate); err != nil {
+	if err = c.Bind(&m); err != nil {
 		log.Logger.Error("Bind categories change with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.ChangeCategories(cate)
+	err = models.ProductService.ChangeCategories(m)
 	if err != nil {
+
 		if err == gorm.ErrRecordNotFound{
-			log.Logger.Error("Categories not exist",err)
+			log.Logger.Error("Categories not exist", err)
+
+			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 		}
 
 		log.Logger.Error("Categories change with error:", err)

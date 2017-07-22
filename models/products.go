@@ -31,7 +31,6 @@
 
 package models
 
-// todo: 导入包的顺序和风格
 import (
 	"time"
 
@@ -44,30 +43,30 @@ type ProductServiceProvider struct {
 
 var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 
-type ProductID struct{
-	ID				uint64 `json:"id"`
+type ProductID struct {
+	ID uint64 `json:"id"`
 }
-// todo:sql
+
 type Product struct {
-	ID            uint64        `json:"id"`
-	Name          string        `json:"name"`
-	Totalsale     uint64        `json:"totalsale"`
-	Categories    uint64        `json:"categories"`
-	Price         float64    	`json:"price"`
-	Originalprice float64    	`json:"originalprice"`
-	Status        uint64        `json:"status"`
-	Size          string        `json:"size"`
-	Color         string        `json:"color"`
-	Imageid       uint64        `json:"imageid"`
-	Imageids      string        `json:"imageids"`
-	Remark        string        `json:"remark"`
-	Detail        string        `json:"detail"`
-	Created       time.Time     `json:"created"`
-	Inventory     uint64        `json:"inventory"`
+	ID            uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
+	Name          string    `json:"name"`
+	TotalSale     uint64    `gorm:"column:totalsale"json:"totalsale"`
+	Categories    uint64    `json:"categories"`
+	Price         float64   `json:"price"`
+	OriginalPrice float64   `json:"originalprice"`
+	Status        uint64    `json:"status"`
+	Size          string    `json:"size"`
+	Color         string    `json:"color"`
+	ImageID       uint64    `json:"imageid"`
+	ImageIDs      string    `json:"imageids"`
+	Remark        string    `json:"remark"`
+	Detail        string    `json:"detail"`
+	Created       time.Time `json:"created"`
+	Inventory     uint64    `json:"inventory"`
 }
 
 type GetCategories struct {
-	Categories	    uint64 		`json:"categories" validate:"required, alphanum, min = 2, max= 30"`
+	Categories uint64 `json:"categories" validate:"required, alphanum, min = 0, max= 30"`
 }
 
 type GetProList struct {
@@ -85,11 +84,11 @@ type CreatePro struct {
 	Name          string  `json:"name"`
 	Categories    uint64  `json:"categories"`
 	Price         float64 `json:"price"`
-	Originalprice float64 `json:"originalprice"`
+	OriginalPrice float64 `gorm:"column:originalprice" json:"originalprice"`
 	Size          string  `json:"size"`
 	Color         string  `json:"color"`
-	Imageid       uint64  `json:"imageid"`
-	Imageids      string  `json:"imageids"`
+	ImageID       uint64  `json:"imageid"`
+	ImageIDs      string  `json:"imageids"`
 	Detail        string  `json:"detail"`
 	Inventory     uint64  `json:"inventory"`
 }
@@ -100,25 +99,25 @@ type ChangePro struct {
 }
 
 type ChangeCate struct {
-	ID             uint64     `json:"id"`
-	Categories     uint64     `json:"categories"`
+	ID         uint64 `json:"id"`
+	Categories uint64 `json:"categories"`
 }
 
 func (Product) TableName() string {
 	return "products"
 }
 
-func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
+func (ps *ProductServiceProvider) CreateProduct(pr CreatePro) error {
 	pro := Product{
 		Name:          pr.Name,
 		Categories:    pr.Categories,
 		Price:         pr.Price,
-		Originalprice: pr.Originalprice,
+		OriginalPrice: pr.OriginalPrice,
 		Status:        general.ProductOnsale,
 		Size:          pr.Size,
 		Color:         pr.Color,
-		Imageid:       pr.Imageid,
-		Imageids:      pr.Imageids,
+		ImageID:       pr.ImageID,
+		ImageIDs:      pr.ImageIDs,
 		Detail:        pr.Detail,
 		Created:       time.Now(),
 		Inventory:     pr.Inventory,
@@ -136,13 +135,14 @@ func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 
 func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
-		ware  Product
-		list  []Product
-		s     []GetProList
+		ware Product
+		list []Product
+		s    []GetProList
 	)
 
-	db :=orm.Conn
-	err :=db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
+	db := orm.Conn
+	err := db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
+
 	if err != nil {
 		return s, err
 	}
@@ -151,11 +151,11 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 		if c.Status == general.ProductOnsale {
 			pro := GetProList{
 				Name:          c.Name,
-				TotalSale:     c.Totalsale,
+				TotalSale:     c.TotalSale,
 				Price:         c.Price,
-				Originalprice: c.Originalprice,
+				Originalprice: c.OriginalPrice,
 				Status:        c.Status,
-				Imageid:       c.Imageid,
+				Imageid:       c.ImageID,
 				Detail:        c.Detail,
 				Inventory:     c.Inventory,
 			}
@@ -191,21 +191,20 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
-
-func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product,error) {
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product, error) {
 	var (
-		err error
-		proinfo   Product
+		err     error
+		ProInfo Product
 	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", ProID).First(&proinfo).Error
+	err = db.Where("id = ?", ProID).First(&ProInfo).Error
 
 	if err != nil {
-		return proinfo, err
+		return ProInfo, err
 	}
 
-	return proinfo, nil
+	return ProInfo, nil
 }
 
 func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {

@@ -41,21 +41,10 @@ import (
 	"ShopApi/utility"
 )
 
-type Add struct {
-	Name      *string `json:"name" validate:"required,alphanum,min=6,max=100"`
-	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=20"`
-	Province  *string `json:"province" validate:"required,alphanum,min=6,max=100"`
-	City      *string `json:"city" validate:"required,alphanum,min=6,max=100"`
-	Street    *string `json:"street" validate:"required,alphanum,min=6,max=100"`
-	Address   *string `json:"address" validate:"required,alphanum,min=6,max=200"`
-	IsDefault uint8   `json:"isdefault"`
-}
-
-
 func AddAddress(c echo.Context) error {
 	var (
 		err  error
-		addr Add
+		addr models.Add
 	)
 
 	if err = c.Bind(&addr); err != nil {
@@ -67,20 +56,9 @@ func AddAddress(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	contact := &models.Contact{
-		UserID:    userID,
-		Name:      *addr.Name,
-		Phone:     *addr.Phone,
-		Province:  *addr.Province,
-		City:      *addr.City,
-		Street:    *addr.Street,
-		Address:   *addr.Address,
-		IsDefault: addr.IsDefault,
-	}
-
-	err = models.ContactService.AddAddress(contact)
+	err = models.ContactService.AddAddress(addr, userID)
 	if err != nil {
-		log.Logger.Error("Add address with error:", err)
+		log.Logger.Error("Mysql error in add address:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -114,7 +92,7 @@ func GetAddress(c echo.Context) error {
 	var (
 		err    error
 		userId uint64
-		list   []models.Addressget
+		list   []models.AddressGet
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
