@@ -65,31 +65,31 @@ func CreateProduct(c echo.Context) error {
 // todo：代码规范
 func GetProductList(c echo.Context) error {
 	var (
-		err    	error
-		m       models.GetCategories
-		list 	[]models.GetProList
+		err  error
+		m    models.GetCategories
+		list []models.GetProList
 	)
 
 	if err = c.Bind(&m); err != nil {
-	log.Logger.Error("Get categories with error:", err)
+		log.Logger.Error("Get categories with error:", err)
 
-	return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	list, err = models.ProductService.GetProduct(m)
 	if err != nil {
-	log.Logger.Error("Error", err)
+		log.Logger.Error("Error", err)
 
-	return general.NewErrorWithMessage(errcode.ErrMysql,err.Error())
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, list)
 }
 
 func ChangeProStatus(c echo.Context) error {
-	var(
-		err		error
-		pro		models.ChangePro
+	var (
+		err error
+		pro models.ChangePro
 	)
 
 	if err = c.Bind(&pro); err != nil {
@@ -111,9 +111,9 @@ func ChangeProStatus(c echo.Context) error {
 // 根据商品ID获取商品信息
 func GetProInfo(c echo.Context) error {
 	var (
-		err			error
-		ProID		models.ProductID
-		ProInfo		models.Product
+		err     error
+		ProID   models.ProductID
+		ProInfo models.Product
 	)
 
 	if err = c.Bind(&ProID); err != nil {
