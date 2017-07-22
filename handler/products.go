@@ -77,6 +77,7 @@ func GetProductList(c echo.Context) error {
 	}
 
 	list, err = models.ProductService.GetProduct(cate.Categories)
+
 	if err != nil {
 
 		if err == gorm.ErrRecordNotFound {
