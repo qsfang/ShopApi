@@ -40,22 +40,9 @@ type CartsServiceProvider struct {
 
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 
-type CartsInfo struct {
-	ProductId uint64    `gorm:"colum:productid"json:"productid"`
-	Name      string    `json:"name"`
-	Count     uint64    `json:"count"`
-	Size      string    `json:"size"`
-	Color     string    `json:"color"`
-	ImagineId uint64    `gorm:"colum:imagineid" json:"imageid"`
-	UserId    uint64    `gorm:"colum:userid"json:"userid"`
-	Status    uint64    `json:"status"`
-	Created   time.Time `json:"created"`
-}
-
 type CartsDel struct {
 	ID    uint64 `sql:"primary_key;" gorm:"column:id" json:"id"`
 	ProID uint64 `json:"productid"`
-}
 
 type CartPro struct {
 	ID    uint64 `json:"id"`
@@ -77,7 +64,7 @@ type Carts struct {
 	Created   time.Time `json:"created"`
 }
 
-func (cs *CartsServiceProvider) WhetherInCart(ID uint64, ProID uint64) error {
+func (cs *CartsServiceProvider) WhetherInCart (ID uint64, ProID uint64) error {
 	var (
 		err  error
 		cart Carts
@@ -94,7 +81,7 @@ func (cs *CartsServiceProvider) WhetherInCart(ID uint64, ProID uint64) error {
 }
 
 // 状态1表示商品在购物车，状态0表示商品不在购物车
-func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
+func (cs *CartsServiceProvider) CartsDelete (ID uint64, ProID uint64) error {
 	var (
 		cart Carts
 		err  error

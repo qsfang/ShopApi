@@ -33,6 +33,7 @@ package handler
 
 import (
 	"github.com/labstack/echo"
+	"github.com/jinzhu/gorm"
 
 	"ShopApi/general"
 	"ShopApi/general/errcode"
@@ -62,23 +63,29 @@ func CreateProduct(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-// todo：代码规范
 func GetProductList(c echo.Context) error {
 	var (
 		err  error
-		m    models.GetCategories
+		cate models.GetCategories
 		list []models.GetProList
 	)
 
-	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("Get categories with error:", err)
+	if err = c.Bind(&cate); err != nil {
+		log.Logger.Error("Bind get categories with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	list, err = models.ProductService.GetProduct(m.Categories)
+	list, err = models.ProductService.GetProduct(cate.Categories)
+
 	if err != nil {
-		log.Logger.Error("Error", err)
+
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("Categories not exist", err)
+
+			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		}
+		log.Logger.Error("Get categories with error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -140,13 +147,20 @@ func ChangeCategories(c echo.Context) error {
 	)
 
 	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("Categories change with error:", err)
+		log.Logger.Error("Bind categories change with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	err = models.ProductService.ChangeCategories(m)
 	if err != nil {
+
+		if err == gorm.ErrRecordNotFound{
+			log.Logger.Error("Categories not exist", err)
+
+			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		}
+
 		log.Logger.Error("Categories change with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())

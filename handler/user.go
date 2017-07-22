@@ -68,6 +68,13 @@ func Create(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+	match := utility.IsValidPhone(*u.Mobile)
+	if !match {
+		log.Logger.Error("Invalid phone:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
+	}
+
 	err = models.UserService.Create(u.Mobile, u.Pass)
 	if err != nil {
 		log.Logger.Error("create crash with error:", err)
@@ -239,6 +246,14 @@ func Changephone(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
+
+	match := utility.IsValidPhone(m.Phone)
+	if !match {
+		log.Logger.Error("Invalid phone:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
+	}
+
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	user := session.Get(general.SessionUserID).(uint64)
 

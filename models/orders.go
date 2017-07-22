@@ -66,7 +66,6 @@ type GetOrders struct {
 }
 
 type RegisterOrder struct {
-
 	Name       string  `json:"productname"`
 	TotalPrice float64 `json:"totalprice"`
 	Payment    float64 `json:"payment"`
@@ -102,7 +101,7 @@ func (Orders) TableName() string {
 	return "orders"
 }
 
-func (osp *OrderServiceProvider) CreateOrder(numberID uint64,o RegisterOrder) error {
+func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) error {
 	var (
 		pro Product
 		err error
@@ -159,41 +158,48 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	return orders, nil
 }
 
-func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) ([]GetOrders, error, bool) {
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
 	var (
+		judge    bool
 		err      error
-		order    Orders
-		getOrder []GetOrders
+		order    []Orders
+		getOrder GetOrders
 	)
 
+	judge = false
 	db := orm.Conn
-	err = db.Where("id = ?", ID).Find(&order).Error
+	err = db.Where("userid = ?", UserID).Find(&order).Error
 	if err != nil {
-		return getOrder, err, false
+		return getOrder, err, judge
 	}
 
-	add := GetOrders{
-		TotalPrice:		order.TotalPrice,
-		Payment:		order.Payment,
-		Freight:		order.Freight,
-		Discount:   	order.Discount,
-		Size:			order.Size,
-		Color:			order.Color,
-		Status:     	order.Status,
-		Created:    	order.Created,
+	for _, v := range order {
+
+		if v.ID == ID {
+			judge = true
+			var getOrder  = GetOrders {
+				TotalPrice: v.TotalPrice,
+				Payment:    v.Payment,
+				Freight:    v.Freight,
+				Discount:   v.Discount,
+				Size:       v.Size,
+				Color:      v.Color,
+				Status:     v.Status,
+				Created:    v.Created,
+			}
+
+			if judge == true {
+				return getOrder, err, judge
+			}
+
+			break
+		}
 	}
-	getOrder = append(getOrder, add)
 
-	err = db.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
-	if err != nil {
-
-		return getOrder, err, true
-	}
-
-	return getOrder, nil, false
+	return getOrder, err, judge
 }
 
-func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
+func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha := Orders{
 		Status: status,
 	}
