@@ -76,7 +76,7 @@ func GetProductList(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	list, err = models.ProductService.GetProduct(m)
+	list, err = models.ProductService.GetProduct(m.Categories)
 	if err != nil {
 		log.Logger.Error("Error", err)
 

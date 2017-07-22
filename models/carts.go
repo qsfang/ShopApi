@@ -52,8 +52,9 @@ type CartsInfo struct {
 	Created   time.Time `json:"created"`
 }
 
-type CartsID struct {
-	ID uint64 `json:"id"`
+type CartsDel struct {
+	ID    uint64 `sql:"primary_key;" gorm:"column:id" json:"id"`
+	ProID uint64 `json:"productid"`
 }
 
 type CartPro struct {
@@ -64,8 +65,8 @@ type CartPro struct {
 }
 
 type Carts struct {
-	ID        uint64    `sql:"primary_key;" gorm:"column:status" json:"id"`
-	ProductID uint64    `gorm:"column:imageID" json:"productid"`
+	ID        uint64    `sql:"primary_key;" gorm:"column:id" json:"id"`
+	ProductID uint64    `gorm:"column:productid" json:"productid"`
 	Name      string    `json:"name"`
 	Count     uint64    `json:"count"`
 	Size      string    `json:"size"`
@@ -76,14 +77,14 @@ type Carts struct {
 	Created   time.Time `json:"created"`
 }
 
-func (cs *CartsServiceProvider) WhetherInCart(CartsID uint64) error {
+func (cs *CartsServiceProvider) WhetherInCart(ID uint64, ProID uint64) error {
 	var (
 		err  error
 		cart Carts
 	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", CartsID).First(&cart).Error
+	err = db.Where("id = ? and productid = ?", ID, ProID).First(&cart).Error
 
 	if err != nil {
 		return err
@@ -93,13 +94,14 @@ func (cs *CartsServiceProvider) WhetherInCart(CartsID uint64) error {
 }
 
 // 状态1表示商品在购物车，状态0表示商品不在购物车
-func (cs *CartsServiceProvider) CartsDelete(CartsID uint64) error {
+func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	var (
 		cart Carts
+		err  error
 	)
 
 	db := orm.Conn
-	err := db.Model(&cart).Where("id = ?", CartsID).Update("status", 0).Limit(1).Error
+	err = db.Model(&cart).Where("id = ? and productid = ?", ID, ProID).Update("status", 0).Limit(1).Error
 
 	if err != nil {
 		return err

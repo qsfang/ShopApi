@@ -42,7 +42,7 @@ import (
 func Cartsdel(c echo.Context) error {
 	var (
 		err    error
-		cartid models.CartsID
+		cartid models.CartsDel
 	)
 
 	if err = c.Bind(&cartid); err != nil {
@@ -51,15 +51,21 @@ func Cartsdel(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.WhetherInCart(cartid.ID)
+	err = models.CartsService.WhetherInCart(cartid.ID, cartid.ProID)
 
-	if err == gorm.ErrRecordNotFound {
-		log.Logger.Error("The product doesn't exist !", err)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("This product doesn't exist !", err)
 
-		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
+		}
+
+		log.Logger.Error("Check existence exists errors", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	err = models.CartsService.CartsDelete(cartid.ID)
+	err = models.CartsService.CartsDelete(cartid.ID, cartid.ProID)
 
 	if err != nil {
 		log.Logger.Error("Delete product with error:", err)
@@ -82,8 +88,7 @@ func AlterCartPro(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.WhetherInCart(cartpro.ID)
-
+	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count, cartpro.Size, cartpro.Color)
 	if err == gorm.ErrRecordNotFound {
 		log.Logger.Error("The product doesn't exist !", err)
 
