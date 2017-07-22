@@ -42,8 +42,9 @@ const (
 	ErrOrdersNotFound      = 0x8
 	NoOrder                = 0x11
 	ErrCategoriesNotFound  = 0x9
-	ErrNotFound		       = 0xa
+	ErrNotFound            = 0xa
 	ErrAccess              = 0xb
+	ErrInvalidPhone        = 0xc
 
 	// 需要登录
 	ErrLoginRequired    = 0x800

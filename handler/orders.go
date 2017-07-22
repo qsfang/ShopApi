@@ -83,6 +83,7 @@ func CreateOrder(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+
 func GetOrders(c echo.Context) error {
 	var (
 		err    error

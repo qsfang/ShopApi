@@ -162,7 +162,7 @@ func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]AddressGet, erro
 	return getAdd, nil
 }
 
-func (us *ContactServiceProvider) AlterDefault(id uint64) error {
+func (csp *ContactServiceProvider) AlterDefault(id uint64) error {
 	var (
 		s   Contact
 		a   int8

@@ -193,7 +193,7 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) ([]GetOrd
 	return getOrder, nil, false
 }
 
-func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
+func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha := Orders{
 		Status: status,
 	}
