@@ -53,8 +53,8 @@ type Product struct {
 	Name          string        `json:"name"`
 	Totalsale     uint64        `json:"totalsale"`
 	Categories    uint64        `json:"categories"`
-	Price         float64    `json:"price"`
-	Originalprice float64    `json:"originalprice"`
+	Price         float64    	`json:"price"`
+	Originalprice float64    	`json:"originalprice"`
 	Status        uint64        `json:"status"`
 	Size          string        `json:"size"`
 	Color         string        `json:"color"`
@@ -62,7 +62,7 @@ type Product struct {
 	Imageids      string        `json:"imageids"`
 	Remark        string        `json:"remark"`
 	Detail        string        `json:"detail"`
-	Created       time.Time    `json:"created"`
+	Created       time.Time     `json:"created"`
 	Inventory     uint64        `json:"inventory"`
 }
 
