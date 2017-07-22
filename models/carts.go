@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21        Zhu Yaqiang
+ *     Modify: 2017/07/22     Xu Haosheng    添加购物车
  */
 
 package models
@@ -58,10 +59,31 @@ type Carts struct {
 	Count     uint64    `json:"count"`
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
-	ImagineID uint64    `gorm:"column:imageid" json:"imageid"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Status    uint64    `json:"status"`
 	Created   time.Time `json:"created"`
+}
+
+func (cs *CartsServiceProvider) CreatInCarts(carts Carts, userID uint64) error {
+	cartsPutIn := Carts {
+		UserID:                       userID,
+		ProductID:                 carts.ProductID,
+	    Name:                        carts.Name,
+		Count:                        carts.Count,
+		Size:                            carts.Size,
+		Color:                          carts.Color,
+		Status:                        carts.Status,
+		Created:                     time.Now(),
+	}
+
+	db := orm.Conn
+
+	err := db.Create(&cartsPutIn).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (cs *CartsServiceProvider) WhetherInCart(CartsID uint64) error {

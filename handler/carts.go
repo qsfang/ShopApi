@@ -37,7 +37,34 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
+	"ShopApi/utility"
 )
+
+func CartsPutIn(c echo.Context) error {
+	var (
+		err  error
+		carts models.Carts
+	)
+
+	if err = c.Bind(&carts); err != nil {
+		log.Logger.Error("Bind with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID)
+	id := userID.(uint64)
+
+		err = models.CartsService.CreatInCarts(carts, id)
+	if err != nil {
+		log.Logger.Error("Mysql error in add address:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}
 
 func Cartsdel(c echo.Context) error {
 	var (
