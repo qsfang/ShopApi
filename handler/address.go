@@ -87,6 +87,7 @@ func ChangeAddress(c echo.Context) error {
 
 			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 		}
+		
 		log.Logger.Error("Mysql error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
