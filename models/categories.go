@@ -61,7 +61,7 @@ func (Categories) TableName() string {
 	return "categories"
 }
 
-func (cps *CategoriesServiceProvider) CheckPid(pid uint64) error {
+func (csp *CategoriesServiceProvider) CheckPid(pid uint64) error {
 	var(
 		category Categories
 	)

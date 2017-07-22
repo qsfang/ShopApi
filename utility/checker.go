@@ -40,3 +40,11 @@ func IsValidAccount(name string) bool {
 	match, _ := regexp.MatchString("^[\\w]{6,127}$", name)
 	return match
 }
+
+// 手机号是否合法
+func IsValidPhone(phone string) bool {
+	reg := `^(13[0-9]|14[579]|15[0-3,5-9]|17[0135678]|18[0-9])\\d{8}$`
+	rgx := regexp.MustCompile(reg)
+	match := rgx.MatchString(phone)
+	return match
+}

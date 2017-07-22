@@ -199,7 +199,7 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrder
 	return getOrder, err, judge
 }
 
-func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
+func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha := Orders{
 		Status: status,
 	}
