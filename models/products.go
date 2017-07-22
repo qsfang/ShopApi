@@ -31,7 +31,6 @@
 
 package models
 
-// todo: 导入包的顺序和风格
 import (
 	"time"
 
@@ -47,22 +46,22 @@ var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 type ProductID struct{
 	ID				uint64 `json:"id"`
 }
-// todo:sql
+
 type Product struct {
-	ID            uint64        `json:"id"`
+	ID            uint64        `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
 	Name          string        `json:"name"`
-	Totalsale     uint64        `json:"totalsale"`
+	TotalSale     uint64        `gorm:"column:totalsale"json:"totalsale"`
 	Categories    uint64        `json:"categories"`
-	Price         float64    `json:"price"`
-	Originalprice float64    `json:"originalprice"`
+	Price         float64    	`json:"price"`
+	OriginalPrice float64    	`json:"originalprice"`
 	Status        uint64        `json:"status"`
 	Size          string        `json:"size"`
 	Color         string        `json:"color"`
-	Imageid       uint64        `json:"imageid"`
-	Imageids      string        `json:"imageids"`
+	ImageID       uint64        `json:"imageid"`
+	ImageIDs      string        `json:"imageids"`
 	Remark        string        `json:"remark"`
 	Detail        string        `json:"detail"`
-	Created       time.Time    `json:"created"`
+	Created       time.Time     `json:"created"`
 	Inventory     uint64        `json:"inventory"`
 }
 
@@ -85,11 +84,11 @@ type CreatePro struct {
 	Name          string  `json:"name"`
 	Categories    uint64  `json:"categories"`
 	Price         float64 `json:"price"`
-	Originalprice float64 `json:"originalprice"`
+	OriginalPrice float64 `gorm:"column:originalprice" json:"originalprice"`
 	Size          string  `json:"size"`
 	Color         string  `json:"color"`
-	Imageid       uint64  `json:"imageid"`
-	Imageids      string  `json:"imageids"`
+	ImageID       uint64  `json:"imageid"`
+	ImageIDs      string  `json:"imageids"`
 	Detail        string  `json:"detail"`
 	Inventory     uint64  `json:"inventory"`
 }
@@ -108,17 +107,17 @@ func (Product) TableName() string {
 	return "products"
 }
 
-func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
+func (ps *ProductServiceProvider) CreateProduct(pr CreatePro) error {
 	pro := Product{
 		Name:          pr.Name,
 		Categories:    pr.Categories,
 		Price:         pr.Price,
-		Originalprice: pr.Originalprice,
+		OriginalPrice: pr.OriginalPrice,
 		Status:        general.ProductOnsale,
 		Size:          pr.Size,
 		Color:         pr.Color,
-		Imageid:       pr.Imageid,
-		Imageids:      pr.Imageids,
+		ImageID:       pr.ImageID,
+		ImageIDs:      pr.ImageIDs,
 		Detail:        pr.Detail,
 		Created:       time.Now(),
 		Inventory:     pr.Inventory,
@@ -133,8 +132,8 @@ func (ps *ProductServiceProvider) CreateP(pr CreatePro) error {
 
 	return nil
 }
-// todo: 代码规范
-func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, error) {
+
+func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
 		ware  Product
 		list  []Product
@@ -142,8 +141,7 @@ func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, err
 	)
 
 	db :=orm.Conn
-	err :=db.Model(&ware).Where("categories = ?", m.Categories).Find(&list).Error
-
+	err :=db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
 	if err != nil {
 		return s, err
 	}
@@ -152,11 +150,11 @@ func (ps *ProductServiceProvider) GetProduct(m GetCategories) ([]GetProList, err
 		if c.Status == general.ProductOnsale {
 			pro := GetProList{
 				Name:          c.Name,
-				TotalSale:     c.Totalsale,
+				TotalSale:     c.TotalSale,
 				Price:         c.Price,
-				Originalprice: c.Originalprice,
+				Originalprice: c.OriginalPrice,
 				Status:        c.Status,
-				Imageid:       c.Imageid,
+				Imageid:       c.ImageID,
 				Detail:        c.Detail,
 				Inventory:     c.Inventory,
 			}
@@ -209,16 +207,15 @@ func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product,error) {
 	return proinfo, nil
 }
 
-// todo: 代码规范 updates
-func (ps *ProductServiceProvider) ChangeCategories(m ChangeCate) error {
+func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {
 	var (
-		cate Product
+		pro Product
 	)
 
-	change := map[string]uint64{"categories": m.Categories}
+	change := map[string]uint64{"categories": cate.Categories}
 
 	db := orm.Conn
-	err := db.Model(&cate).Where("ID = ?", m.ID).Updates(change).Limit(1).Error
+	err := db.Model(&pro).Where("id = ?", cate.ID).Update(change).Limit(1).Error
 
 	if err != nil {
 		return err

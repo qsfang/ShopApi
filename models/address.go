@@ -50,7 +50,7 @@ type Contact struct {
 	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
 }
 // todo: 命名
-type Addressget struct {
+type AddressGet struct {
 	Province string `json:"province"`
 	City     string `json:"city"`
 	Street   string `json:"street"`
@@ -92,24 +92,23 @@ func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
 
 	return nil
 }
-// todo : 命名和 ID
-func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
+
+func (csp *ContactServiceProvider) ChangeAddress(addr Change) error {
 	var (
 		con Contact
 	)
 
-	changemap := map[string]interface{}{
-		"name":     *m.Name,
-		"phone":    *m.Phone,
-		"province": *m.Province,
-		"city":     *m.City,
-		"street":   *m.Street,
-		"address":  *m.Address,
+	changeMap := map[string]interface{}{
+		"name":     *addr.Name,
+		"phone":    *addr.Phone,
+		"province": *addr.Province,
+		"city":     *addr.City,
+		"street":   *addr.Street,
+		"address":  *addr.Address,
 	}
 
 	db := orm.Conn
-	err := db.Model(&con).Where("ID = ?", m.ID).Updates(changemap).Limit(1).Error
-
+	err := db.Model(&con).Where("id = ?", addr.ID).Updates(changeMap).Limit(1).Error
 	if err != nil {
 		return err
 	}
@@ -117,31 +116,31 @@ func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
 	return nil
 }
 
-// todo: 修改接受者 保持同一
-func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, error) {
+
+func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]AddressGet, error) {
 	var (
 		cont Contact
 		list []Contact
-		s    []Addressget
+		getAdd    []AddressGet
 	)
 
 	db := orm.Conn
 	err := db.Model(&cont).Where("userid=?", userId).Find(&list).Error
 	if err != nil {
-		return s, err
+		return getAdd, err
 	}
 
 	for _, c := range list {
-		add := Addressget{
+		add := AddressGet{
 			Province: c.Province,
 			City:     c.City,
 			Street:   c.Street,
 			Address:  c.Address,
 		}
-		s = append(s, add)
+		getAdd = append(getAdd, add)
 	}
 
-	return s, nil
+	return getAdd, nil
 }
 
 

@@ -1,3 +1,33 @@
+
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 SmartestEE Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/*
+ * Revision History:
+ *     Initial: 2017/07/21        Zhu Yaqiang
+ */
+
 package models
 
 import (
@@ -27,6 +57,13 @@ type CartsID struct {
 	ID			uint64		`json:"id"`
 }
 
+type CartPro struct {
+	ID		uint64		`json:"id"`
+	Count		uint64		`json:"count"`
+	Size		string		`json:"size"`
+	Color		string		`json:"color"`
+}
+
 type Carts struct {
 	ID			uint64		`json:"id"`
 	Productid	uint64		`json:"productid"`
@@ -50,6 +87,7 @@ func (cs *CartsServiceProvider) CartsWhether (CartsID uint64)  error {
 
 	db := orm.Conn
 	err = db.Where("id = ?", CartsID).First(&cart).Error
+
 	if err != nil {
 		return err
 	}
@@ -72,3 +110,23 @@ func (cs *CartsServiceProvider) CartsDelete (CartsID uint64) error {
 
 	return nil
 }
+
+func (cs *CartsServiceProvider) AlterCartPro (CartsID uint64,Count uint64,Size string,Color string) error {
+	var (
+		cart 	Carts
+	)
+	updater := map[string]interface{} {
+		"count": 	Count,
+		"size":		Size,
+		"color":	Color,
+	}
+
+	db := orm.Conn
+	err := db.Model(&cart).Where("id = ?",CartsID).Update(updater).Limit(1).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
