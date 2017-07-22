@@ -161,36 +161,44 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 
 func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) ([]GetOrders, error, bool) {
 	var (
+		judge    bool
 		err      error
-		order    Orders
+		order    []Orders
 		getOrder []GetOrders
 	)
 
+	judge = true
 	db := orm.Conn
-	err = db.Where("id = ?", ID).Find(&order).Error
+	err = db.Where("userid = ?", UserID).Find(&order).Error
 	if err != nil {
-		return getOrder, err, false
+		return getOrder, err, judge
 	}
 
-	add := GetOrders{
-		TotalPrice:		order.TotalPrice,
-		Payment:		order.Payment,
-		Freight:		order.Freight,
-		Discount:   	order.Discount,
-		Size:			order.Size,
-		Color:			order.Color,
-		Status:     	order.Status,
-		Created:    	order.Created,
+	for _, v := range order {
+
+		if v.ID == ID {
+			judge = false
+			add := GetOrders{
+			TotalPrice: v.TotalPrice,
+			Payment:    v.Payment,
+			Freight:    v.Freight,
+			Discount:   v.Discount,
+			Size:       v.Size,
+			Color:      v.Color,
+			Status:     v.Status,
+			Created:    v.Created,
+			}
+			getOrder = append(getOrder, add)
+
+			if judge == false {
+				return getOrder, err, judge
+			}
+
+			break
+		}
 	}
-	getOrder = append(getOrder, add)
-
-	err = db.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
-	if err != nil {
-
-		return getOrder, err, true
-	}
-
-	return getOrder, nil, false
+	
+	return getOrder, err, judge
 }
 
 func (chs *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
