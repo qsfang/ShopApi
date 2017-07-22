@@ -128,7 +128,7 @@ func GetProInfo(c echo.Context) error {
 	)
 
 	if err = c.Bind(&proID); err != nil {
-		log.Logger.Error("Get crash with error:", err)
+		log.Logger.Error("Analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -136,7 +136,7 @@ func GetProInfo(c echo.Context) error {
 	ProInfo,err = models.ProductService.GetProInfo(proID.ID)
 
 	if err != nil {
-		log.Logger.Error("error:", err)
+		log.Logger.Error("Get info with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
