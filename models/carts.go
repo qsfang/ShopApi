@@ -41,18 +41,6 @@ type CartsServiceProvider struct {
 
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 
-type CartsInfo struct {
-    ProductId	       uint64		    `gorm:"colum:productid"json:"productid"`
-    Name		           string		    `json:"name"`
-    Count		           uint64		    `json:"count"`
-    Size		               string		    `json:"size"`
-    Color		           string		    `json:"color"`
-    ImagineId	       uint64		    `gorm:"colum:imagineid" json:"imageid"`
-    UserId		           uint64		    `gorm:"colum:userid"json:"userid"`
-    Status		           uint64		    `json:"status"`
-    Created		       time.Time 	`json:"created"`
-}
-
 type CartsID struct {
 	ID			uint64		`json:"id"`
 }
@@ -65,16 +53,16 @@ type CartPro struct {
 }
 
 type Carts struct {
-	ID			uint64		`json:"id"`
-	Productid	uint64		`json:"productid"`
-	Name		string		`json:"name"`
-	Count		uint64		`json:"count"`
-	Size		string		`json:"size"`
-	Color		string		`json:"color"`
-	Imagineid	uint64		`json:"imageid"`
-	Userid		uint64		`json:"userid"`
-	Status		uint64		`gorm:"column:status" json:"status"`
-	Created		time.Time 	`json:"created"`
+	ID			                   uint64		     `json:"id"`
+	Productid	           uint64		     `json:"productid"`
+	Name		               string		     `json:"name"`
+	Count		               uint64		     `json:"count"`
+	Size		                   string		     `json:"size"`
+	Color		               string		     `json:"color"`
+	Imagineid	           uint64		     `json:"imageid"`
+	Userid		               uint64		     `json:"userid"`
+	Status		               uint64		     `gorm:"column:status" json:"status"`
+	Created		           time.Time 	 `json:"created"`
 }
 
 
