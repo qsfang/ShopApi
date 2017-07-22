@@ -51,6 +51,25 @@ type CartPro struct {
 	Color string `json:"color"`
 }
 
+type Image struct {
+	ID   uint64 `json:"id"`
+	Url  *string `json:"url"`
+	Image *string `json:"image"`
+	Type  *string `json:"type"`
+	Title *string `json:"title"`
+}
+
+type Images struct {
+	Url  *string `json:"url"`
+	Image *string `json:"image"`
+	Type  *string `json:"type"`
+	Title *string `json:"title"`
+}
+
+func (Image) TableName() string {
+	return "image"
+}
+
 type Carts struct {
 	ID        uint64    `sql:"primary_key;" gorm:"column:status" json:"id"`
 	ProductID uint64    `gorm:"column:imageID" json:"productid"`
@@ -62,6 +81,31 @@ type Carts struct {
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Status    uint64    `json:"status"`
 	Created   time.Time `json:"created"`
+}
+
+type Cart struct {
+	ProductID uint64    `gorm:"column:imageID" json:"productid"`
+	ImagineID uint64    `gorm:"column:imageid" json:"imageid"`
+	Count     uint64    `json:"count"`
+	Status    uint64    `json:"status"`
+	Created   time.Time `json:"created"`
+}
+
+type Browse struct {
+	Name      string    `json:"name"`
+	Size      string    `json:"size"`
+	Color     string    `json:"color"`
+	Count     uint64    `json:"count"`
+	Status    uint64    `json:"status"`
+	Created   time.Time `json:"created"`
+	Url  *string `json:"url"`
+	Image *string `json:"image"`
+	Type  *string `json:"type"`
+	Title *string `json:"title"`
+}
+
+func (Carts) TableName() string {
+	return "carts"
 }
 
 func (cs *CartsServiceProvider) WhetherInCart(CartsID uint64) error {
@@ -114,3 +158,7 @@ func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size 
 
 	return nil
 }
+
+
+
+

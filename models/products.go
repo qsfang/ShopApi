@@ -166,14 +166,13 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 	return s, nil
 }
 
-// todo: 命名代码规范
 func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	var (
 		pro Product
 		err error
 	)
 
-	changemap := map[string]interface{}{
+	changeMap := map[string]interface{}{
 		"status": m.Status,
 	}
 
@@ -184,7 +183,7 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	}
 
 	db := orm.Conn
-	err = db.Model(&pro).Where("status = ?", m.ID).Updates(changemap).Limit(1).Error
+	err = db.Model(&pro).Where("status = ?", m.ID).Updates(changeMap).Limit(1).Error
 	if err != nil {
 		return err
 	}
