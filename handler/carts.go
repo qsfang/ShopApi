@@ -69,3 +69,34 @@ func Cartsdel(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
+
+func AlterCartPro (c echo.Context) error {
+	var (
+		err		error
+		cartpro		models.CartPro
+	)
+
+	if err = c.Bind(&cartpro); err != nil {
+		log.Logger.Error("Get crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.CartsService.CartsWhether(cartpro.ID)
+
+	if err == gorm.ErrRecordNotFound {
+		log.Logger.Error("The product doesn't exist !", err)
+
+		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+	}
+
+	err = models.CartsService.AlterCartPro(cartpro.ID,cartpro.Count,cartpro.Size,cartpro.Color)
+
+	if err != nil {
+		log.Logger.Error("Alter product with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, nil)
+}

@@ -92,24 +92,23 @@ func (csp *ContactServiceProvider) AddAddress(contact *Contact) error {
 
 	return nil
 }
-// todo : 命名和 ID
-func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
+
+func (csp *ContactServiceProvider) ChangeAddress(addr Change) error {
 	var (
 		con Contact
 	)
 
-	changemap := map[string]interface{}{
-		"name":     *m.Name,
-		"phone":    *m.Phone,
-		"province": *m.Province,
-		"city":     *m.City,
-		"street":   *m.Street,
-		"address":  *m.Address,
+	changeMap := map[string]interface{}{
+		"name":     *addr.Name,
+		"phone":    *addr.Phone,
+		"province": *addr.Province,
+		"city":     *addr.City,
+		"street":   *addr.Street,
+		"address":  *addr.Address,
 	}
 
 	db := orm.Conn
-	err := db.Model(&con).Where("ID = ?", m.ID).Updates(changemap).Limit(1).Error
-
+	err := db.Model(&con).Where("id = ?", addr.ID).Updates(changeMap).Limit(1).Error
 	if err != nil {
 		return err
 	}
@@ -117,7 +116,7 @@ func (csp *ContactServiceProvider) ChangeAddress(m Change) error {
 	return nil
 }
 
-// todo: 修改接受者 保持同一
+
 func (csp *ContactServiceProvider) GetAddress(userId uint64) ([]Addressget, error) {
 	var (
 		cont Contact
