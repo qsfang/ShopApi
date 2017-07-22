@@ -79,7 +79,6 @@ func Cartsdel(c echo.Context) error {
 	}
 
 	err = models.CartsService.CartsDelete(cart.ID, cart.ProID)
-
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("This product doesn't exist !", err)
