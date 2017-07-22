@@ -145,15 +145,17 @@ func GetOneOrder(c echo.Context) error {
 			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
 		}
 
+		if judge == false {
+			log.Logger.Error("Access with error :", err)
+
+			return general.NewErrorWithMessage(errcode.ErrAccess, err.Error())
+		}
+
 		log.Logger.Error("Get Order with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
-	}
 
-	if judge == false {
-		log.Logger.Error("Access with error :", err)
 
-		return general.NewErrorWithMessage(errcode.ErrAccess, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, OutPut)
