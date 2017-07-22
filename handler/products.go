@@ -119,17 +119,16 @@ func ChangeProStatus(c echo.Context) error {
 func GetProInfo(c echo.Context) error {
 	var (
 		err     error
-		ProID   models.ProductID
 		ProInfo models.Product
 	)
 
-	if err = c.Bind(&ProID); err != nil {
+	if err = c.Bind(&ProInfo); err != nil {
 		log.Logger.Error("Analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	ProInfo, err = models.ProductService.GetProInfo(ProID.ID)
+	ProInfo, err = models.ProductService.GetProInfo(ProInfo.ID)
 
 	if err != nil {
 		log.Logger.Error("Get info with error:", err)

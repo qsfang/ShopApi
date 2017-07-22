@@ -43,11 +43,6 @@ type ProductServiceProvider struct {
 
 var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 
-// todo: 定义到函数内部
-type ProductID struct {
-	ID uint64 `json:"id"`
-}
-
 type Product struct {
 	ID            uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
 	Name          string    `json:"name"`
@@ -196,17 +191,13 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product, error) {
 	var (
 		err     error
-		ProInfo Product
+		ProInfo Product = Product{}
 	)
 
 	db := orm.Conn
 	err = db.Where("id = ?", ProID).First(&ProInfo).Error
 
-	if err != nil {
-		return ProInfo, err
-	}
-
-	return ProInfo, nil
+	return ProInfo, err
 }
 
 func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {
