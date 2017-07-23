@@ -177,6 +177,8 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (Orders, 
 }
 
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
+	var err	error
+
 	cha := Orders{
 		Status: status,
 	}
@@ -184,10 +186,7 @@ func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	updater := map[string]interface{}{"status": status}
 	db := orm.Conn
 
-	err := db.Model(&cha).Where("id=?", id).Update(updater).Limit(1).Error
-	if err != nil {
-		return err
-	}
+	err = db.Model(&cha).Where("id=?", id).Update(updater).Limit(1).Error
 
-	return nil
+	return err
 }
