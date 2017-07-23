@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `products` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) NOT NULL DEFAULT '',
   `totalsale` INT(10) NOT NULL DEFAULT '0',
-  `categories` int(11) NOT NULL,
+  `category` int(11) NOT NULL,
   `price` double NOT NULL,
   `originalprice` double NOT NULL,
   `status` int(11) NOT NULL,
