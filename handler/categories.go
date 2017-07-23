@@ -25,7 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21        Yang Zhengtian
- *     Modify: 2017/07/21         Li Zebang
+ *     Modify : 2017/07/21        Li Zebang
  */
 
 package handler
@@ -38,6 +38,7 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
+	"github.com/pkg/errors"
 )
 
 type Pid struct {
@@ -83,8 +84,8 @@ func CreateCategories(c echo.Context) error {
 func GetCategories(c echo.Context) error {
 	var (
 		err        error
-		pid        Pid
-		categories []models.Categories
+		pid        models.Categories
+		categories *[]models.Categories
 	)
 
 	if err = c.Bind(&pid); err != nil {
@@ -95,16 +96,18 @@ func GetCategories(c echo.Context) error {
 
 	categories, err = models.CategoriesService.GetCategories(pid.Pid)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Categories not found:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrCategoriesNotFound, err.Error())
-		}
-
-		log.Logger.Error("Mysql error in get categories:", err)
+		log.Logger.Error("Mysql error in GetCategories Function:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, categories)
+	if len(*categories) == 0 {
+		err = errors.New("Categories Not Found")
+
+		log.Logger.Error("Error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrCategoriesNotFound, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, *categories)
 }

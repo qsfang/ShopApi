@@ -25,7 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21        Yang Zhengtian
- *     Modify: 2017/07/21         Li Zebang
+ *     Modify : 2017/07/21        Li Zebang
  */
 
 package models
@@ -97,17 +97,12 @@ func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 }
 
 // todo: 数据库操作
-func (csp *CategoriesServiceProvider) GetCategories(pid uint64) ([]Categories, error) {
+func (csp *CategoriesServiceProvider) GetCategories(pid uint64) (*[]Categories, error) {
 	var (
 		categories []Categories
 	)
 
 	db := orm.Conn
 
-	err := db.Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).First(&categories).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return categories, nil
+	return &categories,  db.Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).Find(&categories).Error
 }

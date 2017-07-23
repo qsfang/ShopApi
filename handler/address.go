@@ -25,15 +25,15 @@
 /*
  * Revision History:
  *     Initial: 2017/07/19       Li Zebang
- *     Modify: 2017/07/20        Yu Yi
- *     Modify: 2017/07/20        Yang Zhengtian
+ *     Modify : 2017/07/20       Yu Yi
+ *     Modify : 2017/07/20       Yang Zhengtian
  */
 
 package handler
 
 import (
-	"github.com/labstack/echo"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
 
 	"ShopApi/general"
 	"ShopApi/general/errcode"
@@ -44,20 +44,20 @@ import (
 
 func AddAddress(c echo.Context) error {
 	var (
-		err  error
-		addr models.Add
+		err     error
+		contact models.Contact
 	)
 
-	if err = c.Bind(&addr); err != nil {
+	if err = c.Bind(&contact); err != nil {
 		log.Logger.Error("Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID).(uint64)
+	contact.UserID = session.Get(general.SessionUserID).(uint64)
 
-	err = models.ContactService.AddAddress(addr, userID)
+	err = models.ContactService.AddAddress(&contact)
 	if err != nil {
 		log.Logger.Error("Mysql error in add address:", err)
 
@@ -69,8 +69,8 @@ func AddAddress(c echo.Context) error {
 
 func ChangeAddress(c echo.Context) error {
 	var (
-		err 	error
-		addr    models.Change
+		err  error
+		addr models.Change
 	)
 
 	if err = c.Bind(&addr); err != nil {
@@ -80,14 +80,14 @@ func ChangeAddress(c echo.Context) error {
 	}
 
 	err = models.ContactService.FindAddressId(addr.ID)
-	if err != nil{
+	if err != nil {
 
-		if err == gorm.ErrRecordNotFound{
+		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Address id not find", err)
 
 			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 		}
-		
+
 		log.Logger.Error("Mysql error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
@@ -116,7 +116,7 @@ func GetAddress(c echo.Context) error {
 
 	list, err = models.ContactService.GetAddress(userId)
 	if err != nil {
-		if err==gorm.ErrRecordNotFound{
+		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Id not find:", err)
 
 			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
@@ -129,11 +129,10 @@ func GetAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, list)
 }
 
-
 func Alter(c echo.Context) error {
 	var (
-		err 	error
-		m	models.AddressDefault
+		err error
+		m   models.AddressDefault
 	)
 
 	if err = c.Bind(&m); err != nil {

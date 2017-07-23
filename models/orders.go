@@ -25,8 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Li Zebang
- *	   Modify: 2017/07/21		 Ai Hao       订单状态更改
- *	   Modify: 2017/07/21		 Zhang Zizhao 创建订单
+ *	   Modify : 2017/07/21		 Ai Hao       订单状态更改
+ *	   Modify : 2017/07/21		 Zhang Zizhao 创建订单
  */
 
 package models
@@ -136,8 +136,9 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) e
 	}
 
 	return nil
-} // todo: 代码风格 数据库操作
-func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Orders, error) {
+}
+
+func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) (*[]Orders, error) {
 	var (
 		orders []Orders
 	)
@@ -145,20 +146,10 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) ([]Order
 	db := orm.Conn
 
 	if status == general.OrderUnfinished || status == general.OrderFinished {
-		err := db.Where("userid = ? AND status = ?", userID, status).First(&orders).Error
-		if err != nil {
-			return nil, err
-		}
-
-		return orders, nil
+		return &orders, db.Where("userid = ? AND status = ?", userID, status).Find(&orders).Error
 	}
 
-	err := db.Where("userid = ?", userID).Find(&orders).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return orders, nil
+	return &orders, db.Where("userid = ?", userID).Find(&orders).Error
 }
 
 // todo: 马超 重写
