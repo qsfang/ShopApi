@@ -25,7 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21     Zhu Yaqiang
- *     Modify :2017/07/22      Xu Haosheng    添加购物车
+ *     Modify : 2017/07/22     Xu Haosheng    添加购物车
  */
 
 package handler

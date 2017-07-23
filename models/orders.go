@@ -170,7 +170,7 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (Orders, 
 	db := orm.Conn
 	err = db.Where("userid = ? and id = ?", UserID, ID).First(&order).Error
 	if err != nil {
-		return nil, err
+		return order, err
 	}
 
 	return order, nil
