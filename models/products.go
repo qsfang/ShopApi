@@ -50,7 +50,7 @@ type Product struct {
 	Categories    uint64    `json:"categories"`
 	Price         float64   `json:"price"`
 	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice"`
-	Status        uint8    `json:"status"`
+	Status        uint64    `json:"status"`
 	Size          string    `json:"size"`
 	Color         string    `json:"color"`
 	ImageID       uint64    `gorm:"column:imageid" json:"imageid"`
