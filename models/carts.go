@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-// todo:对齐
+
 /*
  * Revision History:
- *     Initial: 2017/07/21        Zhu Yaqiang
- *     Modify: 2017/07/22     Xu Haosheng    添加购物车
+ *     Initial: 2017/07/21       Zhu Yaqiang
+ *     Modify : 2017/07/22       Xu Haosheng    添加购物车
  */
 
 package models
@@ -34,6 +34,8 @@ import (
 	"time"
 
 	"ShopApi/orm"
+	"ShopApi/general"
+	"github.com/jinzhu/gorm"
 )
 
 type CartsServiceProvider struct {
@@ -46,7 +48,6 @@ type CartsDel struct {
 	ProID uint64 `json:"productid"`
 }
 
-<<<<<<< HEAD
 type Test struct {
 	ID     uint64 `gorm:"column:id" json:"id"`
 	UserID uint64 `json:"userid"`
@@ -65,21 +66,6 @@ type Browse struct {
 	Url     string    `json:"url"`
 }
 
-=======
-type Browse struct {
-	Name    string    `json:"name"`
-	Count   uint64    `json:"count"`
-	Size    string    `json:"size"`
-	Color   string    `json:"color"`
-	Status  uint64    `json:"status"`
-	Created time.Time `json:"created"`
-	Type    string    `json:"type"`
-	Title   string    `json:"title"`
-	Image   string    `json:"image"`
-	Url     string    `json:"url"`
-}
-
->>>>>>> 4b397e369bbc5ab8453c4ad2b33e725f308fd515
 type Cart struct {
 	ProductID uint64    `gorm:"column:productid" json:"productid"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
@@ -155,7 +141,6 @@ func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error 
 }
 
 // 状态0表示商品在购物车，状态1表示商品不在购物车
-// todo: 常量定义  数据库操作
 func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	var (
 		cart Carts
@@ -164,17 +149,16 @@ func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 
 	db := orm.Conn
 
-	err = db.Where("id = ? and productid = ?", ID, ProID).First(&cart).Error
-	if err != nil {
+	result := db.Model(&cart).Where("id = ? AND productid = ? AND status = ?", ID, ProID, general.ProductInCart).Update("status", general.ProductNotInCart)
+	err = result.Error
+
+	count := result.RowsAffected
+	if count == 0 {
+		err = gorm.ErrRecordNotFound
 		return err
 	}
 
-	err = db.Model(&cart).Where("id = ? and productid = ?", ID, ProID).Update("status", 1).Limit(1).Error
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // todo: 返回错误

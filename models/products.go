@@ -24,9 +24,9 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/21        Ai Hao
- *	   Modify: 2017/07/21		  Zhu Yaqiang
- *     Modify: 2017/07/21         Yu Yi
+ *     Initial: 2017/07/21         Ai Hao
+ *     Modify : 2017/07/21         Zhu Yaqiang
+ *     Modify : 2017/07/21         Yu Yi
  */
 
 package models
@@ -42,11 +42,6 @@ type ProductServiceProvider struct {
 }
 
 var ProductService *ProductServiceProvider = &ProductServiceProvider{}
-
-// todo: 定义到函数内部
-type ProductID struct {
-	ID uint64 `json:"id"`
-}
 
 type Product struct {
 	ID            uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
@@ -193,20 +188,20 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 }
 
 // todo: 返回值
-func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product, error) {
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 	var (
 		err     error
-		ProInfo Product
+		ProInfo *Product = &Product{}
 	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", ProID).First(&ProInfo).Error
 
+	err = db.Where("id = ?", ProID).First(&ProInfo).Error
 	if err != nil {
-		return ProInfo, err
+		ProInfo = nil
 	}
 
-	return ProInfo, nil
+	return ProInfo, err
 }
 
 func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {
