@@ -26,6 +26,7 @@
  * Revision History:
  *     Initial: 2017/07/21     Zhu Yaqiang
  *     Modify : 2017/07/22     Xu Haosheng    添加购物车
+ *     Modify : 2017/07/23     Wang Ke
  */
 
 package handler
@@ -71,7 +72,7 @@ func CartsPutIn(c echo.Context) error {
 func Cartsdel(c echo.Context) error {
 	var (
 		err  error
-		cart models.Carts
+		cart models.GetCarts
 	)
 
 	if err = c.Bind(&cart); err != nil {

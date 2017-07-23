@@ -26,6 +26,7 @@
  * Revision History:
  *     Initial: 2017/07/21       Zhu Yaqiang
  *     Modify : 2017/07/22       Xu Haosheng    添加购物车
+ *     Modify : 2017/07/23       Wang Ke
  */
 
 package models
@@ -35,18 +36,12 @@ import (
 
 	"ShopApi/orm"
 	"ShopApi/general"
-	"github.com/jinzhu/gorm"
 )
 
 type CartsServiceProvider struct {
 }
 
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
-/*
-type CartsDel struct {
-	ID    uint64 `gorm:"column:id" json:"id"`
-	ProID uint64 `json:"productid"`
-}*/
 
 type Browse struct {
 	Name    string    `json:"name"`
@@ -107,8 +102,20 @@ type Carts struct {
 	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
-	Status    uint64    `json:"status"`
+	Status    uint8    `json:"status"`
 	Created   time.Time `json:"created"`
+}
+
+type GetCarts struct {
+	ID        uint64    `gorm:"column:id" json:"id" validate:"numeric"`
+	ProductID uint64    `gorm:"column:productid" json:"productid" validate:"numeric"`
+	Name      string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
+	Count     uint64    `json:"count" validate:"numeric"`
+	Size      string    `json:"size"`
+	Color     string    `json:"color"`
+	UserID    uint64    `gorm:"column:userid" json:"userid" validate:"numeric"`
+	ImageID   uint64    `gorm:"column:imageid"json:"imageid" validate:"numeric"`
+	Status    uint8     `json:"status" validate:"required, numeric, max = 1"`
 }
 
 // todo:变量
@@ -143,15 +150,7 @@ func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	)
 
 	db := orm.Conn
-
-	result := db.Model(&cart).Where("id = ? AND productid = ? AND status = ?", ID, ProID, general.ProductInCart).Update("status", general.ProductNotInCart)
-	err = result.Error
-
-	count := result.RowsAffected
-	if count == 0 {
-		err = gorm.ErrRecordNotFound
-		return err
-	}
+	err = db.Model(&cart).Where("id = ? AND productid = ?", ID, ProID).Update("status", general.ProductNotInCart).Limit(1).Error
 
 	return err
 }
