@@ -56,6 +56,22 @@ type Contact struct {
 	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
 }
 
+//Operate 总操作结构
+type Operate struct {
+	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
+	Name      string    `json:"name"`
+	Phone     string    `json:"phone"`
+	Province  string    `json:"province"`
+	City      string    `json:"city"`
+	Street    string    `json:"street"`
+	Address   string    `json:"address"`
+	Created   time.Time `json:"created"`
+	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
+	Page      uint8     `json:"page"`
+	Limit     uint8	    `json:"limit"`
+}
+
 type Add struct {
 	Name      *string `json:"name" validate:"required,alphanum,min=6,max=100"`
 	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=20"`
