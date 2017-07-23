@@ -152,7 +152,6 @@ func (csp *ContactServiceProvider) FindAddressId(ID uint64) error {
 	return nil
 }
 
-// todo: 完善函数名
 func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64) ([]AddressGet, error) {
 	var (
 		list	  []Contact
