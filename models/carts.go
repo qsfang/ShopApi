@@ -42,11 +42,11 @@ type CartsServiceProvider struct {
 }
 
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
-/*
-type CartsDel struct {
-	ID    uint64 `gorm:"column:id" json:"id"`
-	ProID uint64 `json:"productid"`
-}*/
+
+type Test struct {
+	ID     uint64 `gorm:"column:id" json:"id"`
+	UserID uint64 `json:"userid"`
+}
 
 type Browse struct {
 	Name    string    `json:"name"`
