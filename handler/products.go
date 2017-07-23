@@ -44,7 +44,7 @@ import (
 func CreateProduct(c echo.Context) error {
 	var (
 		err error
-		p   models.CreatePro
+		p   models.Product
 	)
 
 	if err = c.Bind(&p); err != nil {

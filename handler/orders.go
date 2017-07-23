@@ -164,6 +164,11 @@ func ChangeStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+	if st.Status != general.OrderFinished || st.Status != general.OrderUnfinished || st.Status != general.OrderCanceled{
+		log.Logger.Error("Status inexistence", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
 	err = models.OrderService.ChangeStatus(st.ID, st.Status)
 	if err != nil {
 		log.Logger.Error("Change status with error:", err)

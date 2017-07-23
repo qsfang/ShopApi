@@ -183,11 +183,10 @@ func ChangeMobilePassword(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	s := sess.Get(general.SessionUserID)
-	userId = s.(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userId = session.Get(general.SessionUserID).(uint64)
 
-	userPassword, err = models.UserService.IsUserExist(userId)
+	userPassword, err = models.UserService.GetUerPassword(userId)
 	if err != nil {
 		log.Logger.Error("User not found:", err)
 
@@ -195,9 +194,15 @@ func ChangeMobilePassword(c echo.Context) error {
 	}
 
 	if !utility.CompareHash([]byte(userPassword), *password.Pass) {
-		log.Logger.Debug("Password doesn't match:", *password.Pass)
+		log.Logger.Debug("Password doesn't match:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrMysqlfound, errors.New("password").Error())
+		return general.NewErrorWithMessage(errcode.ErrMysqlfound, errors.New("Password doesn't match").Error())
+	}
+
+	if *password.Pass == *password.NewPass{
+		log.Logger.Error("The new password is the same as the old password:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInput, errors.New("The new password is the same as the old password").Error())
 	}
 
 	err = models.UserService.ChangeMobilePassword(password.NewPass, userId)
