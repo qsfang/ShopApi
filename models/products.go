@@ -63,19 +63,19 @@ type Product struct {
 
 type GetProduct struct {
 	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
-	Name          string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
-	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale" validate:"numeric"`
-	Categories    uint64    `json:"categories" validate:"numeric"`
-	Price         float64   `json:"price" validate:"numeric"`
-	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice" validate:"numeric"`
-	Status        uint64    `json:"status" validate:"numeric"`
-	Size          string    `json:"size"`
-	Color         string    `json:"color"`
-	ImageID       uint64    `gorm:"column:imageid" json:"imageid" validate:"numeric"`
-	ImageIDs      string    `gorm:"column:imageids" json:"imageids"`
-	Remark        string    `json:"remark"`
-	Detail        string    `json:"detail"`
-	Inventory     uint64    `json:"inventory"`
+	//Name          string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
+	//TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale" validate:"numeric"`
+	//Categories    uint64    `json:"categories" validate:"numeric"`
+	//Price         float64   `json:"price" validate:"numeric"`
+	//OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice" validate:"numeric"`
+	//Status        uint64    `json:"status" validate:"numeric"`
+	//Size          string    `json:"size"`
+	//Color         string    `json:"color"`
+	//ImageID       uint64    `gorm:"column:imageid" json:"imageid" validate:"numeric"`
+	//ImageIDs      string    `gorm:"column:imageids" json:"imageids"`
+	//Remark        string    `json:"remark"`
+	//Detail        string    `json:"detail"`
+	//Inventory     uint64    `json:"inventory"`
 }
 
 // todo: 参数检查
