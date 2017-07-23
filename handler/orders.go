@@ -131,8 +131,7 @@ func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
 		order  ID
-		judge  bool
-		OutPut models.GetOrders
+		OutPut models.Orders
 	)
 	if err = c.Bind(&order); err != nil {
 		log.Logger.Error("Bind with error:", err)
@@ -143,7 +142,7 @@ func GetOneOrder(c echo.Context) error {
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	UserID := sess.Get(general.SessionUserID).(uint64)
 
-	OutPut, err, judge = models.OrderService.GetOneOrder(order.ID, UserID)
+	OutPut, err= models.OrderService.GetOneOrder(order.ID, UserID)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -152,17 +151,9 @@ func GetOneOrder(c echo.Context) error {
 			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
 		}
 
-		if judge == false {
-			log.Logger.Error("Access with error :", err)
-
-			return general.NewErrorWithMessage(errcode.ErrAccess, err.Error())
-		}
-
 		log.Logger.Error("Get Order with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
-
-
 	}
 
 	return c.JSON(errcode.ErrSucceed, OutPut)
@@ -180,6 +171,11 @@ func ChangeStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+	if st.Status != general.OrderFinished || st.Status != general.OrderUnfinished || st.Status != general.OrderCanceled{
+		log.Logger.Error("Status inexistence", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
 	err = models.OrderService.ChangeStatus(st.ID, st.Status)
 	if err != nil {
 		log.Logger.Error("Change status with error:", err)

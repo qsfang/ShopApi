@@ -61,7 +61,6 @@ func (Categories) TableName() string {
 	return "categories"
 }
 
-// todo: 代码风格 直接返回错误
 func (csp *CategoriesServiceProvider) CheckPid(pid uint64) error {
 	var(
 		category Categories
@@ -89,11 +88,8 @@ func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 	db := orm.Conn
 
 	err := db.Create(&cate).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 // todo: 数据库操作

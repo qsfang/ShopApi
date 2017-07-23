@@ -24,8 +24,8 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/21        Zhu Yaqiang
- *     Modify:2017/07/22      Xu Haosheng    添加购物车
+ *     Initial: 2017/07/21     Zhu Yaqiang
+ *     Modify : 2017/07/22     Xu Haosheng    添加购物车
  */
 
 package handler
@@ -71,7 +71,7 @@ func CartsPutIn(c echo.Context) error {
 func Cartsdel(c echo.Context) error {
 	var (
 		err  error
-		cart models.CartsDel
+		cart models.Carts
 	)
 
 	if err = c.Bind(&cart); err != nil {
@@ -80,7 +80,7 @@ func Cartsdel(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.CartsDelete(cart.ID, cart.ProID)
+	err = models.CartsService.CartsDelete(cart.ID, cart.ProductID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("This product doesn't exist !", err)

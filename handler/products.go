@@ -24,9 +24,9 @@
 
 /*
  * Revision History:
- *		Initial: 2017/07/21			Ai Hao
- *		Modify: 2017/07/21			Zhu Yaqiang
- * 		Modify: 2017/07/21			Yu Yi
+ *      Initial: 2017/07/21         Ai Hao
+ *      Modify : 2017/07/21         Zhu Yaqiang
+ *      Modify : 2017/07/21         Yu Yi
  */
 
 package handler
@@ -44,7 +44,7 @@ import (
 func CreateProduct(c echo.Context) error {
 	var (
 		err error
-		p   models.CreatePro
+		p   models.Product
 	)
 
 	if err = c.Bind(&p); err != nil {
@@ -119,17 +119,16 @@ func ChangeProStatus(c echo.Context) error {
 func GetProInfo(c echo.Context) error {
 	var (
 		err     error
-		ProID   models.ProductID
-		ProInfo models.Product
+		ProInfo *models.Product
 	)
 
-	if err = c.Bind(&ProID); err != nil {
+	if err = c.Bind(&ProInfo); err != nil {
 		log.Logger.Error("Analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	ProInfo, err = models.ProductService.GetProInfo(ProID.ID)
+	ProInfo, err = models.ProductService.GetProInfo(ProInfo.ID)
 
 	if err != nil {
 		log.Logger.Error("Get info with error:", err)

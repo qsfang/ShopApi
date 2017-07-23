@@ -52,6 +52,8 @@ const (
 	//Products Status
 	ProductOnsale = 0xe0 // 224
 	ProductUnsale = 0xe1 // 225
+	ProductInCart = 0
+	ProductNotInCart = 1
 
 	//Categories Status
 	CategoriesOnuse = 0xa0 // 160

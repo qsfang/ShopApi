@@ -114,7 +114,7 @@ func GetAddress(c echo.Context) error {
 	s := sess.Get(general.SessionUserID)
 	userId = s.(uint64)
 
-	list, err = models.ContactService.GetAddress(userId)
+	list, err = models.ContactService.GetAddressByUerId(userId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Id not find:", err)

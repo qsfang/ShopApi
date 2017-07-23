@@ -45,6 +45,7 @@ const (
 	ErrNotFound            = 0xa
 	ErrAccess              = 0xb
 	ErrInvalidPhone        = 0xc
+	ErrInput		 =0xd
 
 	// 需要登录
 	ErrLoginRequired    = 0x800
