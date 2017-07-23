@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+// todo:对齐
 /*
  * Revision History:
  *     Initial: 2017/07/21        Zhu Yaqiang
@@ -46,6 +46,7 @@ type CartsDel struct {
 	ProID uint64 `json:"productid"`
 }
 
+<<<<<<< HEAD
 type Test struct {
 	ID     uint64 `gorm:"column:id" json:"id"`
 	UserID uint64 `json:"userid"`
@@ -64,6 +65,21 @@ type Browse struct {
 	Url     string    `json:"url"`
 }
 
+=======
+type Browse struct {
+	Name    string    `json:"name"`
+	Count   uint64    `json:"count"`
+	Size    string    `json:"size"`
+	Color   string    `json:"color"`
+	Status  uint64    `json:"status"`
+	Created time.Time `json:"created"`
+	Type    string    `json:"type"`
+	Title   string    `json:"title"`
+	Image   string    `json:"image"`
+	Url     string    `json:"url"`
+}
+
+>>>>>>> 4b397e369bbc5ab8453c4ad2b33e725f308fd515
 type Cart struct {
 	ProductID uint64    `gorm:"column:productid" json:"productid"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
