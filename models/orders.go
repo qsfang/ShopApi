@@ -54,6 +54,21 @@ type Orders struct {
 	PayWay     uint8     `gorm:"column:payway"json:"payway"`
 }
 
+type OrmOrders struct {
+	ID         uint64    `json:"id"`
+	UserID     uint64    `gorm:"column:userid" json:"userid"`
+	TotalPrice float64   `gorm:"column:totalprice"json:"totalprice"`
+	Payment    float64   `json:"payment"`
+	Freight    float64   `json:"freight"`
+	Remark     string    `json:"remark"`
+	Discount   uint8     `json:"discount"`
+	Size       string    `json:"size"`
+	Color      string    `json:"color"`
+	Status     uint8     `json:"status"`
+	Created    time.Time `json:"created"`
+	PayWay     uint8     `gorm:"column:payway"json:"payway"`
+}
+
 type GetOrders struct {
 	TotalPrice float64   `json:"totalprice"`
 	Payment    float64   `json:"payment"`
@@ -152,24 +167,50 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) (*[]Orde
 	return &orders, db.Where("userid = ?", userID).Find(&orders).Error
 }
 
-func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (Orders, error) {
+// todo: 马超 重写
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
 	var (
+		judge    bool
 		err      error
-		order    Orders
+		order    []Orders
+		getOrder GetOrders
 	)
 
+	judge = false
 	db := orm.Conn
-	err = db.Where("userid = ? and id = ?", UserID, ID).First(&order).Error
+	err = db.Where("userid = ?", UserID).Find(&order).Error
 	if err != nil {
-		return order, err
+		return getOrder, err, judge
 	}
 
-	return order, nil
+	for _, v := range order {
+
+		if v.ID == ID {
+			judge = true
+			var getOrder = GetOrders{
+				TotalPrice: v.TotalPrice,
+				Payment:    v.Payment,
+				Freight:    v.Freight,
+				Discount:   v.Discount,
+				Size:       v.Size,
+				Color:      v.Color,
+				Status:     v.Status,
+				Created:    v.Created,
+			}
+
+			if judge == true {
+				return getOrder, err, judge
+			}
+
+			break
+		}
+	}
+
+	return getOrder, err, judge
 }
 
+// todo: 状态
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
-	var err	error
-
 	cha := Orders{
 		Status: status,
 	}
@@ -177,7 +218,10 @@ func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	updater := map[string]interface{}{"status": status}
 	db := orm.Conn
 
-	err = db.Model(&cha).Where("id=?", id).Update(updater).Limit(1).Error
+	err := db.Model(&cha).Where("id=?", id).Update(updater).Limit(1).Error
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }

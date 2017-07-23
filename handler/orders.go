@@ -43,9 +43,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Status struct {
-	Status uint8 `json:"status"`
-}
 type ID struct {
 	ID uint64 `sql:"auto_increment;primary_key;" json:"id"`
 }
@@ -88,7 +85,7 @@ func CreateOrder(c echo.Context) error {
 func GetOrders(c echo.Context) error {
 	var (
 		err    error
-		status Status
+		status models.Orders
 		orders *[]models.Orders
 	)
 

@@ -45,7 +45,7 @@ import (
 func AddAddress(c echo.Context) error {
 	var (
 		err     error
-		contact models.Contact
+		contact models.OrmContact
 	)
 
 	if err = c.Bind(&contact); err != nil {

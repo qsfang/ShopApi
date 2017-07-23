@@ -33,8 +33,8 @@ package models
 import (
 	"time"
 
-	"ShopApi/orm"
 	"ShopApi/general"
+	"ShopApi/orm"
 )
 
 type CategoriesServiceProvider struct {
@@ -43,12 +43,21 @@ type CategoriesServiceProvider struct {
 var CategoriesService *CategoriesServiceProvider = &CategoriesServiceProvider{}
 
 type Categories struct {
-	ID      uint64                `sql:"auto_increment;primary_key;",json:"id"`
-	Name    string                `json:"name"`
-	Pid     uint64                `json:"pid"`
-	Status  uint64                `json:"status"`
-	Remark  string                `json:"remark"`
-	Created time.Time             `json:"created"`
+	ID      uint64    `sql:"auto_increment;primary_key;",json:"id"`
+	Name    string    `json:"name"`
+	Pid     uint64    `json:"pid"`
+	Status  uint64    `json:"status"`
+	Remark  string    `json:"remark"`
+	Created time.Time `json:"created"`
+}
+
+type OrmCategories struct {
+	ID      uint64    `json:"id" validate:"required,numeric"`
+	Name    string    `json:"name" validate:"required,alphanum,min=6,max=100"`
+	Pid     uint64    `json:"pid" validate:"required,numeric"`
+	Status  uint64    `json:"status" validate:"required,numeric"`
+	Remark  string    `json:"remark" validate:"alphanum"`
+	Created time.Time `json:"created"`
 }
 
 type CreateCat struct {
@@ -62,14 +71,14 @@ func (Categories) TableName() string {
 }
 
 func (csp *CategoriesServiceProvider) CheckPid(pid uint64) error {
-	var(
+	var (
 		category Categories
 	)
 
 	db := orm.Conn
 
-	err:=db.Where("id =? ",pid).First(&category).Error
-	if err!=nil {
+	err := db.Where("id =? ", pid).First(&category).Error
+	if err != nil {
 		return err
 	}
 
@@ -78,11 +87,11 @@ func (csp *CategoriesServiceProvider) CheckPid(pid uint64) error {
 
 func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 	cate := Categories{
-		Name:                ca.Name,
-		Pid:                 ca.Pid,
-		Status:              general.CategoriesOnuse,
-		Remark:              ca.Remark,
-		Created:             time.Now(),
+		Name:    ca.Name,
+		Pid:     ca.Pid,
+		Status:  general.CategoriesOnuse,
+		Remark:  ca.Remark,
+		Created: time.Now(),
 	}
 
 	db := orm.Conn
@@ -100,5 +109,5 @@ func (csp *CategoriesServiceProvider) GetCategories(pid uint64) (*[]Categories, 
 
 	db := orm.Conn
 
-	return &categories,  db.Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).Find(&categories).Error
+	return &categories, db.Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).Find(&categories).Error
 }

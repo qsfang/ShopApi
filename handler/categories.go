@@ -84,7 +84,7 @@ func CreateCategories(c echo.Context) error {
 func GetCategories(c echo.Context) error {
 	var (
 		err        error
-		pid        models.Categories
+		pid        models.OrmCategories
 		categories *[]models.Categories
 	)
 
