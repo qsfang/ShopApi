@@ -148,7 +148,6 @@ func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	err = result.Error
 
 	count := result.RowsAffected
-
 	if count == 0 {
 		err = gorm.ErrRecordNotFound
 		return err

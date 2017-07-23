@@ -24,9 +24,9 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/21        Ai Hao
- *	   Modify: 2017/07/21		  Zhu Yaqiang
- *     Modify: 2017/07/21         Yu Yi
+ *     Initial: 2017/07/21         Ai Hao
+ *     Modify : 2017/07/21         Zhu Yaqiang
+ *     Modify : 2017/07/21         Yu Yi
  */
 
 package models
@@ -188,14 +188,18 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 }
 
 // todo: 返回值
-func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (Product, error) {
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 	var (
 		err     error
-		ProInfo Product = Product{}
+		ProInfo *Product = &Product{}
 	)
 
 	db := orm.Conn
+
 	err = db.Where("id = ?", ProID).First(&ProInfo).Error
+	if err != nil {
+		ProInfo = nil
+	}
 
 	return ProInfo, err
 }

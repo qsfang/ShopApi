@@ -24,9 +24,9 @@
 
 /*
  * Revision History:
- *		Initial: 2017/07/21			Ai Hao
- *		Modify: 2017/07/21			Zhu Yaqiang
- * 		Modify: 2017/07/21			Yu Yi
+ *      Initial: 2017/07/21         Ai Hao
+ *      Modify : 2017/07/21         Zhu Yaqiang
+ *      Modify : 2017/07/21         Yu Yi
  */
 
 package handler
@@ -119,7 +119,7 @@ func ChangeProStatus(c echo.Context) error {
 func GetProInfo(c echo.Context) error {
 	var (
 		err     error
-		ProInfo models.Product
+		ProInfo *models.Product
 	)
 
 	if err = c.Bind(&ProInfo); err != nil {
