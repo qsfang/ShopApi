@@ -191,8 +191,7 @@ func (us *UserServiceProvider)ChangePhone(UserID uint64, Phone string) error {
 	return nil
 }
 
-// todo：函数命名
-func (us *UserServiceProvider) IsUserExist(id uint64) (string, error) {
+func (us *UserServiceProvider) GetUerPassword(id uint64) (string, error) {
 	var (
 		user User
 		err  error
@@ -200,13 +199,10 @@ func (us *UserServiceProvider) IsUserExist(id uint64) (string, error) {
 
 	db := orm.Conn
 	err = db.Where("id = ?", id).First(&user).Error
-	if err != nil {
-		return user.Password, err
-	}
 
-	return user.Password, nil
+	return user.Password, err
 }
-// todo: 函数权限
+
 func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) error {
 	var (
 		user User
@@ -221,11 +217,8 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 
 	updater := map[string]interface{}{"password": hashPass}
 	err = db.Model(&user).Where("id =? ", id).Update(updater).Limit(1).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 // todo: 代码风格 业务逻辑设计
