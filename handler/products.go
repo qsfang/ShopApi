@@ -32,6 +32,8 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
@@ -44,7 +46,7 @@ import (
 func CreateProduct(c echo.Context) error {
 	var (
 		err error
-		p   models.Product
+		p   models.ConProduct
 	)
 
 	if err = c.Bind(&p); err != nil {
@@ -53,7 +55,7 @@ func CreateProduct(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.CreateProduct(p)
+	err = models.ProductService.CreateProduct(&p)
 	if err != nil {
 		log.Logger.Error("Create product with error:", err)
 
@@ -96,18 +98,25 @@ func GetProductList(c echo.Context) error {
 func ChangeProStatus(c echo.Context) error {
 	var (
 		err error
-		pro models.ChangePro
+		pro models.ConProduct
 	)
 
 	if err = c.Bind(&pro); err != nil {
-		log.Logger.Error("Change crash with error:", err)
+		log.Logger.Error("Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.ChangeProStatus(pro)
+	if pro.Status != general.ProductOnsale && pro.Status != general.ProductUnsale {
+		err = errors.New("Status unExistence")
+		log.Logger.Error("status transformed with error :",err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.ProductService.ChangeProStatus(pro.ID, pro.Status)
 	if err != nil {
-		log.Logger.Error("change chanslates with error:", err)
+		log.Logger.Error("status transformed with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -115,6 +124,7 @@ func ChangeProStatus(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
+<<<<<<< HEAD
 //// 根据商品ID获取商品信息
 //func GetProInfo(c echo.Context) error {
 //	var (
@@ -138,6 +148,31 @@ func ChangeProStatus(c echo.Context) error {
 //
 //	return c.JSON(errcode.ErrSucceed, ProInfo)
 //}
+=======
+func GetProInfo(c echo.Context) error {
+	var (
+		err           error
+		ProInfo       *models.ConProduct
+		ProInfoReturn *models.Product
+	)
+
+	if err = c.Bind(&ProInfo); err != nil {
+		log.Logger.Error("Analysis crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	ProInfoReturn, err = models.ProductService.GetProInfo(ProInfo.ID)
+
+	if err != nil {
+		log.Logger.Error("Get info with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, ProInfoReturn)
+}
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 
 func ChangeCategories(c echo.Context) error {
 	var (

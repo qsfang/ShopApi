@@ -64,22 +64,23 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
-type ChangeUseInfo struct {
-	Nickname string `json:"nickname"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Sex      uint8  `json:"sex"`
+//todo：连接前端
+type ConUsers struct {
+	UserID   uint64    `gorm:"column:id" json:"userid"`
+	OpenID   string    `gorm:"column:openid" json:"openid"`
+	Name     string    `json:"name"`
+	Status   uint16    `json:"status"`
+	Type     uint16    `json:"type"`
+	Created  time.Time `json:"created"`
+	Avatar   string    `json:"avatar"`
+	Nickname string    `json:"nickname"`
+	Email    string    `json:"email"`
+	Phone    string    `json:"phone"`
+	Sex      uint8     `json:"sex"`
+	Pass    *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
+	NewPass *string `json:"newpass" validate:"required,alphanum,min=6,max=30"`
 }
 
-type ChangeAvatar struct {
-	Avatar string `json:"avatar"`
-}
-
-type Phone struct {
-	Phone string `json:"phone"`
-}
-
-// todo: 接收者
 func (User) TableName() string {
 	return "users"
 }
@@ -136,6 +137,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	return nil
 }
+
 // todo: 代码风格
 func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	var (
@@ -158,11 +160,11 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return true, u.UserID, nil
 }
 
-func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
+func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
 
 	var (
 		err error
-		ui  UserInfo
+		ui  *UserInfo = &UserInfo{}
 	)
 
 	db := orm.Conn
@@ -173,19 +175,21 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	return ui, nil
 }
-// todo: 参数 代码风格
-func (us *UserServiceProvider)ChangePhone(UserID uint64, Phone string) error {
+
+func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 	var (
 		err error
 		con Contact
 	)
+
 	change := map[string]interface{}{"phone": Phone}
 
 	db := orm.Conn
-	err = db.Model(&con).Where("userid=?", UserID).Update(change).Limit(1).Error
+	err = db.Model(&con).Where("id=?", UserID).Update(change).Limit(1).Error
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -219,33 +223,28 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 	return err
 }
 
-// todo: 代码风格 业务逻辑设计
-func (us *UserServiceProvider) ChangeUserInfo(info ChangeUseInfo, userID uint64) error {
-	var con Contact
+func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) error {
+	var (
+		con Contact
+		nil uint8 = 0
+	)
 
-	changMap := map[string]interface{}{"nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
-
-	db := orm.Conn
-	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
-
-	if err != nil {
-		return err
+	changMap := map[string]interface{}{
+		"nickname": info.Nickname,
+		"email"       : info.Email,
+		"phone"     : info.Phone,
+		"sex"           : info.Sex,
+		"avatar"      : info.Avatar,
 	}
 
-	return nil
+	db := orm.Conn
+
+	for userInfo, value := range changMap {
+		if value =="" || value == nil {
+			delete(changMap, userInfo)
+		}
+	}
+	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
+
+	return err
 }
-func (us *UserServiceProvider) ChangeAvatar(info ChangeAvatar, userID uint64) error {
-var con Contact
-
-changMap := map[string]interface{}{"avatar": info.Avatar}
-
-db := orm.Conn
-err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
-
-if err != nil {
-return err
-}
-
-return nil
-}
-

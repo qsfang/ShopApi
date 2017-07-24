@@ -79,6 +79,13 @@ type ConProduct struct {
 	Inventory     uint64    `json:"inventory"`
 }
 
+<<<<<<< HEAD
+=======
+type GetCategories struct {
+	Categories uint64 `json:"categories" validate:"required, alphanum, min = 0, max= 30"`
+}
+
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 type GetProList struct {
 	Name          string
 	TotalSale     uint64
@@ -104,16 +111,30 @@ func (Product) TableName() string {
 	return "products"
 }
 
-func (ps *ProductServiceProvider) CreateProduct(pr Product) error {
-	pr.Status = general.ProductOnsale
-	pr.Created = time.Now()
+func (ps *ProductServiceProvider) CreateProduct(pr *ConProduct) error {
+	pro := Product{
+		Name:			pr.Name,
+		TotalSale:		pr.TotalSale,
+		Category: 		pr.Category,
+		Price:			pr.Price,
+		OriginalPrice:	pr.OriginalPrice,
+		Size: 			pr.Size,
+		Color: 			pr.Color,
+		ImageID:		pr.ImageID,
+		ImageIDs:		pr.ImageIDs,
+		Detail:			pr.Detail,
+		Inventory:		pr.Inventory,
+	}
+
+	pro.Status = general.ProductOnsale
+	pro.Created = time.Now()
 
 	db := orm.Conn
-	err := db.Create(&pr).Error
+	err := db.Create(&pro).Error
 
 	return err
 }
-// todo: 分页
+
 func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
 	//	ware Product
@@ -129,6 +150,7 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 	}
 
 	for _, c := range list {
+<<<<<<< HEAD
 		pro := GetProList{
 			Name:          c.Name,
 			TotalSale:     c.TotalSale,
@@ -138,6 +160,20 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 			ImageId:       c.ImageID,
 			Detail:        c.Detail,
 			Inventory:     c.Inventory,
+=======
+		if c.Status == general.ProductOnsale {
+			pro := GetProList{
+				Name:          c.Name,
+				TotalSale:     c.TotalSale,
+				Price:         c.Price,
+				OriginalPrice: c.OriginalPrice,
+				Status:        c.Status,
+				ImageId:       c.ImageID,
+				Detail:        c.Detail,
+				Inventory:     c.Inventory,
+			}
+			s = append(s, pro)
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 		}
 		s = append(s, pro)
 
@@ -146,26 +182,42 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 	return s, nil
 }
 
+<<<<<<< HEAD
 func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
+=======
+func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) error {
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	var (
-		pro Product
+		pro ConProduct
 		err error
 	)
 
-	changeMap := map[string]interface{}{
-		"status": m.Status,
-	}
+	change := map[string]interface{}{"status": status}
+	db := orm.Conn
 
-	if m.Status == general.ProductOnsale {
-		m.Status = general.ProductUnsale
-	} else {
-		m.Status = general.ProductUnsale
-	}
+	err = db.Model(&pro).Where("id = ?", ID).Updates(change).Limit(1).Error
 
+<<<<<<< HEAD
 	db := orm.Conn
 	err = db.Model(&pro).Where("id = ?", m.ID).Updates(changeMap).Limit(1).Error
 	if err != nil {
 		return err
+=======
+	return err
+}
+
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
+	var (
+		err     error
+		ProInfo *Product = &Product{}
+	)
+
+	db := orm.Conn
+
+	err = db.Where("id = ?", ProID).First(&ProInfo).Error
+	if err != nil {
+		return ProInfo, err
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	}
 
 	return nil

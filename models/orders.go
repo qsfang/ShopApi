@@ -36,7 +36,13 @@ import (
 
 	"ShopApi/general"
 	"ShopApi/orm"
+	"fmt"
 )
+
+type OrderServiceProvider struct {
+}
+
+var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 
 // todo：参数检查 结构
 type Orders struct {
@@ -55,30 +61,20 @@ type Orders struct {
 }
 
 type OrmOrders struct {
-	ID         uint64    `json:"id"`
-	UserID     uint64    `gorm:"column:userid" json:"userid"`
-	TotalPrice float64   `gorm:"column:totalprice"json:"totalprice"`
-	Payment    float64   `json:"payment"`
-	Freight    float64   `json:"freight"`
-	Remark     string    `json:"remark"`
-	Discount   uint8     `json:"discount"`
-	Size       string    `json:"size"`
-	Color      string    `json:"color"`
-	Status     uint8     `json:"status"`
+	ID         uint64    `json:"id" validate:"required,numeric"`
+	UserID     uint64    `json:"userid" validate:"required,numeric"`
+	TotalPrice float64   `json:"totalprice" validate:"required,numeric"`
+	Payment    float64   `json:"payment" validate:"required,numeric"`
+	Freight    float64   `json:"freight" validate:"required,numeric"`
+	Remark     string    `json:"remark" validate:"alphanum"`
+	Discount   uint8     `json:"discount" validate:"numeric"`
+	Size       string    `json:"size" validate:"required,alphanum"`
+	Color      string    `json:"color" validate:"required,alphanum"`
+	Status     uint8     `json:"status" validate:"required,numeric"`
 	Created    time.Time `json:"created"`
-	PayWay     uint8     `gorm:"column:payway"json:"payway"`
-}
-
-type GetOrders struct {
-	TotalPrice float64   `json:"totalprice"`
-	Payment    float64   `json:"payment"`
-	Freight    float64   `json:"freight"`
-	Discount   uint8     `json:"discount"`
-	Size       string    `json:"size"`
-	Color      string    `json:"color"`
-	Status     uint8     `json:"status"`
-	Created    time.Time `json:"created"`
-	Payway     uint8     `json:"payway"`
+	PayWay     uint8     `json:"payway" validate:"required,numeric"`
+	Page       uint64    `json:"page" validate:"required,numeric"`
+	PageSize   uint64    `json:"pagesize" validate:"required,numeric"`
 }
 
 type RegisterOrder struct {
@@ -92,27 +88,6 @@ type RegisterOrder struct {
 	Color      string  `json:"color"`
 	Payway     uint8   `json:"payway"`
 }
-
-type Order struct {
-	Name       string
-	UserID     uint64
-	TotalPrice float64
-	Payment    float64
-	Freight    float64
-	Remark     string
-	Discount   uint8
-	Size       string
-	Color      string
-	Status     uint8
-	Created    time.Time
-	Payway     uint8
-}
-
-// todo: 代码风格
-type OrderServiceProvider struct {
-}
-
-var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 
 func (Orders) TableName() string {
 	return "orders"
@@ -153,20 +128,48 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) e
 	return nil
 }
 
-func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) (*[]Orders, error) {
+func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStart, pageEnd uint64) (*[]Orders, error) {
 	var (
+		order  Orders
 		orders []Orders
 	)
 
 	db := orm.Conn
 
 	if status == general.OrderUnfinished || status == general.OrderFinished {
-		return &orders, db.Where("userid = ? AND status = ?", userID, status).Find(&orders).Error
+		sql := fmt.Sprintf("SELECT * FROM orders WHERE userid = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
+
+		rows, err := db.Raw(sql, userID, status).Rows()
+		defer rows.Close()
+		if err != nil {
+			return nil, err
+		}
+
+		for rows.Next() {
+			db.ScanRows(rows, &order)
+			orders = append(orders, order)
+		}
+
+		return &orders, err
 	}
 
-	return &orders, db.Where("userid = ?", userID).Find(&orders).Error
+	sql := fmt.Sprintf("SELECT * FROM orders WHERE userid = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
+
+	rows, err := db.Raw(sql, userID).Rows()
+	defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		db.ScanRows(rows, &order)
+		orders = append(orders, order)
+	}
+
+	return &orders, err
 }
 
+<<<<<<< HEAD
 func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrders, error) {
 	var (
 		err      error
@@ -176,11 +179,26 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrder
 
 	db := orm.Conn
 	err = db.Where("userid = ? AND id = ?", UserID , ID).Find(&order).Error
+=======
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (*OrmOrders, error) {
+	var (
+		err      error
+		order    Orders
+		getOrder *OrmOrders = &OrmOrders{}
+	)
+
+	db := orm.Conn
+	err = db.Where("userid = ? AND id = ?", UserID, ID).Find(&order).Error
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	if err != nil {
 		return getOrder, err
 	}
 
+<<<<<<< HEAD
 	getOrder = OrmOrders{
+=======
+	*getOrder = OrmOrders{
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 		TotalPrice: order.TotalPrice,
 		Payment:    order.Payment,
 		Freight:    order.Freight,
@@ -194,7 +212,6 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrder
 	return getOrder, nil
 }
 
-// todo: 状态
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha := Orders{
 		Status: status,
@@ -204,9 +221,5 @@ func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	db := orm.Conn
 
 	err := db.Model(&cha).Where("id=?", id).Update(updater).Limit(1).Error
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

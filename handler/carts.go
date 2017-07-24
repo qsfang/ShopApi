@@ -47,7 +47,7 @@ import (
 func CartsPutIn(c echo.Context) error {
 	var (
 		err   error
-		carts models.Carts
+		carts models.ConCarts
 	)
 
 	if err = c.Bind(&carts); err != nil {
@@ -60,7 +60,7 @@ func CartsPutIn(c echo.Context) error {
 	userID := session.Get(general.SessionUserID)
 	id := userID.(uint64)
 
-	err = models.CartsService.CreateInCarts(carts, id)
+	err = models.CartsService.CreateInCarts(&carts, id)
 	if err != nil {
 		log.Logger.Error("Mysql error in add address:", err)
 
@@ -110,14 +110,14 @@ func AlterCartPro(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count, cartpro.Size, cartpro.Color)
+	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count)
 	if err == gorm.ErrRecordNotFound {
 		log.Logger.Error("The product doesn't exist !", err)
 
 		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
-	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count, cartpro.Size, cartpro.Color)
+	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count)
 
 	if err != nil {
 		log.Logger.Error("Alter product with error:", err)
@@ -128,18 +128,20 @@ func AlterCartPro(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func Browse(c echo.Context) error {
+func BrowseCart(c echo.Context) error {
 	var(
 		err error
+<<<<<<< HEAD
 		output []models.ConCarts
+=======
+		output []models.Carts
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID)
-	id := userID.(uint64)
+	userID := session.Get(general.SessionUserID).(uint64)
 
-	output, err= models.CartsService.BrowseCart(id)
-
+	output, err= models.CartsService.BrowseCart(userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Find order with error:", err)

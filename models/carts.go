@@ -27,7 +27,11 @@
  *     Initial: 2017/07/21       Zhu Yaqiang
  *     Modify : 2017/07/22       Xu Haosheng    添加购物车
  *     Modify : 2017/07/23       Wang Ke
+<<<<<<< HEAD
  *     Modify : 2017/07/24       Ma Chao
+=======
+ *     Modify : 2017/07/23 		 Ma Chao
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
  */
 
 package models
@@ -35,8 +39,8 @@ package models
 import (
 	"time"
 
-	"ShopApi/orm"
 	"ShopApi/general"
+	"ShopApi/orm"
 )
 
 type CartsServiceProvider struct {
@@ -44,6 +48,7 @@ type CartsServiceProvider struct {
 
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 
+<<<<<<< HEAD
 type Browse struct {
 	Name    string    `json:"name"`
 	Count   uint64    `json:"count"`
@@ -94,6 +99,8 @@ type CartPro struct {
 	Color string `json:"color"`
 }
 
+=======
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 type Carts struct {
 	ID        uint64    `sql:"primary_key;" gorm:"column:id" json:"id"`
 	ProductID uint64    `gorm:"column:productid" json:"productid"`
@@ -120,8 +127,7 @@ type ConCarts struct {
 	Created   time.Time `json:"created"`
 }
 
-// todo:变量
-func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error {
+func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) error {
 	cartsPutIn := Carts{
 		UserID:    userID,
 		ProductID: carts.ProductID,
@@ -130,18 +136,13 @@ func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error 
 		Size:      carts.Size,
 		Color:     carts.Color,
 		ImageID:   carts.ImageID,
-		Status:    carts.Status,
 		Created:   time.Now(),
 	}
 
 	db := orm.Conn
-
 	err := db.Create(&cartsPutIn).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 // 状态0表示商品在购物车，状态1表示商品不在购物车
@@ -157,15 +158,13 @@ func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	return err
 }
 
-// todo: 返回错误
-func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size string, Color string) error {
+func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error {
 	var (
 		cart Carts
 	)
+
 	updater := map[string]interface{}{
 		"count": Count,
-		"size":  Size,
-		"color": Color,
 	}
 
 	db := orm.Conn
@@ -177,14 +176,21 @@ func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size 
 	return nil
 }
 
+<<<<<<< HEAD
 func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
 	var (
 		err         error
 		carts       []ConCarts
 		browseCart  []ConCarts
 		browse      []ConCarts
+=======
+func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Carts, error) {
+	var (
+		err    error
+		carts  []Carts
+		browse []Carts
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	)
-
 
 	db := orm.Conn
 	err = db.Where("userid = ?", UserID).Find(&carts).Error
@@ -193,6 +199,7 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
 	}
 
 	for _, v := range carts {
+<<<<<<< HEAD
 		add := ConCarts {
 			ImageID:  v.ImageID,
 		}
@@ -206,10 +213,24 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
 			Name:    v.Name,
 			Color:   v.Color,
 			Size:    v.Size,
+=======
+		add1 := Carts{
+			ImageID:   v.ImageID,
+			Status:    v.Status,
+			Created:   v.Created,
+			Count:     v.Count,
+			Name:      v.Name,
+			Color:     v.Color,
+			Size:      v.Size,
+			ProductID: v.ProductID,
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 		}
 		browse = append(browse, add1)
 	}
 
 	return browse, err
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
