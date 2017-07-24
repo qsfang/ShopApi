@@ -160,11 +160,11 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return true, u.UserID, nil
 }
 
-func (us *UserServiceProvider) GetInfo(UserID uint64) (*ConUsers, error) {
+func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
 
 	var (
 		err error
-		ui  *ConUsers
+		ui  *UserInfo = &UserInfo{}
 	)
 
 	db := orm.Conn

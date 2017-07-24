@@ -169,11 +169,11 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 	return &orders, err
 }
 
-func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrders, error) {
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (*OrmOrders, error) {
 	var (
 		err      error
 		order    Orders
-		getOrder OrmOrders
+		getOrder *OrmOrders = &OrmOrders{}
 	)
 
 	db := orm.Conn
@@ -182,7 +182,7 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrder
 		return getOrder, err
 	}
 
-	getOrder = OrmOrders{
+	*getOrder = OrmOrders{
 		TotalPrice: order.TotalPrice,
 		Payment:    order.Payment,
 		Freight:    order.Freight,

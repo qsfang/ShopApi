@@ -131,7 +131,7 @@ func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
 		order  ID
-		OutPut models.OrmOrders
+		OutPut *models.OrmOrders
 	)
 	if err = c.Bind(&order); err != nil {
 		log.Logger.Error("Bind with error:", err)
