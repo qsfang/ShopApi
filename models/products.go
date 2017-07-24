@@ -46,20 +46,38 @@ var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 type Product struct {
 	ID            uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
 	Name          string    `json:"name"`
-	TotalSale     uint64    `gorm:"column:totalsale"json:"totalsale"`
+	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale"`
 	Categories    uint64    `json:"categories"`
 	Price         float64   `json:"price"`
-	OriginalPrice float64   `json:"originalprice"`
+	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice"`
 	Status        uint64    `json:"status"`
 	Size          string    `json:"size"`
 	Color         string    `json:"color"`
-	ImageID       uint64    `json:"imageid"`
-	ImageIDs      string    `json:"imageids"`
+	ImageID       uint64    `gorm:"column:imageid" json:"imageid"`
+	ImageIDs      string    `gorm:"column:imageids" json:"imageids"`
 	Remark        string    `json:"remark"`
 	Detail        string    `json:"detail"`
 	Created       time.Time `json:"created"`
 	Inventory     uint64    `json:"inventory"`
 }
+
+type GetProduct struct {
+	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
+	//Name          string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
+	//TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale" validate:"numeric"`
+	//Categories    uint64    `json:"categories" validate:"numeric"`
+	//Price         float64   `json:"price" validate:"numeric"`
+	//OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice" validate:"numeric"`
+	//Status        uint64    `json:"status" validate:"numeric"`
+	//Size          string    `json:"size"`
+	//Color         string    `json:"color"`
+	//ImageID       uint64    `gorm:"column:imageid" json:"imageid" validate:"numeric"`
+	//ImageIDs      string    `gorm:"column:imageids" json:"imageids"`
+	//Remark        string    `json:"remark"`
+	//Detail        string    `json:"detail"`
+	//Inventory     uint64    `json:"inventory"`
+}
+
 // todo: 参数检查
 type GetCategories struct {
 	Categories uint64 `json:"categories" validate:"required, alphanum, min = 0, max= 30"`
@@ -76,19 +94,6 @@ type GetProList struct {
 	Inventory     uint64
 }
 
-type CreatePro struct {
-	Name          string  `json:"name"`
-	Categories    uint64  `json:"categories"`
-	Price         float64 `json:"price"`
-	OriginalPrice float64 `gorm:"column:originalprice" json:"originalprice"`
-	Size          string  `json:"size"`
-	Color         string  `json:"color"`
-	ImageID       uint64  `json:"imageid"`
-	ImageIDs      string  `json:"imageids"`
-	Detail        string  `json:"detail"`
-	Inventory     uint64  `json:"inventory"`
-}
-
 type ChangePro struct {
 	ID     uint64 `json:"id" validate:"numeric"`
 	Status uint64 `json:"status" validate:"numeric"`
@@ -102,31 +107,15 @@ type ChangeCate struct {
 func (Product) TableName() string {
 	return "products"
 }
-// todo：返回错误 参数
-func (ps *ProductServiceProvider) CreateProduct(pr CreatePro) error {
-	pro := Product{
-		Name:          pr.Name,
-		Categories:    pr.Categories,
-		Price:         pr.Price,
-		OriginalPrice: pr.OriginalPrice,
-		Status:        general.ProductOnsale,
-		Size:          pr.Size,
-		Color:         pr.Color,
-		ImageID:       pr.ImageID,
-		ImageIDs:      pr.ImageIDs,
-		Detail:        pr.Detail,
-		Created:       time.Now(),
-		Inventory:     pr.Inventory,
-	}
+
+func (ps *ProductServiceProvider) CreateProduct(pr Product) error {
+	pr.Status = general.ProductOnsale
+	pr.Created = time.Now()
 
 	db := orm.Conn
+	err := db.Create(&pr).Error
 
-	err := db.Create(&pro).Error
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 // todo: 分页
 func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {

@@ -64,17 +64,6 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
-type ChangeUseInfo struct {
-	Nickname string `json:"nickname"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Sex      uint8  `json:"sex"`
-}
-
-type ChangeAvatar struct {
-	Avatar string `json:"avatar"`
-}
-
 type Phone struct {
 	Phone string `json:"phone"`
 }
@@ -189,8 +178,7 @@ func (us *UserServiceProvider)ChangePhone(UserID uint64, Phone string) error {
 	return nil
 }
 
-// todo：函数命名
-func (us *UserServiceProvider) IsUserExist(id uint64) (string, error) {
+func (us *UserServiceProvider) GetUerPassword(id uint64) (string, error) {
 	var (
 		user User
 		err  error
@@ -198,13 +186,10 @@ func (us *UserServiceProvider) IsUserExist(id uint64) (string, error) {
 
 	db := orm.Conn
 	err = db.Where("id = ?", id).First(&user).Error
-	if err != nil {
-		return user.Password, err
-	}
 
-	return user.Password, nil
+	return user.Password, err
 }
-// todo: 函数权限
+
 func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) error {
 	var (
 		user User
@@ -219,40 +204,33 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 
 	updater := map[string]interface{}{"password": hashPass}
 	err = db.Model(&user).Where("id =? ", id).Update(updater).Limit(1).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
-// todo: 代码风格 业务逻辑设计
-func (us *UserServiceProvider) ChangeUserInfo(info ChangeUseInfo, userID uint64) error {
-	var con Contact
+// todo: 业务逻辑设计
+func (us *UserServiceProvider) ChangeUserInfo(info UserInfo, userID uint64) error {
+	var (
+		con Contact
+		nil uint8 = 0
+	)
 
-	changMap := map[string]interface{}{"nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
+	changMap := map[string]interface{}{
+		"nickname": info.Nickname,
+		"email": info.Email,
+		"phone": info.Phone,
+		"sex": info.Sex,
+		"avatar": info.Avatar,
+	}
 
 	db := orm.Conn
+
+	for userInfo, value := range changMap {
+		if value =="" || value == nil {
+			delete(changMap, userInfo)
+		}
+	}
 	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
-func (us *UserServiceProvider) ChangeAvatar(info ChangeAvatar, userID uint64) error {
-var con Contact
-
-changMap := map[string]interface{}{"avatar": info.Avatar}
-
-db := orm.Conn
-err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
-
-if err != nil {
-return err
-}
-
-return nil
-}
-
