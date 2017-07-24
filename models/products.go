@@ -47,7 +47,7 @@ type Product struct {
 	ID            uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
 	Name          string    `json:"name"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale"`
-	Category    uint64    `json:"categories"`
+	Category      uint64    `json:"categories"`
 	Price         float64   `json:"price"`
 	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice"`
 	Status        uint64    `json:"status"`
@@ -65,7 +65,7 @@ type ConProduct struct {
 	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
 	Name          string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale" validate:"numeric"`
-	Category    uint64    `json:"categories" validate:"numeric"`
+	Category      uint64    `json:"categories" validate:"numeric"`
 	Price         float64   `json:"price" validate:"numeric"`
 	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice" validate:"numeric"`
 	Status        uint64    `json:"status" validate:"numeric"`
@@ -177,7 +177,7 @@ func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) erro
 }
 
 // todo: 返回值
-func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*ConProduct, error) {
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 	var (
 		err     error
 		ProInfo *ConProduct = &ConProduct{}
@@ -187,7 +187,7 @@ func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*ConProduct, error) 
 
 	err = db.Where("id = ?", ProID).First(&ProInfo).Error
 	if err != nil {
-		ProInfo = nil
+		return nil, err
 	}
 
 	return ProInfo, err
