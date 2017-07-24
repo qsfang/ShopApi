@@ -131,34 +131,6 @@ func AlterCartPro(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-<<<<<<< HEAD
-//func Browse(c echo.Context) error {
-//	var(
-//		err error
-//		output []models.Browse
-//	)
-//
-//	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-//	userID := session.Get(general.SessionUserID)
-//	id := userID.(uint64)
-//
-//	output, err= models.CartsService.BrowseCart(id)
-//
-//	if err != nil {
-//		if err == gorm.ErrRecordNotFound {
-//			log.Logger.Error("Find order with error:", err)
-//
-//			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
-//		}
-//
-//		log.Logger.Error("Get Order with error:", err)
-//
-//		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
-//	}
-//
-//	return c.JSON(errcode.ErrSucceed, output)
-//}
-=======
 func BrowseCart(c echo.Context) error {
 	var(
 		err error
@@ -183,4 +155,3 @@ func BrowseCart(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, output)
 }
->>>>>>> e84b31acb09c085dbd0661abfa9f02367dd8f28e

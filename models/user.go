@@ -209,7 +209,6 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 	return err
 }
 
-// todo: 业务逻辑设计   已完成
 func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) error {
 	var (
 		con Contact
@@ -218,10 +217,10 @@ func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) err
 
 	changMap := map[string]interface{}{
 		"nickname": info.Nickname,
-		"email": info.Email,
-		"phone": info.Phone,
-		"sex": info.Sex,
-		"avatar": info.Avatar,
+		"email"       : info.Email,
+		"phone"     : info.Phone,
+		"sex"           : info.Sex,
+		"avatar"      : info.Avatar,
 	}
 
 	db := orm.Conn

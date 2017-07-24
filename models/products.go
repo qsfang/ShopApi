@@ -47,15 +47,7 @@ type Product struct {
 	ID            uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
 	Name          string    `json:"name"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale"`
-<<<<<<< HEAD
-<<<<<<< HEAD
-	Categories    uint64    `json:"categories"`
-=======
-	Category    uint64    `json:"categories"`
->>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
-=======
 	Category      uint64    `json:"categories"`
->>>>>>> e84b31acb09c085dbd0661abfa9f02367dd8f28e
 	Price         float64   `json:"price"`
 	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice"`
 	Status        uint64    `json:"status"`
@@ -73,15 +65,7 @@ type ConProduct struct {
 	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
 	Name          string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale" validate:"numeric"`
-<<<<<<< HEAD
-<<<<<<< HEAD
-	Categories    uint64    `json:"categories" validate:"numeric"`
-=======
-	Category    uint64    `json:"categories" validate:"numeric"`
->>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
-=======
 	Category      uint64    `json:"categories" validate:"numeric"`
->>>>>>> e84b31acb09c085dbd0661abfa9f02367dd8f28e
 	Price         float64   `json:"price" validate:"numeric"`
 	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice" validate:"numeric"`
 	Status        uint64    `json:"status" validate:"numeric"`
