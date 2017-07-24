@@ -150,7 +150,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 			orders = append(orders, order)
 		}
 
-		return &orders, err
+		return &orders, nil
 	}
 
 	sql := fmt.Sprintf("SELECT * FROM orders WHERE userid = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
@@ -166,9 +166,10 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 		orders = append(orders, order)
 	}
 
-	return &orders, err
+	return &orders, nil
 }
 
+<<<<<<< HEAD
 func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrders, error) {
 	var (
 		err      error
@@ -177,12 +178,27 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrder
 	)
 
 	db := orm.Conn
+	err = db.Where("userid = ? AND id = ?", UserID , ID).Find(&order).Error
+=======
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (*OrmOrders, error) {
+	var (
+		err      error
+		order    Orders
+		getOrder *OrmOrders = &OrmOrders{}
+	)
+
+	db := orm.Conn
 	err = db.Where("userid = ? AND id = ?", UserID, ID).Find(&order).Error
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	if err != nil {
 		return getOrder, err
 	}
 
+<<<<<<< HEAD
 	getOrder = OrmOrders{
+=======
+	*getOrder = OrmOrders{
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 		TotalPrice: order.TotalPrice,
 		Payment:    order.Payment,
 		Freight:    order.Freight,

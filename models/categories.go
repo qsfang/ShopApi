@@ -125,5 +125,5 @@ func (csp *CategoriesServiceProvider) GetCategories(pid, pageStart, pageEnd uint
 		categories = append(categories, category)
 	}
 
-	return &categories, err
+	return &categories, nil
 }

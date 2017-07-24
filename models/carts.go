@@ -29,12 +29,13 @@
  *     Modify : 2017/07/23       Wang Ke
 <<<<<<< HEAD
 <<<<<<< HEAD
+ *     Modify : 2017/07/24       Ma Chao
 =======
  *     Modify : 2017/07/23 		 Ma Chao
->>>>>>> e84b31acb09c085dbd0661abfa9f02367dd8f28e
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 =======
- *     Modify : 2017/07/24       Ma Chao
->>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
+ *     Modify : 2017/07/23       Ma Chao
+>>>>>>> c9f6e54f8a86371d05c52278ef277322011623e7
  */
 
 package models
@@ -42,8 +43,8 @@ package models
 import (
 	"time"
 
-	"ShopApi/orm"
 	"ShopApi/general"
+	"ShopApi/orm"
 )
 
 type CartsServiceProvider struct {
@@ -51,6 +52,59 @@ type CartsServiceProvider struct {
 
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 
+<<<<<<< HEAD
+type Browse struct {
+	Name    string    `json:"name"`
+	Count   uint64    `json:"count"`
+	Size    string    `json:"size"`
+	Color   string    `json:"color"`
+	Status  uint8     `json:"status"`
+	Created time.Time `json:"created"`
+	Type    string    `json:"type"`
+	Title   string    `json:"title"`
+	Image   string    `json:"image"`
+	Url     string    `json:"url"`
+}
+
+type Cart struct {
+	ProductID uint64    `gorm:"column:productid" json:"productid"`
+	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
+	Name      string    `json:"name"`
+	Size      string    `json:"size"`
+	Color     string    `json:"color"`
+	Status    uint64    `json:"status"`
+	Created   time.Time `json:"created"`
+	Count     uint64    `json:"count"`
+}
+
+type Images struct {
+	Type  string `json:"type"`
+	Title string `json:"title"`
+	Image string `json:"image"`
+	Url   string `json:"url"`
+}
+
+type Image struct {
+	Type  uint64 `json:"type"`
+	Title string `json:"title"`
+	Image string `json:"image"`
+	Url   string `json:"url"`
+	ID    uint64 `json:"id"`
+}
+
+func (Image) TableName() string {
+	return "image"
+}
+
+type CartPro struct {
+	ID    uint64 `json:"id"`
+	Count uint64 `json:"count"`
+	Size  string `json:"size"`
+	Color string `json:"color"`
+}
+
+=======
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 type Carts struct {
 	ID        uint64    `sql:"primary_key;" gorm:"column:id" json:"id"`
 	ProductID uint64    `gorm:"column:productid" json:"productid"`
@@ -79,14 +133,14 @@ type ConCarts struct {
 
 func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) error {
 	cartsPutIn := Carts{
-		UserID      :      userID,
-		ProductID:      carts.ProductID,
-		Name       :      carts.Name,
-		Count       :      carts.Count,
-		Size           :      carts.Size,
-		Color         :      carts.Color,
-		ImageID   :      carts.ImageID,
-		Created    :      time.Now(),
+		UserID:    userID,
+		ProductID: carts.ProductID,
+		Name:      carts.Name,
+		Count:     carts.Count,
+		Size:      carts.Size,
+		Color:     carts.Color,
+		ImageID:   carts.ImageID,
+		Created:   time.Now(),
 	}
 
 	db := orm.Conn
@@ -108,7 +162,6 @@ func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	return err
 }
 
-
 func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error {
 	var (
 		cart Carts
@@ -127,11 +180,20 @@ func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error
 	return nil
 }
 
-func (cs *CartsServiceProvider) BrowseCart(UserID uint64) (*[]ConCarts, error) {
+<<<<<<< HEAD
+func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
 	var (
 		err         error
 		carts       []ConCarts
-		browse      *[]ConCarts
+		browseCart  []ConCarts
+		browse      []ConCarts
+=======
+func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Carts, error) {
+	var (
+		err    error
+		carts  []Carts
+		browse []Carts
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	)
 
 	db := orm.Conn
@@ -141,6 +203,12 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) (*[]ConCarts, error) {
 	}
 
 	for _, v := range carts {
+<<<<<<< HEAD
+		add := ConCarts {
+			ImageID:  v.ImageID,
+		}
+		browseCart = append(browseCart, add)
+
 		add1 := ConCarts{
 			ImageID:  v.ImageID,
 			Status:  v.Status,
@@ -149,9 +217,24 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) (*[]ConCarts, error) {
 			Name:    v.Name,
 			Color:   v.Color,
 			Size:    v.Size,
+=======
+		add1 := Carts{
+			ImageID:   v.ImageID,
+			Status:    v.Status,
+			Created:   v.Created,
+			Count:     v.Count,
+			Name:      v.Name,
+			Color:     v.Color,
+			Size:      v.Size,
+			ProductID: v.ProductID,
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 		}
-		*browse = append(*browse, add1)
+		browse = append(browse, add1)
 	}
 
 	return browse, err
 }
+<<<<<<< HEAD
+
+=======
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66

@@ -54,7 +54,7 @@ type Register struct {
 func Create(c echo.Context) error {
 	var (
 		err error
-		u Register
+		u   Register
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -83,7 +83,7 @@ func Create(c echo.Context) error {
 func Login(c echo.Context) error {
 	var (
 		user Register
-		err error
+		err  error
 	)
 
 	if err = c.Bind(&user); err != nil {
@@ -106,9 +106,9 @@ func Login(c echo.Context) error {
 
 			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 		}
-			log.Logger.Error("Mysql error:", err)
+		log.Logger.Error("Mysql error:", err)
 
-			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	} else {
 		if !flag {
 			log.Logger.Debug("Name and pass don't match:")
@@ -138,12 +138,12 @@ func Logout(c echo.Context) error {
 
 func GetInfo(c echo.Context) error {
 	var (
-		err error
-		Output *models.ConUsers
+		err    error
+		Output *models.UserInfo
 	)
 
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	numberID := sess.Get(general.SessionUserID).(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	numberID := session.Get(general.SessionUserID).(uint64)
 
 	Output, err = models.UserService.GetInfo(numberID)
 	if err != nil {
@@ -165,10 +165,9 @@ func GetInfo(c echo.Context) error {
 
 func ChangeMobilePassword(c echo.Context) error {
 	var (
-
-		password models.ConUsers
-		userId uint64
-		err error
+		password     models.ConUsers
+		userId       uint64
+		err          error
 		userPassword string
 	)
 
@@ -194,7 +193,7 @@ func ChangeMobilePassword(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysqlfound, errors.New("Password doesn't match").Error())
 	}
 
-	if *password.Pass == *password.NewPass{
+	if *password.Pass == *password.NewPass {
 		log.Logger.Error("The new password is the same as the old password:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInput, errors.New("The new password is the same as the old password").Error())
@@ -212,7 +211,7 @@ func ChangeMobilePassword(c echo.Context) error {
 
 func ChangeUserInfo(c echo.Context) error {
 	var (
-		err error
+		err  error
 		info models.UserInfo
 	)
 
