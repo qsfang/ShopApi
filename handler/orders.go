@@ -44,10 +44,6 @@ import (
 	"ShopApi/utility"
 )
 
-type ID struct {
-	ID uint64 `sql:"auto_increment;primary_key;" json:"id"`
-}
-
 type ChangStatus struct {
 	ID     uint64 `json:"id"`
 	Status uint8  `json:"status"`
@@ -86,17 +82,17 @@ func CreateOrder(c echo.Context) error {
 func GetOrders(c echo.Context) error {
 	var (
 		err    error
-		status models.Orders
+		orm    models.OrmOrders
 		orders *[]models.Orders
 	)
 
-	if err = c.Bind(&status); err != nil {
+	if err = c.Bind(&orm); err != nil {
 		log.Logger.Error("Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if status.Status != general.OrderUnfinished && status.Status != general.OrderFinished && status.Status != general.OrderGetAll {
+	if orm.Status != general.OrderUnfinished && orm.Status != general.OrderFinished && orm.Status != general.OrderGetAll {
 		err = errors.New("Invalid Orders Status")
 
 		log.Logger.Error("Error:", err)
@@ -107,7 +103,9 @@ func GetOrders(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	orders, err = models.OrderService.GetOrders(userID, status.Status)
+	pageStart, pageEnd := utility.Paging(orm.Page, orm.PageSize)
+
+	orders, err = models.OrderService.GetOrders(userID, orm.Status, pageStart, pageEnd)
 	if err != nil {
 		log.Logger.Error("Mysql error in GetOrders Function:", err)
 
@@ -128,8 +126,8 @@ func GetOrders(c echo.Context) error {
 func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
-		order  ID
-		OutPut models.OrmOrders
+		order  *models.OrmOrders
+		OutPut *models.OrmOrders
 	)
 	if err = c.Bind(&order); err != nil {
 		log.Logger.Error("Bind with error:", err)
@@ -137,10 +135,10 @@ func GetOneOrder(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	UserID := sess.Get(general.SessionUserID).(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	UserID := session.Get(general.SessionUserID).(uint64)
 
-	OutPut, err= models.OrderService.GetOneOrder(order.ID, UserID)
+	OutPut, err = models.OrderService.GetOneOrder(order.ID, UserID)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -169,9 +167,9 @@ func ChangeStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if st.Status != general.OrderFinished && st.Status !=general.OrderUnfinished && st.Status !=general.OrderCanceled{
+	if st.Status != general.OrderFinished && st.Status != general.OrderUnfinished && st.Status != general.OrderCanceled {
 		err = errors.New("Status unExistence")
-		log.Logger.Error("",err)
+		log.Logger.Error("", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}

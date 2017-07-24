@@ -43,11 +43,10 @@ import (
 	"ShopApi/utility"
 )
 
-
 func CartsPutIn(c echo.Context) error {
 	var (
 		err   error
-		carts models.Carts
+		carts models.ConCarts
 	)
 
 	if err = c.Bind(&carts); err != nil {
@@ -60,7 +59,7 @@ func CartsPutIn(c echo.Context) error {
 	userID := session.Get(general.SessionUserID)
 	id := userID.(uint64)
 
-	err = models.CartsService.CreateInCarts(carts, id)
+	err = models.CartsService.CreateInCarts(&carts, id)
 	if err != nil {
 		log.Logger.Error("Mysql error in add address:", err)
 
@@ -129,15 +128,15 @@ func AlterCartPro(c echo.Context) error {
 }
 
 func BrowseCart(c echo.Context) error {
-	var(
-		err error
-		output *[]models.ConCarts
+	var (
+		err    error
+		output []models.ConCarts
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	output, err= models.CartsService.BrowseCart(userID)
+	output, err = models.CartsService.BrowseCart(userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Find order with error:", err)

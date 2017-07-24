@@ -51,15 +51,10 @@ type Register struct {
 	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
 
-type GetPassword struct {
-	Pass    *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-	NewPass *string `json:"newpass" validate:"required,alphanum,min=6,max=30"`
-}
-
 func Create(c echo.Context) error {
 	var (
 		err error
-		u Register
+		u   Register
 	)
 
 	if err = c.Bind(&u); err != nil {
@@ -88,7 +83,7 @@ func Create(c echo.Context) error {
 func Login(c echo.Context) error {
 	var (
 		user Register
-		err error
+		err  error
 	)
 
 	if err = c.Bind(&user); err != nil {
@@ -111,9 +106,9 @@ func Login(c echo.Context) error {
 
 			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 		}
-			log.Logger.Error("Mysql error:", err)
+		log.Logger.Error("Mysql error:", err)
 
-			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	} else {
 		if !flag {
 			log.Logger.Debug("Name and pass don't match:")
@@ -143,12 +138,12 @@ func Logout(c echo.Context) error {
 
 func GetInfo(c echo.Context) error {
 	var (
-		err error
-		Output *models.ConUsers
+		err    error
+		Output *models.UserInfo
 	)
 
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	numberID := sess.Get(general.SessionUserID).(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	numberID := session.Get(general.SessionUserID).(uint64)
 
 	Output, err = models.UserService.GetInfo(numberID)
 	if err != nil {
@@ -170,10 +165,9 @@ func GetInfo(c echo.Context) error {
 
 func ChangeMobilePassword(c echo.Context) error {
 	var (
-
-		password GetPassword
-		userId uint64
-		err error
+		password     models.ConUsers
+		userId       uint64
+		err          error
 		userPassword string
 	)
 
@@ -199,7 +193,7 @@ func ChangeMobilePassword(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysqlfound, errors.New("Password doesn't match").Error())
 	}
 
-	if *password.Pass == *password.NewPass{
+	if *password.Pass == *password.NewPass {
 		log.Logger.Error("The new password is the same as the old password:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInput, errors.New("The new password is the same as the old password").Error())
@@ -217,8 +211,8 @@ func ChangeMobilePassword(c echo.Context) error {
 
 func ChangeUserInfo(c echo.Context) error {
 	var (
-		err error
-		info models.ChangeUseInfo
+		err  error
+		info models.UserInfo
 	)
 
 	if err = c.Bind(&info); err != nil {
@@ -231,7 +225,7 @@ func ChangeUserInfo(c echo.Context) error {
 	userID := session.Get(general.SessionUserID)
 	id := userID.(uint64)
 
-	err = models.UserService.ChangeUserInfo(info, id)
+	err = models.UserService.ChangeUserInfo(&info, id)
 	if err != nil {
 		log.Logger.Error("create crash with error:", err)
 
@@ -265,32 +259,6 @@ func Changephone(c echo.Context) error {
 	err = models.UserService.ChangePhone(user, m.Phone)
 	if err != nil {
 		log.Logger.Error("changephone crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, nil)
-}
-
-func ChangeAvatar(c echo.Context) error {
-	var (
-		err error
-		Ava models.ChangeUseInfo
-	)
-
-	if err = c.Bind(&Ava); err != nil {
-		log.Logger.Error("Create crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID)
-	id := userID.(uint64)
-
-	err = models.UserService.ChangeUserInfo(Ava, id)
-	if err != nil {
-		log.Logger.Error("create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

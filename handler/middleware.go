@@ -35,13 +35,14 @@ import (
 	"ShopApi/general"
 	"ShopApi/general/errcode"
 	"ShopApi/utility"
+	"fmt"
 )
 
 func MustLogin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 		id := sess.Get(general.SessionUserID)
-
+		fmt.Println(id)
 		if id == nil {
 			return general.NewErrorWithMessage(errcode.ErrLoginRequired, "User Must Login.")
 		}
