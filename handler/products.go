@@ -119,16 +119,17 @@ func ChangeProStatus(c echo.Context) error {
 func GetProInfo(c echo.Context) error {
 	var (
 		err     error
-		ProInfo *models.Product
+		ProInfoGet *models.GetProduct
+		ProInfoReturn *models.Product
 	)
 
-	if err = c.Bind(&ProInfo); err != nil {
+	if err = c.Bind(&ProInfoGet); err != nil {
 		log.Logger.Error("Analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	ProInfo, err = models.ProductService.GetProInfo(ProInfo.ID)
+	ProInfoReturn, err = models.ProductService.GetProInfo(ProInfoGet.ID)
 
 	if err != nil {
 		log.Logger.Error("Get info with error:", err)
@@ -136,7 +137,7 @@ func GetProInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, ProInfo)
+	return c.JSON(errcode.ErrSucceed, ProInfoReturn)
 }
 
 func ChangeCategories(c echo.Context) error {

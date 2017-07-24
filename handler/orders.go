@@ -25,8 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Li Zebang
- *     Modify: 2017/07/21        Zhang Zizhao 添加创建订单
- *	   Modify: 2017/07/21		 Ai Hao       订单状态更改
+ *     Modify : 2017/07/21       Zhang Zizhao 添加创建订单
+ *	   Modify : 2017/07/21       Ai Hao       订单状态更改
  */
 
 package handler
@@ -43,9 +43,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Status struct {
-	Status uint8 `json:"status"`
-}
 type ID struct {
 	ID uint64 `sql:"auto_increment;primary_key;" json:"id"`
 }
@@ -88,8 +85,8 @@ func CreateOrder(c echo.Context) error {
 func GetOrders(c echo.Context) error {
 	var (
 		err    error
-		status Status
-		orders []models.Orders
+		status models.Orders
+		orders *[]models.Orders
 	)
 
 	if err = c.Bind(&status); err != nil {
@@ -99,6 +96,10 @@ func GetOrders(c echo.Context) error {
 	}
 
 	if status.Status != general.OrderUnfinished && status.Status != general.OrderFinished && status.Status != general.OrderGetAll {
+		err = errors.New("Invalid Orders Status")
+
+		log.Logger.Error("Error:", err)
+
 		return general.NewErrorWithMessage(errcode.ErrInvalidOrdersStatus, err.Error())
 	}
 
@@ -107,15 +108,17 @@ func GetOrders(c echo.Context) error {
 
 	orders, err = models.OrderService.GetOrders(userID, status.Status)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Orders not found:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
-		}
-		
-		log.Logger.Error("Mysql error in get orders:", err)
+		log.Logger.Error("Mysql error in GetOrders Function:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	if len(*orders) == 0 {
+		err = errors.New("Orders Not Found")
+
+		log.Logger.Error("Error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, orders)
