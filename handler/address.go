@@ -132,7 +132,7 @@ func GetAddress(c echo.Context) error {
 func Alter(c echo.Context) error {
 	var (
 		err error
-		m   models.AddressDefault
+		m   models.Contact
 	)
 
 	if err = c.Bind(&m); err != nil {
