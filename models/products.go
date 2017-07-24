@@ -152,7 +152,6 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 	return s, nil
 }
 
-// todo: 返回错误 数据库操作
 func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	var (
 		pro Product
@@ -170,10 +169,11 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	}
 
 	db := orm.Conn
-	err = db.Model(&pro).Where("status = ?", m.ID).Updates(changeMap).Limit(1).Error
+	err = db.Model(&pro).Where("id = ?", m.ID).Updates(changeMap).Limit(1).Error
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
