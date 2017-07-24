@@ -27,6 +27,7 @@
  *     Initial: 2017/07/21       Zhu Yaqiang
  *     Modify : 2017/07/22       Xu Haosheng    添加购物车
  *     Modify : 2017/07/23       Wang Ke
+ *     Modify : 2017/07/24       Ma Chao
  */
 
 package models
@@ -48,7 +49,7 @@ type Browse struct {
 	Count   uint64    `json:"count"`
 	Size    string    `json:"size"`
 	Color   string    `json:"color"`
-	Status  uint64    `json:"status"`
+	Status  uint8     `json:"status"`
 	Created time.Time `json:"created"`
 	Type    string    `json:"type"`
 	Title   string    `json:"title"`
@@ -106,14 +107,17 @@ type Carts struct {
 	Created   time.Time `json:"created"`
 }
 
-type GetCarts struct {
+type ConCarts struct {
 	ID        uint64    `gorm:"column:id" json:"id" validate:"numeric"`
 	ProductID uint64    `gorm:"column:productid" json:"productid" validate:"numeric"`
 	Name      string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
 	Count     uint64    `json:"count" validate:"numeric"`
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid" validate:"numeric"`
+	Status    uint8     `json:"status" validate:"required, numeric, max = 1"`
+	Created   time.Time `json:"created"`
 }
 
 // todo:变量
@@ -173,14 +177,12 @@ func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size 
 	return nil
 }
 
-// todo: 命名
-func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Browse, error) {
+func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
 	var (
 		err         error
-		carts       []Carts
-		browseCart  []Cart
-		browse      []Browse
-		browseImage Images
+		carts       []ConCarts
+		browseCart  []ConCarts
+		browse      []ConCarts
 	)
 
 
@@ -191,12 +193,13 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Browse, error) {
 	}
 
 	for _, v := range carts {
-		add := Cart {
+		add := ConCarts {
 			ImageID:  v.ImageID,
 		}
 		browseCart = append(browseCart, add)
 
-		add1 := Browse{
+		add1 := ConCarts{
+			ImageID:  v.ImageID,
 			Status:  v.Status,
 			Created: v.Created,
 			Count:   v.Count,
@@ -205,30 +208,8 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Browse, error) {
 			Size:    v.Size,
 		}
 		browse = append(browse, add1)
-
-		browseImage, err = cs.GetImage(add.ImageID)
-		if err != nil {
-			return browse, err
-		}
-		add2 := Browse{
-			Url:   browseImage.Url,
-			Image: browseImage.Image,
-			Type:  browseImage.Type,
-			Title: browseImage.Title,
-		}
-		browse = append(browse, add2)
 	}
 
 	return browse, err
 }
 
-func (cs *CartsServiceProvider) GetImage(ImageID uint64) (Images, error) {
-	var image Images
-	db := orm.Conn
-	err := db.Where("id = ?", ImageID).Find(&image).Error
-	if err != nil {
-		return image, err
-	}
-
-	return image, nil
-}

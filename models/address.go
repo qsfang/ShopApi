@@ -91,7 +91,7 @@ type AddressGet struct {
 	Address  string `json:"address"`
 }
 
-type Change struct {
+type ChangeAddress struct {
 	ID       uint64  `json:"id" validate:"numeric"`
 	Name     *string `json:"name" validate:"required, alphaunicode, min=2,max=18"`
 	Phone    *string `json:"phone" validate:"required, alphanum, min=6,max=30"`
@@ -129,27 +129,24 @@ func (csp *ContactServiceProvider) AddAddress(ormContact *OrmContact) error {
 	return db.Create(contact).Error
 }
 
-func (csp *ContactServiceProvider) ChangeAddress(addr Change) error {
+func (csp *ContactServiceProvider) ChangeAddress(addr Operate) error {
 	var (
 		con Contact
 	)
 
 	changeMap := map[string]interface{}{
-		"name":     *addr.Name,
-		"phone":    *addr.Phone,
-		"province": *addr.Province,
-		"city":     *addr.City,
-		"street":   *addr.Street,
-		"address":  *addr.Address,
+		"name":     addr.Name,
+		"phone":    addr.Phone,
+		"province": addr.Province,
+		"city":     addr.City,
+		"street":   addr.Street,
+		"address":  addr.Address,
 	}
 
 	db := orm.Conn
 	err := db.Model(&con).Where("id = ?", addr.ID).Update(changeMap).Limit(1).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (csp *ContactServiceProvider) FindAddressId(ID uint64) error {
@@ -159,11 +156,8 @@ func (csp *ContactServiceProvider) FindAddressId(ID uint64) error {
 
 	db := orm.Conn
 	err := db.Where("id = ?", ID).First(&con).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64) ([]AddressGet, error) {

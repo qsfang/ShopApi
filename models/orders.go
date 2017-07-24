@@ -167,46 +167,31 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8) (*[]Orde
 	return &orders, db.Where("userid = ?", userID).Find(&orders).Error
 }
 
-// todo: 马超 重写
-func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (GetOrders, error, bool) {
+func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrders, error) {
 	var (
-		judge    bool
 		err      error
-		order    []Orders
-		getOrder GetOrders
+		order    Orders
+		getOrder OrmOrders
 	)
 
-	judge = false
 	db := orm.Conn
-	err = db.Where("userid = ?", UserID).Find(&order).Error
+	err = db.Where("userid = ? AND id = ?", UserID , ID).Find(&order).Error
 	if err != nil {
-		return getOrder, err, judge
+		return getOrder, err
 	}
 
-	for _, v := range order {
-
-		if v.ID == ID {
-			judge = true
-			var getOrder = GetOrders{
-				TotalPrice: v.TotalPrice,
-				Payment:    v.Payment,
-				Freight:    v.Freight,
-				Discount:   v.Discount,
-				Size:       v.Size,
-				Color:      v.Color,
-				Status:     v.Status,
-				Created:    v.Created,
-			}
-
-			if judge == true {
-				return getOrder, err, judge
-			}
-
-			break
-		}
+	getOrder = OrmOrders{
+		TotalPrice: order.TotalPrice,
+		Payment:    order.Payment,
+		Freight:    order.Freight,
+		Discount:   order.Discount,
+		Size:       order.Size,
+		Color:      order.Color,
+		Status:     order.Status,
+		Created:    order.Created,
 	}
 
-	return getOrder, err, judge
+	return getOrder, nil
 }
 
 // todo: 状态

@@ -70,7 +70,7 @@ func AddAddress(c echo.Context) error {
 func ChangeAddress(c echo.Context) error {
 	var (
 		err  error
-		addr models.Change
+		addr models.Operate
 	)
 
 	if err = c.Bind(&addr); err != nil {

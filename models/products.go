@@ -37,7 +37,7 @@ import (
 	"ShopApi/general"
 	"ShopApi/orm"
 )
-// todo: 代码风格
+
 type ProductServiceProvider struct {
 }
 
@@ -47,7 +47,7 @@ type Product struct {
 	ID            uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
 	Name          string    `json:"name"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale"`
-	Categories    uint64    `json:"categories"`
+	Category      uint64    `json:"categories"`
 	Price         float64   `json:"price"`
 	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice"`
 	Status        uint64    `json:"status"`
@@ -65,7 +65,7 @@ type ConProduct struct {
 	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
 	Name          string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale" validate:"numeric"`
-	Categories    uint64    `json:"categories" validate:"numeric"`
+	Category      uint64    `json:"categories" validate:"numeric"`
 	Price         float64   `json:"price" validate:"numeric"`
 	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice" validate:"numeric"`
 	Status        uint64    `json:"status" validate:"numeric"`
@@ -77,11 +77,6 @@ type ConProduct struct {
 	Detail        string    `json:"detail"`
 	Created       time.Time `json:"created"`
 	Inventory     uint64    `json:"inventory"`
-}
-
-// todo: 参数检查
-type GetCategories struct {
-	Categories uint64 `json:"categories" validate:"required, alphanum, min = 0, max= 30"`
 }
 
 type GetProList struct {
@@ -121,38 +116,36 @@ func (ps *ProductServiceProvider) CreateProduct(pr Product) error {
 // todo: 分页
 func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
-		ware Product
+	//	ware Product
 		list []Product
 		s    []GetProList
 	)
 
 	db := orm.Conn
-	err := db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
+	err := db.Where("categories = ? AND status = ?", cate, general.ProductOnsale).Find(&list).Error
 
 	if err != nil {
 		return s, err
 	}
 
-	for _, c := range list { // todo: 放到 sql 中
-		if c.Status == general.ProductOnsale {
-			pro := GetProList{
-				Name:          c.Name,
-				TotalSale:     c.TotalSale,
-				Price:         c.Price,
-				OriginalPrice: c.OriginalPrice,
-				Status:        c.Status,
-				ImageId:       c.ImageID,
-				Detail:        c.Detail,
-				Inventory:     c.Inventory,
-			}
-			s = append(s, pro)
+	for _, c := range list {
+		pro := GetProList{
+			Name:          c.Name,
+			TotalSale:     c.TotalSale,
+			Price:         c.Price,
+			OriginalPrice: c.OriginalPrice,
+			Status:        c.Status,
+			ImageId:       c.ImageID,
+			Detail:        c.Detail,
+			Inventory:     c.Inventory,
 		}
+		s = append(s, pro)
+
 	}
 
 	return s, nil
 }
 
-// todo: 返回错误 数据库操作
 func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	var (
 		pro Product
@@ -170,44 +163,38 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	}
 
 	db := orm.Conn
-	err = db.Model(&pro).Where("status = ?", m.ID).Updates(changeMap).Limit(1).Error
+	err = db.Model(&pro).Where("id = ?", m.ID).Updates(changeMap).Limit(1).Error
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-// todo: 返回值
-func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
-	var (
-		err     error
-		ProInfo *Product = &Product{}
-	)
+//// todo: 返回值
+//func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*ConProduct, error) {
+//	var (
+//		err     error
+//		ProInfo *Product = &Product{}
+//	)
+//
+//	db := orm.Conn
+//
+//	err = db.Where("id = ?", ProID).First(&ProInfo).Error
+//	if err != nil {
+//		ProInfo = nil
+//	}
+//
+//	return ProInfo, err
+//}
 
-	db := orm.Conn
-
-	err = db.Where("id = ?", ProID).First(&ProInfo).Error
-	if err != nil {
-		ProInfo = nil
-	}
-
-	return ProInfo, err
-}
-
-func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {
+func (ps *ProductServiceProvider) ChangeCategories(cate ConProduct) error {
 	var (
 		pro Product
 	)
 
-	// todo: 复数
-	change := map[string]uint64{"categories": cate.Categories}
-
 	db := orm.Conn
-	err := db.Model(&pro).Where("id = ?", cate.ID).Update(change).Limit(1).Error
+	err := db.Model(&pro).Where("id = ?", cate.ID).Update("category", cate.Category).Limit(1).Error
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

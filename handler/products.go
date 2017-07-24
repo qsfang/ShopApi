@@ -115,35 +115,34 @@ func ChangeProStatus(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-// 根据商品ID获取商品信息
-func GetProInfo(c echo.Context) error {
-	var (
-		err     error
-		ProInfoGet *models.GetProduct
-		ProInfoReturn *models.Product
-	)
-
-	if err = c.Bind(&ProInfoGet); err != nil {
-		log.Logger.Error("Analysis crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	ProInfoReturn, err = models.ProductService.GetProInfo(ProInfoGet.ID)
-
-	if err != nil {
-		log.Logger.Error("Get info with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, ProInfoReturn)
-}
+//// 根据商品ID获取商品信息
+//func GetProInfo(c echo.Context) error {
+//	var (
+//		err     error
+//		ProInfo *models.ConProduct
+//	)
+//
+//	if err = c.Bind(&ProInfo); err != nil {
+//		log.Logger.Error("Analysis crash with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+//	}
+//
+//	ProInfo, err = models.ProductService.GetProInfo(ProInfo.ID)
+//
+//	if err != nil {
+//		log.Logger.Error("Get info with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+//	}
+//
+//	return c.JSON(errcode.ErrSucceed, ProInfo)
+//}
 
 func ChangeCategories(c echo.Context) error {
 	var (
 		err error
-		m   models.ChangeCate
+		m   *models.ChangeCate
 	)
 
 	if err = c.Bind(&m); err != nil {
@@ -152,7 +151,7 @@ func ChangeCategories(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	_, err = models.ProductService.GetProInfo(m.ID)
+	_, err = models.ProductService.GetProduct(m.ID)
 	if err != nil {
 
 		if err == gorm.ErrRecordNotFound {
@@ -166,7 +165,7 @@ func ChangeCategories(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	err = models.ProductService.ChangeCategories(m)
+	err = models.ProductService.ChangeCategories()
 	if err != nil {
 
 		log.Logger.Error("Categories change with error:", err)
