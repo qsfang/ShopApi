@@ -28,10 +28,14 @@
  *     Modify : 2017/07/22       Xu Haosheng    添加购物车
  *     Modify : 2017/07/23       Wang Ke
 <<<<<<< HEAD
+<<<<<<< HEAD
  *     Modify : 2017/07/24       Ma Chao
 =======
  *     Modify : 2017/07/23 		 Ma Chao
 >>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
+=======
+ *     Modify : 2017/07/23       Ma Chao
+>>>>>>> c9f6e54f8a86371d05c52278ef277322011623e7
  */
 
 package models
