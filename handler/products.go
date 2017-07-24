@@ -44,7 +44,7 @@ import (
 func CreateProduct(c echo.Context) error {
 	var (
 		err error
-		p   models.Product
+		p   models.ConProduct
 	)
 
 	if err = c.Bind(&p); err != nil {
@@ -53,7 +53,7 @@ func CreateProduct(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.CreateProduct(p)
+	err = models.ProductService.CreateProduct(&p)
 	if err != nil {
 		log.Logger.Error("Create product with error:", err)
 
