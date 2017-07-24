@@ -177,7 +177,6 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
-// todo: 返回值
 func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 	var (
 		err     error
