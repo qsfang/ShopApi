@@ -32,6 +32,8 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
@@ -105,9 +107,16 @@ func ChangeProStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+	if pro.Status != general.ProductOnsale && pro.Status != general.ProductUnsale {
+		err = errors.New("Status unExistence")
+		log.Logger.Error("status transformed with error :",err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
 	err = models.ProductService.ChangeProStatus(pro.ID, pro.Status)
 	if err != nil {
-		log.Logger.Error("change chanslates with error:", err)
+		log.Logger.Error("status transformed with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

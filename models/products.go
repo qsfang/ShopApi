@@ -171,18 +171,9 @@ func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) erro
 		err error
 	)
 
-	changeMap := map[string]interface{}{
-		"status": status,
-	}
-
-	if status == general.ProductOnsale {
-		status = general.ProductUnsale
-	} else {
-		status = general.ProductUnsale
-	}
-
+	change := map[string]interface{}{"status": status}
 	db := orm.Conn
-	err = db.Model(&pro).Where("id = ?", ID).Updates(changeMap).Limit(1).Error
+	err = db.Model(&pro).Where("id = ?", ID).Updates(change).Limit(1).Error
 	if err != nil {
 		return err
 	}

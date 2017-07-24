@@ -79,6 +79,7 @@ type ConUsers struct {
 	Phone    string    `json:"phone"`
 	Sex      uint8     `json:"sex"`
 }
+
 type ChangeUseInfo struct {
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
