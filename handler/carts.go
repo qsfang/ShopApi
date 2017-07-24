@@ -27,10 +27,7 @@
  *     Initial: 2017/07/21     Zhu Yaqiang
  *     Modify : 2017/07/22     Xu Haosheng    添加购物车
  *     Modify : 2017/07/23     Wang Ke
-<<<<<<< HEAD
-=======
  *     Modify : 2017/07/24     Ma Chao
->>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
  */
 
 package handler
@@ -45,7 +42,6 @@ import (
 	"ShopApi/models"
 	"ShopApi/utility"
 )
-
 
 func CartsPutIn(c echo.Context) error {
 	var (
@@ -132,15 +128,24 @@ func AlterCartPro(c echo.Context) error {
 }
 
 func BrowseCart(c echo.Context) error {
+<<<<<<< HEAD
 	var(
 		err error
-		output *[]models.ConCarts
+<<<<<<< HEAD
+		output []models.ConCarts
+=======
+=======
+	var (
+		err    error
+>>>>>>> 611d465be0ec926e392d05fed1dca2f65c6a732b
+		output []models.Carts
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	output, err= models.CartsService.BrowseCart(userID)
+	output, err = models.CartsService.BrowseCart(userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Find order with error:", err)

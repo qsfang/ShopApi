@@ -77,8 +77,8 @@ type ConUsers struct {
 	Email    string    `json:"email"`
 	Phone    string    `json:"phone"`
 	Sex      uint8     `json:"sex"`
-	Password *string   `json:"password" validate:"required,alphanum,min=6,max=30"`
-	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`
+	Pass    *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
+	NewPass *string `json:"newpass" validate:"required,alphanum,min=6,max=30"`
 }
 
 func (User) TableName() string {
@@ -160,11 +160,11 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return true, u.UserID, nil
 }
 
-func (us *UserServiceProvider) GetInfo(UserID uint64) (*ConUsers, error) {
+func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
 
 	var (
 		err error
-		ui  *ConUsers
+		ui  *UserInfo = &UserInfo{}
 	)
 
 	db := orm.Conn

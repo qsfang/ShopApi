@@ -44,10 +44,6 @@ import (
 	"ShopApi/utility"
 )
 
-type ID struct {
-	ID uint64 `sql:"auto_increment;primary_key;" json:"id"`
-}
-
 type ChangStatus struct {
 	ID     uint64 `json:"id"`
 	Status uint8  `json:"status"`
@@ -130,8 +126,16 @@ func GetOrders(c echo.Context) error {
 func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
+<<<<<<< HEAD
 		order  ID
+<<<<<<< HEAD
 		OutPut models.OrmOrders
+=======
+=======
+		order  *models.OrmOrders
+>>>>>>> 611d465be0ec926e392d05fed1dca2f65c6a732b
+		OutPut *models.OrmOrders
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	)
 	if err = c.Bind(&order); err != nil {
 		log.Logger.Error("Bind with error:", err)
@@ -139,8 +143,8 @@ func GetOneOrder(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	UserID := sess.Get(general.SessionUserID).(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	UserID := session.Get(general.SessionUserID).(uint64)
 
 	OutPut, err = models.OrderService.GetOneOrder(order.ID, UserID)
 

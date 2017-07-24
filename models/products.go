@@ -79,10 +79,13 @@ type ConProduct struct {
 	Inventory     uint64    `json:"inventory"`
 }
 
+<<<<<<< HEAD
+=======
 type GetCategories struct {
 	Categories uint64 `json:"categories" validate:"required, alphanum, min = 0, max= 30"`
 }
 
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 type GetProList struct {
 	Name          string
 	TotalSale     uint64
@@ -134,19 +137,30 @@ func (ps *ProductServiceProvider) CreateProduct(pr *ConProduct) error {
 
 func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
-		ware Product
+	//	ware Product
 		list []Product
 		s    []GetProList
 	)
 
 	db := orm.Conn
-	err := db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
+	err := db.Where("categories = ? AND status = ?", cate, general.ProductOnsale).Find(&list).Error
 
 	if err != nil {
 		return s, err
 	}
 
 	for _, c := range list {
+<<<<<<< HEAD
+		pro := GetProList{
+			Name:          c.Name,
+			TotalSale:     c.TotalSale,
+			Price:         c.Price,
+			OriginalPrice: c.OriginalPrice,
+			Status:        c.Status,
+			ImageId:       c.ImageID,
+			Detail:        c.Detail,
+			Inventory:     c.Inventory,
+=======
 		if c.Status == general.ProductOnsale {
 			pro := GetProList{
 				Name:          c.Name,
@@ -159,15 +173,22 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 				Inventory:     c.Inventory,
 			}
 			s = append(s, pro)
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 		}
+		s = append(s, pro)
+
 	}
 
 	return s, nil
 }
 
+<<<<<<< HEAD
+func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
+=======
 func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) error {
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	var (
-		pro Product
+		pro ConProduct
 		err error
 	)
 
@@ -176,6 +197,12 @@ func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) erro
 
 	err = db.Model(&pro).Where("id = ?", ID).Updates(change).Limit(1).Error
 
+<<<<<<< HEAD
+	db := orm.Conn
+	err = db.Model(&pro).Where("id = ?", m.ID).Updates(changeMap).Limit(1).Error
+	if err != nil {
+		return err
+=======
 	return err
 }
 
@@ -190,25 +217,36 @@ func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 	err = db.Where("id = ?", ProID).First(&ProInfo).Error
 	if err != nil {
 		return ProInfo, err
+>>>>>>> 3d64342f474377a51e79106608c0092cd3e45f66
 	}
 
-	return ProInfo, err
+	return nil
 }
 
-func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {
+//// todo: 返回值
+//func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*ConProduct, error) {
+//	var (
+//		err     error
+//		ProInfo *Product = &Product{}
+//	)
+//
+//	db := orm.Conn
+//
+//	err = db.Where("id = ?", ProID).First(&ProInfo).Error
+//	if err != nil {
+//		ProInfo = nil
+//	}
+//
+//	return ProInfo, err
+//}
+
+func (ps *ProductServiceProvider) ChangeCategories(cate ConProduct) error {
 	var (
 		pro Product
 	)
 
-	// todo: 复数
-	change := map[string]uint64{"categories": cate.Categories}
-
 	db := orm.Conn
-	err := db.Model(&pro).Where("id = ?", cate.ID).Update(change).Limit(1).Error
+	err := db.Model(&pro).Where("id = ?", cate.ID).Update("category", cate.Category).Limit(1).Error
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
