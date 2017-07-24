@@ -96,7 +96,7 @@ func GetProductList(c echo.Context) error {
 func ChangeProStatus(c echo.Context) error {
 	var (
 		err error
-		pro models.ChangePro
+		pro models.Product
 	)
 
 	if err = c.Bind(&pro); err != nil {
@@ -105,7 +105,7 @@ func ChangeProStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.ChangeProStatus(pro)
+	err = models.ProductService.ChangeProStatus(pro.ID, pro.Status)
 	if err != nil {
 		log.Logger.Error("change chanslates with error:", err)
 
