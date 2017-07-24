@@ -123,7 +123,7 @@ func GetProInfo(c echo.Context) error {
 		ProInfoReturn *models.Product
 	)
 
-	if err = c.Bind(&ProInfoGet); err != nil {
+	if err = c.Bind(&ProInfo); err != nil {
 		log.Logger.Error("Analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
