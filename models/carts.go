@@ -27,6 +27,7 @@
  *     Initial: 2017/07/21       Zhu Yaqiang
  *     Modify : 2017/07/22       Xu Haosheng    添加购物车
  *     Modify : 2017/07/23       Wang Ke
+ *     Modify : 2017/07/24       Ma Chao
  */
 
 package models
@@ -106,14 +107,17 @@ type Carts struct {
 	Created   time.Time `json:"created"`
 }
 
-type GetCarts struct {
+type ConCarts struct {
 	ID        uint64    `gorm:"column:id" json:"id" validate:"numeric"`
 	ProductID uint64    `gorm:"column:productid" json:"productid" validate:"numeric"`
 	Name      string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
 	Count     uint64    `json:"count" validate:"numeric"`
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid" validate:"numeric"`
+	Status    uint8     `json:"status"`
+	Created   time.Time `json:"created"`
 }
 
 // todo:变量
