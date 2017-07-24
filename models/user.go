@@ -80,20 +80,6 @@ type ConUsers struct {
 	Sex      uint8     `json:"sex"`
 }
 
-type Phone struct {
-	Phone string `json:"phone"`
-}
-
-type Register struct {
-	Mobile *string `json:"mobile" validate:"required,alphanum,min=6,max=30"`
-	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-}
-
-type GetPassword struct {
-	Pass    *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-	NewPass *string `json:"newpass" validate:"required,alphanum,min=6,max=30"`
-}
-
 // todo: 接收者
 func (User) TableName() string {
 	return "users"
@@ -190,19 +176,20 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (*ConUsers, error) {
 	return ui, nil
 }
 
- todo: 参数 代码风格
 func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 	var (
 		err error
 		con Contact
 	)
+
 	change := map[string]interface{}{"phone": Phone}
 
 	db := orm.Conn
-	err = db.Model(&con).Where("userid=?", UserID).Update(change).Limit(1).Error
+	err = db.Model(&con).Where("id=?", UserID).Update(change).Limit(1).Error
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

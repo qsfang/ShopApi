@@ -32,6 +32,8 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
@@ -44,7 +46,7 @@ import (
 func CreateProduct(c echo.Context) error {
 	var (
 		err error
-		p   models.Product
+		p   models.ConProduct
 	)
 
 	if err = c.Bind(&p); err != nil {
@@ -53,7 +55,7 @@ func CreateProduct(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.CreateProduct(p)
+	err = models.ProductService.CreateProduct(&p)
 	if err != nil {
 		log.Logger.Error("Create product with error:", err)
 
@@ -105,9 +107,16 @@ func ChangeProStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+	if pro.Status != general.ProductOnsale && pro.Status != general.ProductUnsale {
+		err = errors.New("Status unExistence")
+		log.Logger.Error("status transformed with error :",err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
 	err = models.ProductService.ChangeProStatus(pro.ID, pro.Status)
 	if err != nil {
-		log.Logger.Error("change chanslates with error:", err)
+		log.Logger.Error("status transformed with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -115,7 +124,6 @@ func ChangeProStatus(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-// 根据商品ID获取商品信息
 func GetProInfo(c echo.Context) error {
 	var (
 		err           error

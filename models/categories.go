@@ -31,6 +31,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"ShopApi/general"
@@ -52,12 +53,14 @@ type Categories struct {
 }
 
 type OrmCategories struct {
-	ID      uint64    `json:"id" validate:"required,numeric"`
-	Name    string    `json:"name" validate:"required,alphanum,min=6,max=100"`
-	Pid     uint64    `json:"pid" validate:"required,numeric"`
-	Status  uint64    `json:"status" validate:"required,numeric"`
-	Remark  string    `json:"remark" validate:"alphanum"`
-	Created time.Time `json:"created"`
+	ID       uint64    `json:"id" validate:"required,numeric"`
+	Name     string    `json:"name" validate:"required,alphanum,min=6,max=100"`
+	Pid      uint64    `json:"pid" validate:"required,numeric"`
+	Status   uint64    `json:"status" validate:"required,numeric"`
+	Remark   string    `json:"remark" validate:"alphanum"`
+	Created  time.Time `json:"created"`
+	Page     uint64    `json:"page" validate:"required,numeric"`
+	PageSize uint64    `gorm:"column:pagesize" json:"pagesize" validate:"required,numeric"`
 }
 
 type CreateCat struct {
@@ -101,12 +104,25 @@ func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 	return err
 }
 
-func (csp *CategoriesServiceProvider) GetCategories(pid uint64) (*[]Categories, error) {
+func (csp *CategoriesServiceProvider) GetCategories(pid, pageStart, pageEnd uint64) (*[]Categories, error) {
 	var (
+		category   Categories
 		categories []Categories
 	)
 
 	db := orm.Conn
+	sql := fmt.Sprintf("SELECT * FROM categories WHERE pid = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
 
-	return &categories, db.Where("pid = ? AND status = ?", pid, general.CategoriesOnuse).Find(&categories).Error
+	rows, err := db.Raw(sql, pid, general.CategoriesOnuse).Rows()
+	defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		db.ScanRows(rows, &category)
+		categories = append(categories, category)
+	}
+
+	return &categories, err
 }

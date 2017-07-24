@@ -69,17 +69,6 @@ type OrmOrders struct {
 	PayWay     uint8     `gorm:"column:payway"json:"payway"`
 }
 
-type GetOrders struct {
-	TotalPrice float64   `json:"totalprice"`
-	Payment    float64   `json:"payment"`
-	Freight    float64   `json:"freight"`
-	Discount   uint8     `json:"discount"`
-	Size       string    `json:"size"`
-	Color      string    `json:"color"`
-	Status     uint8     `json:"status"`
-	Created    time.Time `json:"created"`
-	Payway     uint8     `json:"payway"`
-}
 
 type RegisterOrder struct {
 	Name       string  `json:"productname"`
@@ -91,21 +80,6 @@ type RegisterOrder struct {
 	Size       string  `json:"size"`
 	Color      string  `json:"color"`
 	Payway     uint8   `json:"payway"`
-}
-
-type Order struct {
-	Name       string
-	UserID     uint64
-	TotalPrice float64
-	Payment    float64
-	Freight    float64
-	Remark     string
-	Discount   uint8
-	Size       string
-	Color      string
-	Status     uint8
-	Created    time.Time
-	Payway     uint8
 }
 
 // todo: 代码风格
@@ -194,7 +168,6 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrder
 	return getOrder, nil
 }
 
-// todo: 状态
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha := Orders{
 		Status: status,
@@ -204,9 +177,5 @@ func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	db := orm.Conn
 
 	err := db.Model(&cha).Where("id=?", id).Update(updater).Limit(1).Error
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

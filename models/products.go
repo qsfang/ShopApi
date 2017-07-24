@@ -108,12 +108,26 @@ func (Product) TableName() string {
 	return "products"
 }
 
-func (ps *ProductServiceProvider) CreateProduct(pr Product) error {
-	pr.Status = general.ProductOnsale
-	pr.Created = time.Now()
+func (ps *ProductServiceProvider) CreateProduct(pr *ConProduct) error {
+	pro := Product{
+		Name:			pr.Name,
+		TotalSale:		pr.TotalSale,
+		Category: 		pr.Category,
+		Price:			pr.Price,
+		OriginalPrice:	pr.OriginalPrice,
+		Size: 			pr.Size,
+		Color: 			pr.Color,
+		ImageID:		pr.ImageID,
+		ImageIDs:		pr.ImageIDs,
+		Detail:			pr.Detail,
+		Inventory:		pr.Inventory,
+	}
+
+	pro.Status = general.ProductOnsale
+	pro.Created = time.Now()
 
 	db := orm.Conn
-	err := db.Create(&pr).Error
+	err := db.Create(&pro).Error
 
 	return err
 }
@@ -157,18 +171,9 @@ func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) erro
 		err error
 	)
 
-	changeMap := map[string]interface{}{
-		"status": status,
-	}
-
-	if status == general.ProductOnsale {
-		status = general.ProductUnsale
-	} else {
-		status = general.ProductUnsale
-	}
-
+	change := map[string]interface{}{"status": status}
 	db := orm.Conn
-	err = db.Model(&pro).Where("id = ?", ID).Updates(changeMap).Limit(1).Error
+	err = db.Model(&pro).Where("id = ?", ID).Updates(change).Limit(1).Error
 	if err != nil {
 		return err
 	}
