@@ -86,23 +86,7 @@ type ChangeUseInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
-type ChangeAvatar struct {
-	Avatar string `json:"avatar"`
-}
 
-type Phone struct {
-	Phone string `json:"phone"`
-}
-
-type Register struct {
-	Mobile *string `json:"mobile" validate:"required,alphanum,min=6,max=30"`
-	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-}
-
-type GetPassword struct {
-	Pass    *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-	NewPass *string `json:"newpass" validate:"required,alphanum,min=6,max=30"`
-}
 
 // todo: 接收者
 func (User) TableName() string {
@@ -261,7 +245,7 @@ func (us *UserServiceProvider) ChangeUserInfo(info ChangeUseInfo, userID uint64)
 
 	return nil
 }
-func (us *UserServiceProvider) ChangeAvatar(info ChangeAvatar, userID uint64) error {
+func (us *UserServiceProvider) ChangeAvatar(info ConUsers, userID uint64) error {
 	var con Contact
 
 	changMap := map[string]interface{}{"avatar": info.Avatar}

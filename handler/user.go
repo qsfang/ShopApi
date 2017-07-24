@@ -144,7 +144,7 @@ func Logout(c echo.Context) error {
 func GetInfo(c echo.Context) error {
 	var (
 		err error
-		Output models.UserInfo
+		Output *models.ConUsers
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
