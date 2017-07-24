@@ -122,7 +122,6 @@ func GetAddress(c echo.Context) error {
 	userId = s.(uint64)
 
 	pageStart, pageEnd := utility.Paging(address.Page, address.PageSize)
-
 	list, err = models.ContactService.GetAddressByUerId(userId, pageStart, pageEnd)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

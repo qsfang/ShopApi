@@ -174,17 +174,6 @@ func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64, pageStart, p
 			getAdd = append(getAdd, add)
 		}
 
-/*
-	for _, c := range list {
-		add := AddressGet{
-			Province: c.Province,
-			City:     c.City,
-			Street:   c.Street,
-			Address:  c.Address,
-		}
-		getAdd = append(getAdd, add)
-	}*/
-
 	return getAdd, nil
 }
 
