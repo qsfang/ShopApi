@@ -46,7 +46,7 @@ import (
 func CartsPutIn(c echo.Context) error {
 	var (
 		err   error
-		carts models.GetCarts
+		carts models.ConCarts
 	)
 
 	if err = c.Bind(&carts); err != nil {
@@ -59,7 +59,7 @@ func CartsPutIn(c echo.Context) error {
 	userID := session.Get(general.SessionUserID)
 	id := userID.(uint64)
 
-	err = models.CartsService.CreateInCarts(carts, id)
+	err = models.CartsService.CreateInCarts(&carts, id)
 	if err != nil {
 		log.Logger.Error("Mysql error in add address:", err)
 
@@ -72,7 +72,7 @@ func CartsPutIn(c echo.Context) error {
 func Cartsdel(c echo.Context) error {
 	var (
 		err  error
-		cart models.GetCarts
+		cart models.ConCarts
 	)
 
 	if err = c.Bind(&cart); err != nil {
@@ -127,29 +127,29 @@ func AlterCartPro(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func Browse(c echo.Context) error {
-	var(
-		err error
-		output []models.Browse
-	)
-
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID)
-	id := userID.(uint64)
-
-	output, err= models.CartsService.BrowseCart(id)
-
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Find order with error:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
-		}
-
-		log.Logger.Error("Get Order with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, output)
-}
+//func Browse(c echo.Context) error {
+//	var(
+//		err error
+//		output []models.Browse
+//	)
+//
+//	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+//	userID := session.Get(general.SessionUserID)
+//	id := userID.(uint64)
+//
+//	output, err= models.CartsService.BrowseCart(id)
+//
+//	if err != nil {
+//		if err == gorm.ErrRecordNotFound {
+//			log.Logger.Error("Find order with error:", err)
+//
+//			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
+//		}
+//
+//		log.Logger.Error("Get Order with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
+//	}
+//
+//	return c.JSON(errcode.ErrSucceed, output)
+//}

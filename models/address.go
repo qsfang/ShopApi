@@ -25,8 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Li Zebang
- *     Modify: 2017/07/20         Yu Yi
- *     Modify: 2017/07/20         Yang Zhengtian
+ *     Modify : 2017/07/20        Yu Yi
+ *     Modify : 2017/07/20        Yang Zhengtian
  */
 
 package models
@@ -42,7 +42,6 @@ type ContactServiceProvider struct {
 
 var ContactService *ContactServiceProvider = &ContactServiceProvider{}
 
-// todo：结构
 type Contact struct {
 	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
@@ -53,17 +52,36 @@ type Contact struct {
 	Street    string    `json:"street"`
 	Address   string    `json:"address"`
 	Created   time.Time `json:"created"`
-	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
+	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault" `
 }
 
-type Add struct {
-	Name      *string `json:"name" validate:"required,alphanum,min=6,max=100"`
-	Phone     *string `json:"phone" validate:"required,alphanum,min=6,max=20"`
-	Province  *string `json:"province" validate:"required,alphanum,min=6,max=100"`
-	City      *string `json:"city" validate:"required,alphanum,min=6,max=100"`
-	Street    *string `json:"street" validate:"required,alphanum,min=6,max=100"`
-	Address   *string `json:"address" validate:"required,alphanum,min=6,max=200"`
-	IsDefault uint8   `json:"isdefault"`
+type OrmContact struct {
+	ID        uint64    `json:"id" validate:"required,numeric"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
+	Name      string    `json:"name" validate:"required,alphanum,min=6,max=100"`
+	Phone     string    `json:"phone" validate:"required,numeric,min=6,max=20"`
+	Province  string    `json:"province" validate:"required,alphanum,min=6,max=100"`
+	City      string    `json:"city" validate:"required,alphanum,min=6,max=100"`
+	Street    string    `json:"street" validate:"required,alphanum,min=6,max=100"`
+	Address   string    `json:"address" validate:"required,alphanum,min=6,max=200"`
+	Created   time.Time `json:"created"`
+	IsDefault uint8     `json:"isdefault" validate:"required,numeric"`
+}
+
+//Operate 总操作结构
+type Operate struct {
+	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
+	Name      string    `json:"name"`
+	Phone     string    `json:"phone"`
+	Province  string    `json:"province"`
+	City      string    `json:"city"`
+	Street    string    `json:"street"`
+	Address   string    `json:"address"`
+	Created   time.Time `json:"created"`
+	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
+	Page      uint8     `json:"page"`
+	Limit     uint8     `json:"limit"`
 }
 
 type AddressGet struct {
@@ -91,28 +109,24 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
-// todo: 结构传地址 返回值直接返回
-func (csp *ContactServiceProvider) AddAddress(addr Add, userID uint64) error {
-	contact := Contact{
-		UserID:    userID,
-		Name:      *addr.Name,
-		Phone:     *addr.Phone,
-		Province:  *addr.Province,
-		City:      *addr.City,
-		Street:    *addr.Street,
-		Address:   *addr.Address,
+func (csp *ContactServiceProvider) AddAddress(ormContact *OrmContact) error {
+	ormContact.Created = time.Now()
+
+	contact := &Contact{
+		UserID:    ormContact.UserID,
+		Name:      ormContact.Name,
+		Phone:     ormContact.Phone,
+		Province:  ormContact.Province,
+		City:      ormContact.City,
+		Street:    ormContact.Street,
+		Address:   ormContact.Address,
 		Created:   time.Now(),
-		IsDefault: addr.IsDefault,
+		IsDefault: ormContact.IsDefault,
 	}
 
 	db := orm.Conn
 
-	err := db.Create(&contact).Error
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return db.Create(contact).Error
 }
 
 func (csp *ContactServiceProvider) ChangeAddress(addr Change) error {
@@ -140,7 +154,7 @@ func (csp *ContactServiceProvider) ChangeAddress(addr Change) error {
 
 func (csp *ContactServiceProvider) FindAddressId(ID uint64) error {
 	var (
-		con  Contact
+		con Contact
 	)
 
 	db := orm.Conn
@@ -154,8 +168,8 @@ func (csp *ContactServiceProvider) FindAddressId(ID uint64) error {
 
 func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64) ([]AddressGet, error) {
 	var (
-		list	  []Contact
-		getAdd    []AddressGet
+		list   []Contact
+		getAdd []AddressGet
 	)
 
 	db := orm.Conn
