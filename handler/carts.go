@@ -110,15 +110,13 @@ func AlterCartPro(c echo.Context) error {
 	}
 
 	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count)
-	if err == gorm.ErrRecordNotFound {
-		log.Logger.Error("The product doesn't exist !", err)
-
-		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
-	}
-
-	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count)
-
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("This product doesn't exist !", err)
+
+			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
+		}
+
 		log.Logger.Error("Alter product with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
