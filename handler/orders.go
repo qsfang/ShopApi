@@ -169,8 +169,9 @@ func ChangeStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if st.Status != general.OrderFinished || st.Status != general.OrderUnfinished || st.Status != general.OrderCanceled{
-		log.Logger.Error("Status inexistence", err)
+	if st.Status != general.OrderFinished && st.Status !=general.OrderUnfinished && st.Status !=general.OrderCanceled{
+		err = errors.New("Status unExistence")
+		log.Logger.Error("",err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
