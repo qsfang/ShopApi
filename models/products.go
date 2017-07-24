@@ -37,7 +37,7 @@ import (
 	"ShopApi/general"
 	"ShopApi/orm"
 )
-// todo: 代码风格
+
 type ProductServiceProvider struct {
 }
 
@@ -48,10 +48,14 @@ type Product struct {
 	Name          string    `json:"name"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale"`
 <<<<<<< HEAD
+<<<<<<< HEAD
 	Categories    uint64    `json:"categories"`
 =======
 	Category    uint64    `json:"categories"`
 >>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
+=======
+	Category      uint64    `json:"categories"`
+>>>>>>> e84b31acb09c085dbd0661abfa9f02367dd8f28e
 	Price         float64   `json:"price"`
 	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice"`
 	Status        uint64    `json:"status"`
@@ -70,10 +74,14 @@ type ConProduct struct {
 	Name          string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale" validate:"numeric"`
 <<<<<<< HEAD
+<<<<<<< HEAD
 	Categories    uint64    `json:"categories" validate:"numeric"`
 =======
 	Category    uint64    `json:"categories" validate:"numeric"`
 >>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
+=======
+	Category      uint64    `json:"categories" validate:"numeric"`
+>>>>>>> e84b31acb09c085dbd0661abfa9f02367dd8f28e
 	Price         float64   `json:"price" validate:"numeric"`
 	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice" validate:"numeric"`
 	Status        uint64    `json:"status" validate:"numeric"`
@@ -87,7 +95,6 @@ type ConProduct struct {
 	Inventory     uint64    `json:"inventory"`
 }
 
-// todo: 参数检查
 type GetCategories struct {
 	Categories uint64 `json:"categories" validate:"required, alphanum, min = 0, max= 30"`
 }
@@ -126,7 +133,7 @@ func (ps *ProductServiceProvider) CreateProduct(pr Product) error {
 
 	return err
 }
-// todo: 分页
+
 func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
 		ware Product
@@ -141,7 +148,7 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 		return s, err
 	}
 
-	for _, c := range list { // todo: 放到 sql 中
+	for _, c := range list {
 		if c.Status == general.ProductOnsale {
 			pro := GetProList{
 				Name:          c.Name,
@@ -160,43 +167,43 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 	return s, nil
 }
 
-// todo: 返回错误 数据库操作
-func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
+func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) error {
 	var (
 		pro Product
 		err error
 	)
 
 	changeMap := map[string]interface{}{
-		"status": m.Status,
+		"status": status,
 	}
 
-	if m.Status == general.ProductOnsale {
-		m.Status = general.ProductUnsale
+	if status == general.ProductOnsale {
+		status = general.ProductUnsale
 	} else {
-		m.Status = general.ProductUnsale
+		status = general.ProductUnsale
 	}
 
 	db := orm.Conn
-	err = db.Model(&pro).Where("status = ?", m.ID).Updates(changeMap).Limit(1).Error
+	err = db.Model(&pro).Where("id = ?", ID).Updates(changeMap).Limit(1).Error
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 // todo: 返回值
-func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*ConProduct, error) {
+func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 	var (
 		err     error
-		ProInfo *Product = &Product{}
+		ProInfo *ConProduct = &ConProduct{}
 	)
 
 	db := orm.Conn
 
 	err = db.Where("id = ?", ProID).First(&ProInfo).Error
 	if err != nil {
-		ProInfo = nil
+		return nil, err
 	}
 
 	return ProInfo, err

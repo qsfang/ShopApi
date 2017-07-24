@@ -96,7 +96,7 @@ func GetProductList(c echo.Context) error {
 func ChangeProStatus(c echo.Context) error {
 	var (
 		err error
-		pro models.ChangePro
+		pro models.Product
 	)
 
 	if err = c.Bind(&pro); err != nil {
@@ -105,7 +105,7 @@ func ChangeProStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.ChangeProStatus(pro)
+	err = models.ProductService.ChangeProStatus(pro.ID, pro.Status)
 	if err != nil {
 		log.Logger.Error("change chanslates with error:", err)
 
@@ -118,10 +118,16 @@ func ChangeProStatus(c echo.Context) error {
 // 根据商品ID获取商品信息
 func GetProInfo(c echo.Context) error {
 	var (
+<<<<<<< HEAD
 		err     error
 		ProInfoGet *models.GetProduct
 		ProInfoReturn *models.Product
 		ProInfo *models.ConProduct
+=======
+		err           error
+		ProInfo       *models.ConProduct
+		ProInfoReturn *models.Product
+>>>>>>> e84b31acb09c085dbd0661abfa9f02367dd8f28e
 	)
 
 	if err = c.Bind(&ProInfoGet); err != nil {
@@ -130,7 +136,11 @@ func GetProInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+<<<<<<< HEAD
 	ProInfoReturn, err = models.ProductService.GetProInfo(ProInfoGet.ID)
+=======
+	ProInfoReturn, err = models.ProductService.GetProInfo(ProInfo.ID)
+>>>>>>> e84b31acb09c085dbd0661abfa9f02367dd8f28e
 
 	if err != nil {
 		log.Logger.Error("Get info with error:", err)
