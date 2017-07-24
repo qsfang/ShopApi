@@ -200,19 +200,20 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (*ConUsers, error) {
 	return ui, nil
 }
 
-// todo: 参数 代码风格
 func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 	var (
 		err error
 		con Contact
 	)
+
 	change := map[string]interface{}{"phone": Phone}
 
 	db := orm.Conn
-	err = db.Model(&con).Where("userid=?", UserID).Update(change).Limit(1).Error
+	err = db.Model(&con).Where("id=?", UserID).Update(change).Limit(1).Error
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
