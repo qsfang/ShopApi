@@ -167,7 +167,7 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 
 func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) error {
 	var (
-		pro Product
+		pro ConProduct
 		err error
 	)
 

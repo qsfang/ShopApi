@@ -98,7 +98,7 @@ func GetProductList(c echo.Context) error {
 func ChangeProStatus(c echo.Context) error {
 	var (
 		err error
-		pro models.Product
+		pro models.ConProduct
 	)
 
 	if err = c.Bind(&pro); err != nil {

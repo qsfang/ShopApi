@@ -35,15 +35,15 @@
 =======
  *     Modify : 2017/07/24       Ma Chao
 >>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
- */
+*/
 
 package models
 
 import (
 	"time"
 
-	"ShopApi/orm"
 	"ShopApi/general"
+	"ShopApi/orm"
 )
 
 type CartsServiceProvider struct {
@@ -79,14 +79,14 @@ type ConCarts struct {
 
 func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) error {
 	cartsPutIn := Carts{
-		UserID      :      userID,
-		ProductID:      carts.ProductID,
-		Name       :      carts.Name,
-		Count       :      carts.Count,
-		Size           :      carts.Size,
-		Color         :      carts.Color,
-		ImageID   :      carts.ImageID,
-		Created    :      time.Now(),
+		UserID:    userID,
+		ProductID: carts.ProductID,
+		Name:      carts.Name,
+		Count:     carts.Count,
+		Size:      carts.Size,
+		Color:     carts.Color,
+		ImageID:   carts.ImageID,
+		Created:   time.Now(),
 	}
 
 	db := orm.Conn
@@ -108,7 +108,6 @@ func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	return err
 }
 
-
 func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error {
 	var (
 		cart Carts
@@ -127,11 +126,11 @@ func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error
 	return nil
 }
 
-func (cs *CartsServiceProvider) BrowseCart(UserID uint64) (*[]ConCarts, error) {
+func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]Carts, error) {
 	var (
-		err         error
-		carts       []ConCarts
-		browse      *[]ConCarts
+		err    error
+		carts  []Carts
+		browse []Carts
 	)
 
 	db := orm.Conn
@@ -141,16 +140,17 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) (*[]ConCarts, error) {
 	}
 
 	for _, v := range carts {
-		add1 := ConCarts{
-			ImageID:  v.ImageID,
-			Status:  v.Status,
-			Created: v.Created,
-			Count:   v.Count,
-			Name:    v.Name,
-			Color:   v.Color,
-			Size:    v.Size,
+		add1 := Carts{
+			ImageID:   v.ImageID,
+			Status:    v.Status,
+			Created:   v.Created,
+			Count:     v.Count,
+			Name:      v.Name,
+			Color:     v.Color,
+			Size:      v.Size,
+			ProductID: v.ProductID,
 		}
-		*browse = append(*browse, add1)
+		browse = append(browse, add1)
 	}
 
 	return browse, err
