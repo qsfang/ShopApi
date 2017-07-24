@@ -53,6 +53,8 @@ type Contact struct {
 	Address   string    `json:"address"`
 	Created   time.Time `json:"created"`
 	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault" `
+	Page       uint64    `json:"page" validate:"required,numeric"`
+	PageSize   uint64    `json:"pagesize" validate:"required,numeric"`
 }
 
 type OrmContact struct {
@@ -66,6 +68,8 @@ type OrmContact struct {
 	Address   string    `json:"address" validate:"required,alphanum,min=6,max=200"`
 	Created   time.Time `json:"created"`
 	IsDefault uint8     `json:"isdefault" validate:"required,numeric"`
+	Page       uint64    `json:"page" validate:"required,numeric"`
+	PageSize   uint64    `json:"pagesize" validate:"required,numeric"`
 }
 
 type AddressGet struct {
@@ -140,9 +144,9 @@ func (csp *ContactServiceProvider) FindAddressId(ID uint64) error {
 	return err
 }
 
-func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64) ([]AddressGet, error) {
+func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64, pageStart, pageEnd uint64) ([]AddressGet, error) {
 	var (
-		list   []Contact
+		list   Contact
 		getAdd []AddressGet
 	)
 
@@ -151,7 +155,26 @@ func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64) ([]AddressGe
 	if err != nil {
 		return getAdd, err
 	}
+	sql := "SELECT * FROM contact WHERE userid = ? LIMIT ?, ? LOCK IN SHARE MODE"
 
+	rows, err := db.Raw(sql, userId, pageStart, pageEnd).Rows()
+	defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		db.ScanRows(rows, &list)
+			add := AddressGet{
+				Province: list.Province,
+				City:     list.City,
+				Street:   list.Street,
+				Address:  list.Address,
+			}
+			getAdd = append(getAdd, add)
+		}
+
+/*
 	for _, c := range list {
 		add := AddressGet{
 			Province: c.Province,
@@ -160,7 +183,7 @@ func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64) ([]AddressGe
 			Address:  c.Address,
 		}
 		getAdd = append(getAdd, add)
-	}
+	}*/
 
 	return getAdd, nil
 }
