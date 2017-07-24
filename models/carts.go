@@ -27,15 +27,8 @@
  *     Initial: 2017/07/21       Zhu Yaqiang
  *     Modify : 2017/07/22       Xu Haosheng    添加购物车
  *     Modify : 2017/07/23       Wang Ke
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
  *     Modify : 2017/07/23 		 Ma Chao
->>>>>>> e84b31acb09c085dbd0661abfa9f02367dd8f28e
-=======
- *     Modify : 2017/07/24       Ma Chao
->>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
-*/
+ */
 
 package models
 
