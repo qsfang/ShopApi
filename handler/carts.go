@@ -128,18 +128,16 @@ func AlterCartPro(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func Browse(c echo.Context) error {
+func BrowseCart(c echo.Context) error {
 	var(
 		err error
-		output []models.ConCarts
+		output *[]models.ConCarts
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID)
-	id := userID.(uint64)
+	userID := session.Get(general.SessionUserID).(uint64)
 
-	output, err= models.CartsService.BrowseCart(id)
-
+	output, err= models.CartsService.BrowseCart(userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Find order with error:", err)
