@@ -51,11 +51,6 @@ type Register struct {
 	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
 
-type GetPassword struct {
-	Pass    *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-	NewPass *string `json:"newpass" validate:"required,alphanum,min=6,max=30"`
-}
-
 func Create(c echo.Context) error {
 	var (
 		err error
@@ -171,7 +166,7 @@ func GetInfo(c echo.Context) error {
 func ChangeMobilePassword(c echo.Context) error {
 	var (
 
-		password GetPassword
+		password models.ConUsers
 		userId uint64
 		err error
 		userPassword string
