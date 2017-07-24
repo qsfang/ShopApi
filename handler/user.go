@@ -195,6 +195,7 @@ func ChangeMobilePassword(c echo.Context) error {
 
 	if !utility.CompareHash([]byte(userPassword), *password.Pass) {
 		log.Logger.Debug("Password doesn't match:", err)
+
 		return general.NewErrorWithMessage(errcode.ErrMysqlfound, errors.New("Password doesn't match").Error())
 	}
 
@@ -230,7 +231,7 @@ func ChangeUserInfo(c echo.Context) error {
 	userID := session.Get(general.SessionUserID)
 	id := userID.(uint64)
 
-	err = models.UserService.ChangeUserInfo(info, id)
+	err = models.UserService.ChangeUserInfo(&info, id)
 	if err != nil {
 		log.Logger.Error("create crash with error:", err)
 

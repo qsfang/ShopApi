@@ -27,6 +27,10 @@
  *     Initial: 2017/07/21       Zhu Yaqiang
  *     Modify : 2017/07/22       Xu Haosheng    添加购物车
  *     Modify : 2017/07/23       Wang Ke
+<<<<<<< HEAD
+=======
+ *     Modify : 2017/07/24       Ma Chao
+>>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
  */
 
 package models
@@ -113,7 +117,10 @@ type ConCarts struct {
 	Count     uint64    `json:"count" validate:"numeric"`
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
+	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid" validate:"numeric"`
+	Status    uint8     `json:"status"`
+	Created   time.Time `json:"created"`
 }
 
 // todo:变量

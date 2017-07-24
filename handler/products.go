@@ -121,6 +121,7 @@ func GetProInfo(c echo.Context) error {
 		err     error
 		ProInfoGet *models.GetProduct
 		ProInfoReturn *models.Product
+		ProInfo *models.ConProduct
 	)
 
 	if err = c.Bind(&ProInfoGet); err != nil {
