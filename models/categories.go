@@ -111,6 +111,7 @@ func (csp *CategoriesServiceProvider) GetCategories(pid, pageStart, pageEnd uint
 	)
 
 	db := orm.Conn
+
 	sql := fmt.Sprintf("SELECT * FROM categories WHERE pid = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
 
 	rows, err := db.Raw(sql, pid, general.CategoriesOnuse).Rows()

@@ -86,17 +86,17 @@ func CreateOrder(c echo.Context) error {
 func GetOrders(c echo.Context) error {
 	var (
 		err    error
-		status models.Orders
+		orm models.OrmOrders
 		orders *[]models.Orders
 	)
 
-	if err = c.Bind(&status); err != nil {
+	if err = c.Bind(&orm); err != nil {
 		log.Logger.Error("Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if status.Status != general.OrderUnfinished && status.Status != general.OrderFinished && status.Status != general.OrderGetAll {
+	if orm.Status != general.OrderUnfinished && orm.Status != general.OrderFinished && orm.Status != general.OrderGetAll {
 		err = errors.New("Invalid Orders Status")
 
 		log.Logger.Error("Error:", err)
@@ -107,7 +107,9 @@ func GetOrders(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	orders, err = models.OrderService.GetOrders(userID, status.Status)
+	pageStart, pageEnd := utility.Paging(orm.Page, orm.PageSize)
+
+	orders, err = models.OrderService.GetOrders(userID, orm.Status, pageStart, pageEnd)
 	if err != nil {
 		log.Logger.Error("Mysql error in GetOrders Function:", err)
 
