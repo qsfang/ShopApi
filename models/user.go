@@ -55,6 +55,7 @@ type User struct {
 	Created  time.Time `json:"created"`
 }
 
+//todo：用户信息相关都用这一个
 type UserInfo struct {
 	UserID   uint64 `sql:"primary_key" gorm:"column:userid" json:"userid"`
 	Avatar   string `json:"avatar"`

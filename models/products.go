@@ -37,7 +37,7 @@ import (
 	"ShopApi/general"
 	"ShopApi/orm"
 )
-// todo: 代码风格
+
 type ProductServiceProvider struct {
 }
 
@@ -79,7 +79,6 @@ type ConProduct struct {
 	Inventory     uint64    `json:"inventory"`
 }
 
-// todo: 参数检查
 type GetCategories struct {
 	Categories uint64 `json:"categories" validate:"required, alphanum, min = 0, max= 30"`
 }
@@ -118,7 +117,7 @@ func (ps *ProductServiceProvider) CreateProduct(pr Product) error {
 
 	return err
 }
-// todo: 分页
+
 func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
 	var (
 		ware Product
@@ -133,7 +132,7 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 		return s, err
 	}
 
-	for _, c := range list { // todo: 放到 sql 中
+	for _, c := range list {
 		if c.Status == general.ProductOnsale {
 			pro := GetProList{
 				Name:          c.Name,
@@ -152,24 +151,24 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 	return s, nil
 }
 
-func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
+func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) error {
 	var (
 		pro Product
 		err error
 	)
 
 	changeMap := map[string]interface{}{
-		"status": m.Status,
+		"status": status,
 	}
 
-	if m.Status == general.ProductOnsale {
-		m.Status = general.ProductUnsale
+	if status == general.ProductOnsale {
+		status = general.ProductUnsale
 	} else {
-		m.Status = general.ProductUnsale
+		status = general.ProductUnsale
 	}
 
 	db := orm.Conn
-	err = db.Model(&pro).Where("id = ?", m.ID).Updates(changeMap).Limit(1).Error
+	err = db.Model(&pro).Where("id = ?", ID).Updates(changeMap).Limit(1).Error
 	if err != nil {
 		return err
 	}
@@ -181,7 +180,7 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*ConProduct, error) {
 	var (
 		err     error
-		ProInfo *Product = &Product{}
+		ProInfo *ConProduct = &ConProduct{}
 	)
 
 	db := orm.Conn
