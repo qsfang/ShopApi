@@ -72,7 +72,7 @@ func CartsPutIn(c echo.Context) error {
 func Cartsdel(c echo.Context) error {
 	var (
 		err  error
-		cart models.GetCarts
+		cart models.ConCarts
 	)
 
 	if err = c.Bind(&cart); err != nil {
@@ -100,7 +100,7 @@ func Cartsdel(c echo.Context) error {
 func AlterCartPro(c echo.Context) error {
 	var (
 		err     error
-		cartpro models.CartPro
+		cartpro models.ConCarts
 	)
 
 	if err = c.Bind(&cartpro); err != nil {
@@ -130,7 +130,7 @@ func AlterCartPro(c echo.Context) error {
 func Browse(c echo.Context) error {
 	var(
 		err error
-		output []models.Browse
+		output []models.ConCarts
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
