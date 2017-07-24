@@ -102,7 +102,7 @@ type Carts struct {
 	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
-	Status    uint8    `json:"status"`
+	Status    uint8     `json:"status"`
 	Created   time.Time `json:"created"`
 }
 
@@ -113,9 +113,7 @@ type GetCarts struct {
 	Count     uint64    `json:"count" validate:"numeric"`
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
-	UserID    uint64    `gorm:"column:userid" json:"userid" validate:"numeric"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid" validate:"numeric"`
-	Status    uint8     `json:"status" validate:"required, numeric, max = 1"`
 }
 
 // todo:变量
