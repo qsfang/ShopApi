@@ -98,11 +98,11 @@ func GetProductList(c echo.Context) error {
 func ChangeProStatus(c echo.Context) error {
 	var (
 		err error
-		pro models.Product
+		pro models.ConProduct
 	)
 
 	if err = c.Bind(&pro); err != nil {
-		log.Logger.Error("Change crash with error:", err)
+		log.Logger.Error("Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -124,7 +124,6 @@ func ChangeProStatus(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-// 根据商品ID获取商品信息
 func GetProInfo(c echo.Context) error {
 	var (
 		err           error

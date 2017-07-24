@@ -68,22 +68,6 @@ type OrmContact struct {
 	IsDefault uint8     `json:"isdefault" validate:"required,numeric"`
 }
 
-//Operate 总操作结构
-type Operate struct {
-	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
-	UserID    uint64    `gorm:"column:userid" json:"userid"`
-	Name      string    `json:"name"`
-	Phone     string    `json:"phone"`
-	Province  string    `json:"province"`
-	City      string    `json:"city"`
-	Street    string    `json:"street"`
-	Address   string    `json:"address"`
-	Created   time.Time `json:"created"`
-	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
-	Page      uint8     `json:"page"`
-	Limit     uint8     `json:"limit"`
-}
-
 type AddressGet struct {
 	Province string `json:"province"`
 	City     string `json:"city"`
@@ -99,10 +83,6 @@ type Change struct {
 	City     *string `json:"city" validate:"required, alphaunicode, min=2,max=30"`
 	Street   *string `json:"street" validate:"required, alphaunicode, min=2,max=30"`
 	Address  *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
-}
-
-type AddressDefault struct {
-	ID uint64
 }
 
 func (Contact) TableName() string {
@@ -195,18 +175,13 @@ func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64) ([]AddressGe
 func (csp *ContactServiceProvider) AlterDefault(id uint64) error {
 	var (
 		s   Contact
-		a   int8
 		con Contact
 	)
 	db := orm.Conn
 	err := db.Where("id=?", id).Find(&s).Error
-	if err != nil {
-		return err
-	}
-	if s.IsDefault == 0 {
-		a = 1
-	}
-	updater := map[string]interface{}{"isdefault": a}
+
+	updater := map[string]interface{}{"isdefault": s.IsDefault^1}
+
 	err = db.Model(&con).Where("id=?", id).Update(updater).Limit(1).Error
 	if err != nil {
 		return err

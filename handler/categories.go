@@ -40,6 +40,7 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
+	"ShopApi/utility"
 )
 
 type Pid struct {
@@ -85,17 +86,19 @@ func CreateCategories(c echo.Context) error {
 func GetCategories(c echo.Context) error {
 	var (
 		err        error
-		pid        models.OrmCategories
+		orm        models.OrmCategories
 		categories *[]models.Categories
 	)
 
-	if err = c.Bind(&pid); err != nil {
+	if err = c.Bind(&orm); err != nil {
 		log.Logger.Error("Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	categories, err = models.CategoriesService.GetCategories(pid.Pid)
+	pageStart, pageEnd := utility.Paging(orm.Page, orm.PageSize)
+
+	categories, err = models.CategoriesService.GetCategories(orm.Pid, pageStart, pageEnd)
 	if err != nil {
 		log.Logger.Error("Mysql error in GetCategories Function:", err)
 

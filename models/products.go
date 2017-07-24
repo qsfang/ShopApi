@@ -123,8 +123,8 @@ func (ps *ProductServiceProvider) CreateProduct(pr *ConProduct) error {
 		Inventory:		pr.Inventory,
 	}
 
-	pr.Status = general.ProductOnsale
-	pr.Created = time.Now()
+	pro.Status = general.ProductOnsale
+	pro.Created = time.Now()
 
 	db := orm.Conn
 	err := db.Create(&pro).Error
@@ -167,18 +167,16 @@ func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) 
 
 func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) error {
 	var (
-		pro Product
+		pro ConProduct
 		err error
 	)
 
 	change := map[string]interface{}{"status": status}
 	db := orm.Conn
-	err = db.Model(&pro).Where("id = ?", ID).Updates(change).Limit(1).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+	err = db.Model(&pro).Where("id = ?", ID).Updates(change).Limit(1).Error
+
+	return err
 }
 
 func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
@@ -191,7 +189,7 @@ func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 
 	err = db.Where("id = ?", ProID).First(&ProInfo).Error
 	if err != nil {
-		return nil, err
+		return ProInfo, err
 	}
 
 	return ProInfo, err

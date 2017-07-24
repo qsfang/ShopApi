@@ -110,8 +110,8 @@ func GetAddress(c echo.Context) error {
 		list   []models.AddressGet
 	)
 
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	s := sess.Get(general.SessionUserID)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	s := session.Get(general.SessionUserID)
 	userId = s.(uint64)
 
 	list, err = models.ContactService.GetAddressByUerId(userId)
@@ -132,7 +132,7 @@ func GetAddress(c echo.Context) error {
 func Alter(c echo.Context) error {
 	var (
 		err error
-		m   models.AddressDefault
+		m   models.Contact
 	)
 
 	if err = c.Bind(&m); err != nil {
