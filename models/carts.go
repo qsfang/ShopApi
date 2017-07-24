@@ -106,17 +106,12 @@ func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error
 		cart Carts
 	)
 
-	updater := map[string]interface{}{
-		"count": Count,
-	}
+	updater := map[string]interface{}{"count": Count, }
 
 	db := orm.Conn
 	err := db.Model(&cart).Where("id = ?", CartsID).Update(updater).Limit(1).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {

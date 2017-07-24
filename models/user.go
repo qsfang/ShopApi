@@ -186,11 +186,8 @@ func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 
 	db := orm.Conn
 	err = db.Model(&con).Where("id=?", UserID).Update(change).Limit(1).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+		return err
 }
 
 func (us *UserServiceProvider) GetUerPassword(id uint64) (string, error) {
