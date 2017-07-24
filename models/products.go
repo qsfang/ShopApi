@@ -191,7 +191,7 @@ func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 
 	err = db.Where("id = ?", ProID).First(&ProInfo).Error
 	if err != nil {
-		return nil, err
+		return ProInfo, err
 	}
 
 	return ProInfo, err

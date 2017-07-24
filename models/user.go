@@ -78,6 +78,8 @@ type ConUsers struct {
 	Email    string    `json:"email"`
 	Phone    string    `json:"phone"`
 	Sex      uint8     `json:"sex"`
+	Pass    *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
+	NewPass *string `json:"newpass" validate:"required,alphanum,min=6,max=30"`
 }
 
 // todo: 接收者
