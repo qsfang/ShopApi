@@ -36,6 +36,7 @@ import (
 
 	"ShopApi/general"
 	"ShopApi/orm"
+	"fmt"
 )
 
 type ProductServiceProvider struct {
@@ -77,10 +78,8 @@ type ConProduct struct {
 	Detail        string    `json:"detail"`
 	Created       time.Time `json:"created"`
 	Inventory     uint64    `json:"inventory"`
-}
-
-type GetCategories struct {
-	Categories uint64 `json:"categories" validate:"required, alphanum, min = 0, max= 30"`
+	Page          uint64    `json:"page"`
+	PageSize      uint64    `gorm:"column: pagesize" json:"pagesize"`
 }
 
 type GetProList struct {
@@ -97,11 +96,6 @@ type GetProList struct {
 type ChangePro struct {
 	ID     uint64 `json:"id" validate:"numeric"`
 	Status uint64 `json:"status" validate:"numeric"`
-}
-
-type ChangeCate struct {
-	ID         uint64 `json:"id"`
-	Categories uint64 `json:"categories"`
 }
 
 func (Product) TableName() string {
@@ -132,37 +126,38 @@ func (ps *ProductServiceProvider) CreateProduct(pr *ConProduct) error {
 	return err
 }
 
-func (ps *ProductServiceProvider) GetProduct(cate uint64) ([]GetProList, error) {
+func (ps *ProductServiceProvider) GetProduct(cate, pageStart, pageEnd uint64) (*[]GetProList, error) {
 	var (
-		ware Product
-		list []Product
+		list Product
 		s    []GetProList
 	)
 
 	db := orm.Conn
-	err := db.Model(&ware).Where("categories = ?", cate).Find(&list).Error
+	sql := fmt.Sprintf("SELECT * FROM products WHERE category = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
+
+	rows, err := db.Raw(sql, cate, general.ProductOnsale).Rows()
+	defer rows.Close()
 
 	if err != nil {
-		return s, err
+		return nil, err
 	}
 
-	for _, c := range list {
-		if c.Status == general.ProductOnsale {
-			pro := GetProList{
-				Name:          c.Name,
-				TotalSale:     c.TotalSale,
-				Price:         c.Price,
-				OriginalPrice: c.OriginalPrice,
-				Status:        c.Status,
-				ImageId:       c.ImageID,
-				Detail:        c.Detail,
-				Inventory:     c.Inventory,
-			}
-			s = append(s, pro)
-		}
+	for rows.Next()  {
+		db.ScanRows(rows, &list)
+
+		s=append(s, GetProList{
+			Name:          list.Name,
+			TotalSale:     list.TotalSale,
+			Price:         list.Price,
+			OriginalPrice: list.OriginalPrice,
+			Status:        list.Status,
+			ImageId:       list.ImageID,
+			Detail:        list.Detail,
+			Inventory:     list.Inventory,
+		})
 	}
 
-	return s, nil
+	return &s, nil
 }
 
 func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) error {
@@ -197,20 +192,13 @@ func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 	return ProInfo, err
 }
 
-func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {
+func (ps *ProductServiceProvider) ChangeCategories(cate ConProduct) error {
 	var (
 		pro Product
 	)
 
-	// todo: 复数
-	change := map[string]uint64{"categories": cate.Categories}
-
 	db := orm.Conn
-	err := db.Model(&pro).Where("id = ?", cate.ID).Update(change).Limit(1).Error
+	err := db.Model(&pro).Where("id = ?", cate.ID).Update("category", cate.Category).Limit(1).Error
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
