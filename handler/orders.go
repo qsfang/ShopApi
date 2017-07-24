@@ -44,10 +44,6 @@ import (
 	"ShopApi/utility"
 )
 
-type ID struct {
-	ID uint64 `sql:"auto_increment;primary_key;" json:"id"`
-}
-
 type ChangStatus struct {
 	ID     uint64 `json:"id"`
 	Status uint8  `json:"status"`
@@ -86,7 +82,7 @@ func CreateOrder(c echo.Context) error {
 func GetOrders(c echo.Context) error {
 	var (
 		err    error
-		orm models.OrmOrders
+		orm    models.OrmOrders
 		orders *[]models.Orders
 	)
 
@@ -130,7 +126,7 @@ func GetOrders(c echo.Context) error {
 func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
-		order  ID
+		order  *models.OrmOrders
 		OutPut *models.OrmOrders
 	)
 	if err = c.Bind(&order); err != nil {
@@ -139,10 +135,10 @@ func GetOneOrder(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	UserID := sess.Get(general.SessionUserID).(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	UserID := session.Get(general.SessionUserID).(uint64)
 
-	OutPut, err= models.OrderService.GetOneOrder(order.ID, UserID)
+	OutPut, err = models.OrderService.GetOneOrder(order.ID, UserID)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -171,9 +167,9 @@ func ChangeStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if st.Status != general.OrderFinished && st.Status !=general.OrderUnfinished && st.Status !=general.OrderCanceled{
+	if st.Status != general.OrderFinished && st.Status != general.OrderUnfinished && st.Status != general.OrderCanceled {
 		err = errors.New("Status unExistence")
-		log.Logger.Error("",err)
+		log.Logger.Error("", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
