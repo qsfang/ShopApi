@@ -105,16 +105,25 @@ func ChangeAddress(c echo.Context) error {
 
 func GetAddress(c echo.Context) error {
 	var (
-		err    error
-		userId uint64
-		list   []models.AddressGet
+		err   	 error
+		userId   uint64
+		address  models.OrmContact
+		list     []models.AddressGet
 	)
+
+	if err = c.Bind(&address); err != nil {
+		log.Logger.Error("Bind with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	s := session.Get(general.SessionUserID)
 	userId = s.(uint64)
 
-	list, err = models.ContactService.GetAddressByUerId(userId)
+	pageStart, pageEnd := utility.Paging(address.Page, address.PageSize)
+
+	list, err = models.ContactService.GetAddressByUerId(userId, pageStart, pageEnd)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Id not find:", err)

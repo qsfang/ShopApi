@@ -55,7 +55,7 @@ func InitRouter(server *echo.Echo) {
 	server.POST("/api/v1/contact/add", handler.AddAddress, handler.MustLogin)
 	server.POST("/api/vl/contact/alter",handler.Alter)
 	server.POST("/api/v1/contact/change",handler.ChangeAddress)
-	server.GET("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
+	server.POST("/api/v1/contact/getaddress", handler.GetAddress, handler.MustLogin)
 
 	server.POST("/api/v1/products/create",handler.CreateProduct)//创建商品
 	server.POST("/api/v1/product/getinfo",handler.GetProInfo,handler.MustLogin)
