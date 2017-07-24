@@ -41,6 +41,7 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
+	"ShopApi/utility"
 )
 
 func CreateProduct(c echo.Context) error {
@@ -68,8 +69,8 @@ func CreateProduct(c echo.Context) error {
 func GetProductList(c echo.Context) error {
 	var (
 		err  error
-		cate models.GetCategories
-		list []models.GetProList
+		cate models.ConProduct
+		list *[]models.GetProList
 	)
 
 	if err = c.Bind(&cate); err != nil {
@@ -78,7 +79,8 @@ func GetProductList(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	list, err = models.ProductService.GetProduct(cate.Categories)
+	pageStart, pageEnd := utility.Paging(cate.Page, cate.PageSize)
+	list, err = models.ProductService.GetProduct(cate.Category, pageStart, pageEnd)
 	if err != nil {
 
 		if err == gorm.ErrRecordNotFound {
@@ -151,7 +153,7 @@ func GetProInfo(c echo.Context) error {
 func ChangeCategories(c echo.Context) error {
 	var (
 		err error
-		m   models.ChangeCate
+		m   models.ConProduct
 	)
 
 	if err = c.Bind(&m); err != nil {
