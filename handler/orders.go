@@ -32,6 +32,8 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
@@ -40,7 +42,6 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-	"github.com/pkg/errors"
 )
 
 type ID struct {

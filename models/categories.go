@@ -101,7 +101,6 @@ func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
 	return err
 }
 
-// todo: 数据库操作
 func (csp *CategoriesServiceProvider) GetCategories(pid uint64) (*[]Categories, error) {
 	var (
 		categories []Categories

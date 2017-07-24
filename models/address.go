@@ -65,7 +65,7 @@ type OrmContact struct {
 	Street    string    `json:"street" validate:"required,alphanum,min=6,max=100"`
 	Address   string    `json:"address" validate:"required,alphanum,min=6,max=200"`
 	Created   time.Time `json:"created"`
-	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault" validate:"required,numeric"`
+	IsDefault uint8     `json:"isdefault" validate:"required,numeric"`
 }
 
 //Operate 总操作结构
@@ -81,7 +81,7 @@ type Operate struct {
 	Created   time.Time `json:"created"`
 	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault"`
 	Page      uint8     `json:"page"`
-	Limit     uint8	    `json:"limit"`
+	Limit     uint8     `json:"limit"`
 }
 
 type AddressGet struct {
@@ -109,8 +109,20 @@ func (Contact) TableName() string {
 	return "contact"
 }
 
-func (csp *ContactServiceProvider) AddAddress(contact *OrmContact) error {
-	contact.Created = time.Now()
+func (csp *ContactServiceProvider) AddAddress(ormContact *OrmContact) error {
+	ormContact.Created = time.Now()
+
+	contact := &Contact{
+		UserID:    ormContact.UserID,
+		Name:      ormContact.Name,
+		Phone:     ormContact.Phone,
+		Province:  ormContact.Province,
+		City:      ormContact.City,
+		Street:    ormContact.Street,
+		Address:   ormContact.Address,
+		Created:   time.Now(),
+		IsDefault: ormContact.IsDefault,
+	}
 
 	db := orm.Conn
 
