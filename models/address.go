@@ -177,7 +177,6 @@ func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64, pageStart, p
 	return getAdd, nil
 }
 
-// todo:sql 语句合并
 func (csp *ContactServiceProvider) AlterDefault(id uint64) error {
 	var (
 		s   Contact
@@ -189,9 +188,6 @@ func (csp *ContactServiceProvider) AlterDefault(id uint64) error {
 	updater := map[string]interface{}{"isdefault": s.IsDefault^1}
 
 	err = db.Model(&con).Where("id=?", id).Update(updater).Limit(1).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+		return err
 }
