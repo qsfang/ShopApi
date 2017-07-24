@@ -123,8 +123,8 @@ func (ps *ProductServiceProvider) CreateProduct(pr *ConProduct) error {
 		Inventory:		pr.Inventory,
 	}
 
-	pr.Status = general.ProductOnsale
-	pr.Created = time.Now()
+	pro.Status = general.ProductOnsale
+	pro.Created = time.Now()
 
 	db := orm.Conn
 	err := db.Create(&pro).Error

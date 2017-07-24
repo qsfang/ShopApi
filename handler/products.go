@@ -124,7 +124,6 @@ func ChangeProStatus(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-// 根据商品ID获取商品信息
 func GetProInfo(c echo.Context) error {
 	var (
 		err           error
