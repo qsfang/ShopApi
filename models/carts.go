@@ -111,15 +111,14 @@ func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	return err
 }
 
-// todo: 返回错误
-func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size string, Color string) error {
+
+func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error {
 	var (
 		cart Carts
 	)
+
 	updater := map[string]interface{}{
 		"count": Count,
-		"size":  Size,
-		"color": Color,
 	}
 
 	db := orm.Conn
@@ -131,14 +130,12 @@ func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size 
 	return nil
 }
 
-func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
+func (cs *CartsServiceProvider) BrowseCart(UserID uint64) (*[]ConCarts, error) {
 	var (
 		err         error
 		carts       []ConCarts
-		browseCart  []ConCarts
-		browse      []ConCarts
+		browse      *[]ConCarts
 	)
-
 
 	db := orm.Conn
 	err = db.Where("userid = ?", UserID).Find(&carts).Error
@@ -147,11 +144,6 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
 	}
 
 	for _, v := range carts {
-		add := ConCarts {
-			ImageID:  v.ImageID,
-		}
-		browseCart = append(browseCart, add)
-
 		add1 := ConCarts{
 			ImageID:  v.ImageID,
 			Status:  v.Status,
@@ -161,7 +153,7 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
 			Color:   v.Color,
 			Size:    v.Size,
 		}
-		browse = append(browse, add1)
+		*browse = append(*browse, add1)
 	}
 
 	return browse, err

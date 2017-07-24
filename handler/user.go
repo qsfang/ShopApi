@@ -144,7 +144,7 @@ func Logout(c echo.Context) error {
 func GetInfo(c echo.Context) error {
 	var (
 		err error
-		Output models.UserInfo
+		Output *models.ConUsers
 	)
 
 	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -244,7 +244,7 @@ func ChangeUserInfo(c echo.Context) error {
 func Changephone(c echo.Context) error {
 	var (
 		err error
-		m   models.Phone
+		m   models.UserInfo
 	)
 	if err = c.Bind(&m); err != nil {
 		log.Logger.Error("Bind crash with error:", err)

@@ -64,6 +64,22 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
+//todo：连接前端
+type ConUsers struct {
+	UserID   uint64    `gorm:"column:id" json:"userid"`
+	OpenID   string    `gorm:"column:openid" json:"openid"`
+	Name     string    `json:"name"`
+	Password string    `json:"password"`
+	Status   uint16    `json:"status"`
+	Type     uint16    `json:"type"`
+	Created  time.Time `json:"created"`
+	Avatar   string    `json:"avatar"`
+	Nickname string    `json:"nickname"`
+	Email    string    `json:"email"`
+	Phone    string    `json:"phone"`
+	Sex      uint8     `json:"sex"`
+}
+
 type ChangeUseInfo struct {
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
@@ -71,13 +87,7 @@ type ChangeUseInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
-type ChangeAvatar struct {
-	Avatar string `json:"avatar"`
-}
 
-type Phone struct {
-	Phone string `json:"phone"`
-}
 
 // todo: 接收者
 func (User) TableName() string {
@@ -136,6 +146,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 
 	return nil
 }
+
 // todo: 代码风格
 func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	var (
@@ -158,11 +169,11 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return true, u.UserID, nil
 }
 
-func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
+func (us *UserServiceProvider) GetInfo(UserID uint64) (*ConUsers, error) {
 
 	var (
 		err error
-		ui  UserInfo
+		ui  *ConUsers
 	)
 
 	db := orm.Conn
@@ -173,19 +184,21 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (UserInfo, error) {
 
 	return ui, nil
 }
-// todo: 参数 代码风格
-func (us *UserServiceProvider)ChangePhone(UserID uint64, Phone string) error {
+
+func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 	var (
 		err error
 		con Contact
 	)
+
 	change := map[string]interface{}{"phone": Phone}
 
 	db := orm.Conn
-	err = db.Model(&con).Where("userid=?", UserID).Update(change).Limit(1).Error
+	err = db.Model(&con).Where("id=?", UserID).Update(change).Limit(1).Error
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -234,18 +247,17 @@ func (us *UserServiceProvider) ChangeUserInfo(info ChangeUseInfo, userID uint64)
 
 	return nil
 }
-func (us *UserServiceProvider) ChangeAvatar(info ChangeAvatar, userID uint64) error {
-var con Contact
+func (us *UserServiceProvider) ChangeAvatar(info ConUsers, userID uint64) error {
+	var con Contact
 
-changMap := map[string]interface{}{"avatar": info.Avatar}
+	changMap := map[string]interface{}{"avatar": info.Avatar}
 
-db := orm.Conn
-err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
+	db := orm.Conn
+	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
 
-if err != nil {
-return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
-
-return nil
-}
-
