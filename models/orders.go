@@ -168,7 +168,6 @@ func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrder
 	return getOrder, nil
 }
 
-// todo: 状态
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	cha := Orders{
 		Status: status,
