@@ -28,7 +28,10 @@
  *     Modify : 2017/07/22       Xu Haosheng    添加购物车
  *     Modify : 2017/07/23       Wang Ke
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
  *     Modify : 2017/07/23 		 Ma Chao
+>>>>>>> e84b31acb09c085dbd0661abfa9f02367dd8f28e
 =======
  *     Modify : 2017/07/24       Ma Chao
 >>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
@@ -74,28 +77,22 @@ type ConCarts struct {
 	Created   time.Time `json:"created"`
 }
 
-// todo:变量
-func (cs *CartsServiceProvider) CreateInCarts(carts Carts, userID uint64) error {
+func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) error {
 	cartsPutIn := Carts{
-		UserID:    userID,
-		ProductID: carts.ProductID,
-		Name:      carts.Name,
-		Count:     carts.Count,
-		Size:      carts.Size,
-		Color:     carts.Color,
-		ImageID:   carts.ImageID,
-		Status:    carts.Status,
-		Created:   time.Now(),
+		UserID      :      userID,
+		ProductID:      carts.ProductID,
+		Name       :      carts.Name,
+		Count       :      carts.Count,
+		Size           :      carts.Size,
+		Color         :      carts.Color,
+		ImageID   :      carts.ImageID,
+		Created    :      time.Now(),
 	}
 
 	db := orm.Conn
-
 	err := db.Create(&cartsPutIn).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 // 状态0表示商品在购物车，状态1表示商品不在购物车
@@ -158,4 +155,3 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) (*[]ConCarts, error) {
 
 	return browse, err
 }
-

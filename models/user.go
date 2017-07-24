@@ -69,7 +69,6 @@ type ConUsers struct {
 	UserID   uint64    `gorm:"column:id" json:"userid"`
 	OpenID   string    `gorm:"column:openid" json:"openid"`
 	Name     string    `json:"name"`
-	Password string    `json:"password"`
 	Status   uint16    `json:"status"`
 	Type     uint16    `json:"type"`
 	Created  time.Time `json:"created"`
@@ -78,18 +77,10 @@ type ConUsers struct {
 	Email    string    `json:"email"`
 	Phone    string    `json:"phone"`
 	Sex      uint8     `json:"sex"`
+	Password *string   `json:"password" validate:"required,alphanum,min=6,max=30"`
+	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`
 }
 
-type ChangeUseInfo struct {
-	Nickname string `json:"nickname"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Sex      uint8  `json:"sex"`
-}
-
-
-
-// todo: 接收者
 func (User) TableName() string {
 	return "users"
 }
@@ -232,32 +223,28 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 	return err
 }
 
-// todo: 代码风格 业务逻辑设计
-func (us *UserServiceProvider) ChangeUserInfo(info ChangeUseInfo, userID uint64) error {
-	var con Contact
+func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) error {
+	var (
+		con Contact
+		nil uint8 = 0
+	)
 
-	changMap := map[string]interface{}{"nickname": info.Nickname, "email": info.Email, "phone": info.Phone, "sex": info.Sex}
-
-	db := orm.Conn
-	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
-
-	if err != nil {
-		return err
+	changMap := map[string]interface{}{
+		"nickname": info.Nickname,
+		"email"       : info.Email,
+		"phone"     : info.Phone,
+		"sex"           : info.Sex,
+		"avatar"      : info.Avatar,
 	}
 
-	return nil
-}
-func (us *UserServiceProvider) ChangeAvatar(info ConUsers, userID uint64) error {
-	var con Contact
-
-	changMap := map[string]interface{}{"avatar": info.Avatar}
-
 	db := orm.Conn
+
+	for userInfo, value := range changMap {
+		if value =="" || value == nil {
+			delete(changMap, userInfo)
+		}
+	}
 	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

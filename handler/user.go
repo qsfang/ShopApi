@@ -218,7 +218,7 @@ func ChangeMobilePassword(c echo.Context) error {
 func ChangeUserInfo(c echo.Context) error {
 	var (
 		err error
-		info models.ChangeUseInfo
+		info models.UserInfo
 	)
 
 	if err = c.Bind(&info); err != nil {
@@ -231,7 +231,7 @@ func ChangeUserInfo(c echo.Context) error {
 	userID := session.Get(general.SessionUserID)
 	id := userID.(uint64)
 
-	err = models.UserService.ChangeUserInfo(info, id)
+	err = models.UserService.ChangeUserInfo(&info, id)
 	if err != nil {
 		log.Logger.Error("create crash with error:", err)
 
@@ -265,32 +265,6 @@ func Changephone(c echo.Context) error {
 	err = models.UserService.ChangePhone(user, m.Phone)
 	if err != nil {
 		log.Logger.Error("changephone crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, nil)
-}
-
-func ChangeAvatar(c echo.Context) error {
-	var (
-		err error
-		Ava models.ChangeUseInfo
-	)
-
-	if err = c.Bind(&Ava); err != nil {
-		log.Logger.Error("Create crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID)
-	id := userID.(uint64)
-
-	err = models.UserService.ChangeUserInfo(Ava, id)
-	if err != nil {
-		log.Logger.Error("create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

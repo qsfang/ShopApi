@@ -27,7 +27,10 @@
  *     Initial: 2017/07/21     Zhu Yaqiang
  *     Modify : 2017/07/22     Xu Haosheng    添加购物车
  *     Modify : 2017/07/23     Wang Ke
+<<<<<<< HEAD
+=======
  *     Modify : 2017/07/24     Ma Chao
+>>>>>>> d7f740301763c99e8c71d3ea2692029c7e70637e
  */
 
 package handler
@@ -47,7 +50,7 @@ import (
 func CartsPutIn(c echo.Context) error {
 	var (
 		err   error
-		carts models.Carts
+		carts models.ConCarts
 	)
 
 	if err = c.Bind(&carts); err != nil {
@@ -60,7 +63,7 @@ func CartsPutIn(c echo.Context) error {
 	userID := session.Get(general.SessionUserID)
 	id := userID.(uint64)
 
-	err = models.CartsService.CreateInCarts(carts, id)
+	err = models.CartsService.CreateInCarts(&carts, id)
 	if err != nil {
 		log.Logger.Error("Mysql error in add address:", err)
 

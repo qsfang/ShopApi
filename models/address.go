@@ -101,9 +101,6 @@ type Change struct {
 	Address  *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
 }
 
-type AddressDefault struct {
-	ID uint64
-}
 
 func (Contact) TableName() string {
 	return "contact"
