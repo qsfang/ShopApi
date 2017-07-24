@@ -173,12 +173,10 @@ func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) erro
 
 	change := map[string]interface{}{"status": status}
 	db := orm.Conn
-	err = db.Model(&pro).Where("id = ?", ID).Updates(change).Limit(1).Error
-	if err != nil {
-		return err
-	}
 
-	return nil
+	err = db.Model(&pro).Where("id = ?", ID).Updates(change).Limit(1).Error
+
+	return err
 }
 
 func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
