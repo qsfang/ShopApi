@@ -177,22 +177,22 @@ func (ps *ProductServiceProvider) ChangeProStatus(m ChangePro) error {
 	return nil
 }
 
-// todo: 返回值
-func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*ConProduct, error) {
-	var (
-		err     error
-		ProInfo *Product = &Product{}
-	)
-
-	db := orm.Conn
-
-	err = db.Where("id = ?", ProID).First(&ProInfo).Error
-	if err != nil {
-		ProInfo = nil
-	}
-
-	return ProInfo, err
-}
+//// todo: 返回值
+//func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*ConProduct, error) {
+//	var (
+//		err     error
+//		ProInfo *Product = &Product{}
+//	)
+//
+//	db := orm.Conn
+//
+//	err = db.Where("id = ?", ProID).First(&ProInfo).Error
+//	if err != nil {
+//		ProInfo = nil
+//	}
+//
+//	return ProInfo, err
+//}
 
 func (ps *ProductServiceProvider) ChangeCategories(cate ChangeCate) error {
 	var (

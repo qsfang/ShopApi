@@ -116,62 +116,62 @@ func ChangeProStatus(c echo.Context) error {
 }
 
 // 根据商品ID获取商品信息
-func GetProInfo(c echo.Context) error {
-	var (
-		err     error
-		ProInfo *models.ConProduct
-	)
+//func GetProInfo(c echo.Context) error {
+//	var (
+//		err     error
+//		ProInfo *models.ConProduct
+//	)
+//
+//	if err = c.Bind(&ProInfo); err != nil {
+//		log.Logger.Error("Analysis crash with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+//	}
+//
+//	ProInfo, err = models.ProductService.GetProInfo(ProInfo.ID)
+//
+//	if err != nil {
+//		log.Logger.Error("Get info with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+//	}
+//
+//	return c.JSON(errcode.ErrSucceed, ProInfo)
+//}
 
-	if err = c.Bind(&ProInfo); err != nil {
-		log.Logger.Error("Analysis crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	ProInfo, err = models.ProductService.GetProInfo(ProInfo.ID)
-
-	if err != nil {
-		log.Logger.Error("Get info with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, ProInfo)
-}
-
-func ChangeCategories(c echo.Context) error {
-	var (
-		err error
-		m   models.ChangeCate
-	)
-
-	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("Bind categories change with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	_, err = models.ProductService.GetProInfo(m.ID)
-	if err != nil {
-
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Product not exist", err)
-
-			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
-		}
-
-		log.Logger.Error("Mysql error", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	err = models.ProductService.ChangeCategories(m)
-	if err != nil {
-
-		log.Logger.Error("Categories change with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, nil)
-}
+//func ChangeCategories(c echo.Context) error {
+//	var (
+//		err error
+//		m   models.ChangeCate
+//	)
+//
+//	if err = c.Bind(&m); err != nil {
+//		log.Logger.Error("Bind categories change with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+//	}
+//
+//	_, err = models.ProductService.GetProInfo(m.ID)
+//	if err != nil {
+//
+//		if err == gorm.ErrRecordNotFound {
+//			log.Logger.Error("Product not exist", err)
+//
+//			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+//		}
+//
+//		log.Logger.Error("Mysql error", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+//	}
+//
+//	err = models.ProductService.ChangeCategories(m)
+//	if err != nil {
+//
+//		log.Logger.Error("Categories change with error:", err)
+//
+//		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+//	}
+//
+//	return c.JSON(errcode.ErrSucceed, nil)
+//}
