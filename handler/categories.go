@@ -43,10 +43,6 @@ import (
 	"ShopApi/utility"
 )
 
-type Pid struct {
-	Pid uint64 `json:"pid"`
-}
-
 func CreateCategories(c echo.Context) error {
 	var (
 		err  error
