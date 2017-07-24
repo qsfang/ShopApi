@@ -69,7 +69,6 @@ type ConUsers struct {
 	UserID   uint64    `gorm:"column:id" json:"userid"`
 	OpenID   string    `gorm:"column:openid" json:"openid"`
 	Name     string    `json:"name"`
-	Password string    `json:"password"`
 	Status   uint16    `json:"status"`
 	Type     uint16    `json:"type"`
 	Created  time.Time `json:"created"`
@@ -78,6 +77,8 @@ type ConUsers struct {
 	Email    string    `json:"email"`
 	Phone    string    `json:"phone"`
 	Sex      uint8     `json:"sex"`
+	Password *string   `json:"password" validate:"required,alphanum,min=6,max=30"`
+	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`
 }
 
 type ChangeUseInfo struct {
@@ -86,8 +87,6 @@ type ChangeUseInfo struct {
 	Phone    string `json:"phone"`
 	Sex      uint8  `json:"sex"`
 }
-
-
 
 // todo: 接收者
 func (User) TableName() string {

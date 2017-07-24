@@ -102,7 +102,7 @@ func ChangeProStatus(c echo.Context) error {
 	)
 
 	if err = c.Bind(&pro); err != nil {
-		log.Logger.Error("Change crash with error:", err)
+		log.Logger.Error("Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
