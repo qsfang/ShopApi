@@ -150,7 +150,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 			orders = append(orders, order)
 		}
 
-		return &orders, err
+		return &orders, nil
 	}
 
 	sql := fmt.Sprintf("SELECT * FROM orders WHERE userid = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
@@ -166,7 +166,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 		orders = append(orders, order)
 	}
 
-	return &orders, err
+	return &orders, nil
 }
 
 func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (OrmOrders, error) {
