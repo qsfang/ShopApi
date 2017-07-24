@@ -94,11 +94,6 @@ type GetProList struct {
 	Inventory     uint64
 }
 
-type ChangePro struct {
-	ID     uint64 `json:"id" validate:"numeric"`
-	Status uint64 `json:"status" validate:"numeric"`
-}
-
 func (Product) TableName() string {
 	return "products"
 }
