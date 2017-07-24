@@ -108,12 +108,26 @@ func (Product) TableName() string {
 	return "products"
 }
 
-func (ps *ProductServiceProvider) CreateProduct(pr Product) error {
+func (ps *ProductServiceProvider) CreateProduct(pr *ConProduct) error {
+	pro := Product{
+		Name:			pr.Name,
+		TotalSale:		pr.TotalSale,
+		Category: 		pr.Category,
+		Price:			pr.Price,
+		OriginalPrice:	pr.OriginalPrice,
+		Size: 			pr.Size,
+		Color: 			pr.Color,
+		ImageID:		pr.ImageID,
+		ImageIDs:		pr.ImageIDs,
+		Detail:			pr.Detail,
+		Inventory:		pr.Inventory,
+	}
+
 	pr.Status = general.ProductOnsale
 	pr.Created = time.Now()
 
 	db := orm.Conn
-	err := db.Create(&pr).Error
+	err := db.Create(&pro).Error
 
 	return err
 }

@@ -111,15 +111,14 @@ func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
 	return err
 }
 
-// todo: 返回错误
-func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64, Size string, Color string) error {
+
+func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error {
 	var (
 		cart Carts
 	)
+
 	updater := map[string]interface{}{
 		"count": Count,
-		"size":  Size,
-		"color": Color,
 	}
 
 	db := orm.Conn
