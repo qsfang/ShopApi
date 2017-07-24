@@ -44,7 +44,6 @@ import (
 	"ShopApi/utility"
 )
 
-
 func CartsPutIn(c echo.Context) error {
 	var (
 		err   error
@@ -130,15 +129,15 @@ func AlterCartPro(c echo.Context) error {
 }
 
 func BrowseCart(c echo.Context) error {
-	var(
-		err error
+	var (
+		err    error
 		output []models.Carts
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	output, err= models.CartsService.BrowseCart(userID)
+	output, err = models.CartsService.BrowseCart(userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Find order with error:", err)
