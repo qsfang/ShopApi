@@ -176,11 +176,10 @@ func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) erro
 	return nil
 }
 
-// todo: 返回值
 func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 	var (
 		err     error
-		ProInfo *ConProduct = &ConProduct{}
+		ProInfo *Product = &Product{}
 	)
 
 	db := orm.Conn
