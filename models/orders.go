@@ -178,9 +178,5 @@ func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	db := orm.Conn
 
 	err := db.Model(&cha).Where("id=?", id).Update(updater).Limit(1).Error
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
