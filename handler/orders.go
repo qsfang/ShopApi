@@ -42,6 +42,7 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
+	"fmt"
 )
 
 type ChangStatus struct {
@@ -126,7 +127,7 @@ func GetOrders(c echo.Context) error {
 func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
-		order  *models.OrmOrders
+		order  models.Order
 		OutPut *models.OrmOrders
 	)
 
@@ -136,10 +137,11 @@ func GetOneOrder(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	UserID := session.Get(general.SessionUserID).(uint64)
+	fmt.Println("2222222222222222", order)
+//	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+//	UserID := session.Get(general.SessionUserID).(uint64)
 
-	OutPut, err = models.OrderService.GetOneOrder(order.ID, UserID)
+	OutPut, err = models.OrderService.GetOneOrder(order.ID)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

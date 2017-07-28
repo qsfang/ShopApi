@@ -30,7 +30,7 @@
 package errcode
 
 const (
-	ErrInformation         = 0x4
+	ErrInformation         = 0xf
 	ErrSucceed             = 0x0
 	ErrInvalidParams       = 0x1
 	ErrMysql               = 0x2

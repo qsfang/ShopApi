@@ -49,7 +49,7 @@ const (
 	Default   = 1
 	Undefault = 0
 
-	
+
 	//Products Status
 	ProductOnsale = 0xe0 // 224
 	ProductUnsale = 0xe1 // 225

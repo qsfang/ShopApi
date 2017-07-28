@@ -48,13 +48,15 @@ type Carts struct {
 	ID        uint64    `sql:"primary_key;" gorm:"column:id" json:"id"`
 	ProductID uint64    `gorm:"column:productid" json:"productid"`
 	Name      string    `json:"name"`
-	Count     uint64    `json:"count"`
+	Count     uint64    `json:"count"validate:"required,numeric"`
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
 	Status    uint8     `json:"status"`
 	Created   time.Time `json:"created"`
+	OrderID  uint64     `json:"orderid"validate:"required,numeric"`
+	PayStatus uint8     `json:"paystatus"`
 }
 
 type ConCarts struct {
@@ -68,6 +70,10 @@ type ConCarts struct {
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid" validate:"numeric"`
 	Status    uint8     `json:"status" validate:"required, numeric, max = 1"`
 	Created   time.Time `json:"created"`
+}
+
+func (Carts)  TableName() string {
+	return "cart"
 }
 
 func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) error {

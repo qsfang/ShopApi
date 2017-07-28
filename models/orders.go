@@ -32,11 +32,11 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"ShopApi/general"
 	"ShopApi/orm"
-	"fmt"
 )
 
 type OrderServiceProvider struct {
@@ -44,7 +44,6 @@ type OrderServiceProvider struct {
 
 var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 
-// todo：参数检查 结构
 type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
@@ -60,21 +59,38 @@ type Orders struct {
 	PayWay     uint8     `gorm:"column:payway"json:"payway"`
 }
 
+type Order struct {
+	ID         uint64    `json:"id" validate:"required,numeric"`
+	UserID     uint64    `json:"userid" validate:"required,numeric"`
+	AddressID  uint64    `json:"addressid" validate:"required,numeric"`
+	TotalPrice float64   `json:"totalprice" validate:"required,numeric"`
+	Freight    float64   `json:"freight" validate:"required,numeric"`
+	Remark     string    `json:"remark"`
+	Status     uint8     `json:"status"`
+	Created    time.Time `json:"created"`
+	Updated    time.Time `json:"updated"`
+	PayWay     uint8     `json:"payway"`
+}
+
 type OrmOrders struct {
 	ID         uint64    `json:"id" validate:"required,numeric"`
 	UserID     uint64    `json:"userid" validate:"required,numeric"`
 	TotalPrice float64   `json:"totalprice" validate:"required,numeric"`
 	Payment    float64   `json:"payment" validate:"required,numeric"`
 	Freight    float64   `json:"freight" validate:"required,numeric"`
-	Remark     string    `json:"remark" validate:"alphanum"`
 	Discount   uint8     `json:"discount" validate:"numeric"`
+	Name       string    `json:"name"validate:"required, alphaunicode, min = 2, max = 18"`
 	Size       string    `json:"size" validate:"required,alphanum"`
+	Count      uint64    `json:"count"validate:"required,numeric"`
 	Color      string    `json:"color" validate:"required,alphanum"`
 	Status     uint8     `json:"status" validate:"required,numeric"`
-	Created    time.Time `json:"created"`
 	PayWay     uint8     `json:"payway" validate:"required,numeric"`
 	Page       uint64    `json:"page" validate:"required,numeric"`
 	PageSize   uint64    `json:"pagesize" validate:"required,numeric"`
+	AddressID  uint64    `json:"id" validate:"required,numeric"`
+	ImageID    uint64    `gorm:"column:imageid"json:"imageid"`
+	Created    time.Time `json:"created"`
+	Updated    time.Time `json:"updated"`
 }
 
 type RegisterOrder struct {
@@ -86,14 +102,13 @@ type RegisterOrder struct {
 	Discount   uint8   `json:"discount"`
 	Size       string  `json:"size"`
 	Color      string  `json:"color"`
-	Payway     uint8   `json:"payway"`
+	PayWay     uint8   `json:"payway"`
 }
 
-func (Orders) TableName() string {
-	return "orders"
+func (Order) TableName() string {
+	return "order"
 }
 
-// todo：命名
 func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) error {
 	var (
 		pro Product
@@ -117,7 +132,7 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) e
 		Color:      o.Color,
 		Status:     general.OrderFinished,
 		Created:    time.Now(),
-		PayWay:     o.Payway,
+		PayWay:     o.PayWay,
 	}
 
 	err = db.Create(&order).Error
@@ -169,32 +184,45 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 	return &orders, nil
 }
 
-
-func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (*OrmOrders, error) {
+func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) (*OrmOrders, error) {
 	var (
 		err      error
-		order    Orders
-		getOrder *OrmOrders = &OrmOrders{}
+		order    Order
+		carts    Cart
+		getOrder OrmOrders
 	)
 
-	db := orm.Conn
-	err = db.Where("userid = ? AND id = ?", UserID, ID).Find(&order).Error
+	db1 := orm.Conn
+	err = db1.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
 	if err != nil {
-		return getOrder, err
+		return &getOrder, err
 	}
 
-	*getOrder = OrmOrders{
+	getOrder = OrmOrders{
 		TotalPrice: order.TotalPrice,
-		Payment:    order.Payment,
 		Freight:    order.Freight,
-		Discount:   order.Discount,
-		Size:       order.Size,
-		Color:      order.Color,
 		Status:     order.Status,
 		Created:    order.Created,
+		PayWay:     order.PayWay,
+		Updated:    order.Updated,
+		AddressID:  order.AddressID,
 	}
 
-	return getOrder, nil
+	db2 := orm.Conn
+	err = db2.Where("orderid = ?", order.ID).First(&carts).Error
+	if err != nil {
+		return &getOrder, err
+	}
+
+	getOrder = OrmOrders{
+		Name:    carts.Name,
+		Count:   carts.Count,
+		Size:    carts.Size,
+		Color:   carts.Color,
+		ImageID: carts.ImageID,
+	}
+
+	return &getOrder, nil
 }
 
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {

@@ -46,7 +46,7 @@ var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 
 type Product struct {
 	ID            uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
-	Name          string    `json:"name"`
+	Name          string    `json:"name"validate:"required, alphaunicode, min = 2, max = 18"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale"`
 	Category      uint64    `json:"categories"`
 	Price         float64   `json:"price"`
