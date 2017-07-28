@@ -44,7 +44,7 @@ type CartsServiceProvider struct {
 
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 
-type Carts struct {
+type Cart struct {
 	ID        uint64    `sql:"primary_key;" gorm:"column:id" json:"id"`
 	ProductID uint64    `gorm:"column:productid" json:"productid"`
 	OrderID   uint64    `gorm:"column:orderid" json:"orderid"`
@@ -72,8 +72,13 @@ type ConCarts struct {
 	Created   time.Time `json:"created"`
 }
 
+func(Cart) TableName() string {
+	return "cart"
+}
+
+
 func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) error {
-	cartsPutIn := Carts{
+	cartsPutIn := Cart{
 		UserID:    userID,
 		ProductID: carts.ProductID,
 		Name:      carts.Name,
@@ -93,7 +98,7 @@ func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) er
 // 状态0表示商品在购物车，状态1表示商品不在购物车
 func (cs *CartsServiceProvider) CartsDelete(UserID uint64, ProductID uint64, Color *string, Size *string) error {
 	var (
-		cart Carts
+		cart Cart
 		err  error
 	)
 
@@ -105,7 +110,7 @@ func (cs *CartsServiceProvider) CartsDelete(UserID uint64, ProductID uint64, Col
 
 func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error {
 	var (
-		cart Carts
+		cart Cart
 	)
 
 	updater := map[string]interface{}{"count": Count, }
@@ -119,7 +124,7 @@ func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error
 func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
 	var (
 		err         error
-		carts       []Carts
+		carts       []Cart
 		browse      []ConCarts
 	)
 
