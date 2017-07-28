@@ -81,7 +81,11 @@ func Cartsdel(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.CartsDelete(cart.ID, cart.ProductID)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID)
+	id := userID.(uint64)					
+
+	err = models.CartsService.CartsDelete(id, cart.ProductID, &cart.Color, &cart.Size)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("This product doesn't exist !", err)

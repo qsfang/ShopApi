@@ -91,14 +91,14 @@ func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) er
 }
 
 // 状态0表示商品在购物车，状态1表示商品不在购物车
-func (cs *CartsServiceProvider) CartsDelete(ID uint64, ProID uint64) error {
+func (cs *CartsServiceProvider) CartsDelete(UserID uint64, ProductID uint64, Color *string, Size *string) error {
 	var (
 		cart Carts
 		err  error
 	)
 
 	db := orm.Conn
-	err = db.Model(&cart).Where("id = ? AND productid = ?", ID, ProID).Update("status", general.ProductNotInCart).Limit(1).Error
+	err = db.Model(&cart).Where("userid = ? AND productid = ? AND color = ? AND size = ?", UserID, ProductID, Color, Size).Update("status", general.ProductNotInCart).Limit(1).Error
 
 	return err
 }
