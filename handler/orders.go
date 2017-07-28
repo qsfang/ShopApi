@@ -51,7 +51,7 @@ type ChangStatus struct {
 
 func CreateOrder(c echo.Context) error {
 	var (
-		order models.RegisterOrder
+		order models.OrmOrders
 		err   error
 	)
 
@@ -61,13 +61,13 @@ func CreateOrder(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	numberID := sess.Get(general.SessionUserID).(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	numberID := session.Get(general.SessionUserID).(uint64)
 
 	err = models.OrderService.CreateOrder(numberID, order)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Product not found:", err)
+			log.Logger.Error("Carts not found:", err)
 
 			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 		}
