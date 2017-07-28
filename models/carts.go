@@ -47,13 +47,15 @@ var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 type Carts struct {
 	ID        uint64    `sql:"primary_key;" gorm:"column:id" json:"id"`
 	ProductID uint64    `gorm:"column:productid" json:"productid"`
+	OrderID   uint64    `gorm:"column:orderid" json:"orderid"`
 	Name      string    `json:"name"`
 	Count     uint64    `json:"count"`
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
-	ImageID   uint64    `gorm:"column:imageid"json:"imageid"`
+	ImageID   uint64    `gorm:"column:imageid" json:"imageid"`
 	Status    uint8     `json:"status"`
+	PayStatus uint8     `gorm:"column:paystatus" json:"paystatus"`
 	Created   time.Time `json:"created"`
 }
 
