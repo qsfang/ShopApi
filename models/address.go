@@ -37,12 +37,12 @@ import (
 	"ShopApi/orm"
 )
 
-type ContactServiceProvider struct {
+type AddressServiceProvider struct {
 }
 
-var ContactService *ContactServiceProvider = &ContactServiceProvider{}
+var AddressService *AddressServiceProvider = &AddressServiceProvider{}
 
-type Contact struct {
+type Address struct {
 	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Name      string    `json:"name"`
@@ -52,14 +52,13 @@ type Contact struct {
 	Street    string    `json:"street"`
 	Address   string    `json:"address"`
 	Created   time.Time `json:"created"`
+	Updated   time.Time `json:"updated"`
 	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault" `
-	Page       uint64    `json:"page" validate:"required,numeric"`
-	PageSize   uint64    `json:"pagesize" validate:"required,numeric"`
 }
 
-type OrmContact struct {
+type OrmAddress struct {
 	ID        uint64    `json:"id" validate:"required,numeric"`
-	UserID    uint64    `gorm:"column:userid" json:"userid"`
+	UserID    uint64    `json:"userid"`
 	Name      string    `json:"name" validate:"required,alphanum,min=6,max=100"`
 	Phone     string    `json:"phone" validate:"required,numeric,min=6,max=20"`
 	Province  string    `json:"province" validate:"required,alphanum,min=6,max=100"`
@@ -67,9 +66,10 @@ type OrmContact struct {
 	Street    string    `json:"street" validate:"required,alphanum,min=6,max=100"`
 	Address   string    `json:"address" validate:"required,alphanum,min=6,max=200"`
 	Created   time.Time `json:"created"`
+	Updated   time.Time `json:"updated"`
 	IsDefault uint8     `json:"isdefault" validate:"required,numeric"`
-	Page       uint64    `json:"page" validate:"required,numeric"`
-	PageSize   uint64    `json:"pagesize" validate:"required,numeric"`
+	Page      uint64    `json:"page" validate:"required,numeric"`
+	PageSize  uint64    `json:"pagesize" validate:"required,numeric"`
 }
 
 type AddressGet struct {
@@ -89,64 +89,71 @@ type ChangeAddress struct {
 	Address  *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
 }
 
-func (Contact) TableName() string {
-	return "contact"
+func (Address) TableName() string {
+	return "address"
 }
 
-func (csp *ContactServiceProvider) AddAddress(ormContact *OrmContact) error {
-	ormContact.Created = time.Now()
+func (csp *AddressServiceProvider) AddAddress(ormAddress *OrmAddress) error {
+	var (
+		err     error
+		address *Address
+	)
 
-	contact := &Contact{
-		UserID:    ormContact.UserID,
-		Name:      ormContact.Name,
-		Phone:     ormContact.Phone,
-		Province:  ormContact.Province,
-		City:      ormContact.City,
-		Street:    ormContact.Street,
-		Address:   ormContact.Address,
+	address = &Address{
+		UserID:    ormAddress.UserID,
+		Name:      ormAddress.Name,
+		Phone:     ormAddress.Phone,
+		Province:  ormAddress.Province,
+		City:      ormAddress.City,
+		Street:    ormAddress.Street,
+		Address:   ormAddress.Address,
 		Created:   time.Now(),
-		IsDefault: ormContact.IsDefault,
+		Updated:   time.Now(),
+		IsDefault: ormAddress.IsDefault,
 	}
 
 	db := orm.Conn
 
-	return db.Create(contact).Error
+	tx := db.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	return tx.Create(address).Error
 }
 
-func (csp *ContactServiceProvider) ChangeAddress(addr OrmContact) error {
+func (csp *AddressServiceProvider) ChangeAddress(OrmAddress OrmAddress) error {
 	var (
-		con Contact
+		address Address
 	)
 
 	changeMap := map[string]interface{}{
-		"name":     addr.Name,
-		"phone":    addr.Phone,
-		"province": addr.Province,
-		"city":     addr.City,
-		"street":   addr.Street,
-		"address":  addr.Address,
+		"name":     OrmAddress.Name,
+		"phone":    OrmAddress.Phone,
+		"province": OrmAddress.Province,
+		"city":     OrmAddress.City,
+		"street":   OrmAddress.Street,
+		"address":  OrmAddress.Address,
 	}
 
-	db := orm.Conn
-	err := db.Model(&con).Where("id = ?", addr.ID).Update(changeMap).Limit(1).Error
-
-	return err
+	return orm.Conn.Model(&address).Where("id = ?", OrmAddress.ID).Update(changeMap).Limit(1).Error
 }
 
-func (csp *ContactServiceProvider) FindAddressId(ID uint64) error {
+func (csp *AddressServiceProvider) FindAddressByAddressID(ID uint64) error {
 	var (
-		con Contact
+		address Address
 	)
 
-	db := orm.Conn
-	err := db.Where("id = ?", ID).First(&con).Error
-
-	return err
+	return orm.Conn.Where("id = ?", ID).First(&address).Error
 }
 
-func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64, pageStart, pageEnd uint64) ([]AddressGet, error) {
+func (csp *AddressServiceProvider) GetAddressByUerID(userId uint64, pageStart, pageEnd uint64) ([]AddressGet, error) {
 	var (
-		list   Contact
+		list   Address
 		getAdd []AddressGet
 	)
 
@@ -155,6 +162,7 @@ func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64, pageStart, p
 	if err != nil {
 		return getAdd, err
 	}
+
 	sql := "SELECT * FROM contact WHERE userid = ? LIMIT ?, ? LOCK IN SHARE MODE"
 
 	rows, err := db.Raw(sql, userId, pageStart, pageEnd).Rows()
@@ -165,29 +173,29 @@ func (csp *ContactServiceProvider) GetAddressByUerId(userId uint64, pageStart, p
 
 	for rows.Next() {
 		db.ScanRows(rows, &list)
-			add := AddressGet{
-				Province: list.Province,
-				City:     list.City,
-				Street:   list.Street,
-				Address:  list.Address,
-			}
-			getAdd = append(getAdd, add)
+		add := AddressGet{
+			Province: list.Province,
+			City:     list.City,
+			Street:   list.Street,
+			Address:  list.Address,
 		}
+		getAdd = append(getAdd, add)
+	}
 
 	return getAdd, nil
 }
 
-func (csp *ContactServiceProvider) AlterDefault(id uint64) error {
+func (csp *AddressServiceProvider) AlterDefault(id uint64) error {
 	var (
-		s   Contact
-		con Contact
+		s   Address
+		con Address
 	)
 	db := orm.Conn
 	err := db.Where("id=?", id).Find(&s).Error
 
-	updater := map[string]interface{}{"isdefault": s.IsDefault^1}
+	updater := map[string]interface{}{"isdefault": s.IsDefault ^ 1}
 
 	err = db.Model(&con).Where("id=?", id).Update(updater).Limit(1).Error
 
-		return err
+	return err
 }

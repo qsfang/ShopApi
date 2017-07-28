@@ -165,7 +165,7 @@ func GetInfo(c echo.Context) error {
 
 func ChangeMobilePassword(c echo.Context) error {
 	var (
-		password     models.ConUsers
+		password     models.OrmUser
 		userId       uint64
 		err          error
 		userPassword string
@@ -187,13 +187,13 @@ func ChangeMobilePassword(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 	}
 
-	if !utility.CompareHash([]byte(userPassword), *password.Pass) {
+	if !utility.CompareHash([]byte(userPassword), *password.Password) {
 		log.Logger.Debug("Password doesn't match:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysqlfound, errors.New("Password doesn't match").Error())
 	}
 
-	if *password.Pass == *password.NewPass {
+	if *password.Password == *password.NewPass {
 		log.Logger.Error("The new password is the same as the old password:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInput, errors.New("The new password is the same as the old password").Error())
