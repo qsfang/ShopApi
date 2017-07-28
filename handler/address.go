@@ -27,6 +27,7 @@
  *     Initial: 2017/07/19       Li Zebang
  *     Modify : 2017/07/20       Yu Yi
  *     Modify : 2017/07/20       Yang Zhengtian
+ *     Modify : 2017/07/27       Li Zebang
  */
 
 package handler
@@ -44,22 +45,28 @@ import (
 
 func AddAddress(c echo.Context) error {
 	var (
-		err     error
-		contact models.OrmContact
+		err       error
+		ormAdress models.OrmAddress
 	)
 
-	if err = c.Bind(&contact); err != nil {
-		log.Logger.Error("Bind with error:", err)
+	if err = c.Bind(&ormAdress); err != nil {
+		log.Logger.Error("[ERROR] AddAddress Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
+	}
+
+	if err = c.Validate(ormAdress); err != nil {
+		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	contact.UserID = session.Get(general.SessionUserID).(uint64)
+	ormAdress.UserID = session.Get(general.SessionUserID).(uint64)
 
-	err = models.ContactService.AddAddress(&contact)
+	err = models.AddressService.AddAddress(&ormAdress)
 	if err != nil {
-		log.Logger.Error("Mysql error in add address:", err)
+		log.Logger.Error("[ERROR] AddAddress AddAddress:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -69,33 +76,38 @@ func AddAddress(c echo.Context) error {
 
 func ChangeAddress(c echo.Context) error {
 	var (
-		err  error
-		addr models.OrmContact
+		err       error
+		ormAdress models.OrmAddress
 	)
 
-	if err = c.Bind(&addr); err != nil {
-		log.Logger.Error("Bind change with error:", err)
+	if err = c.Bind(&ormAdress); err != nil {
+		log.Logger.Error("[ERROR] ChangeAddress Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
+	}
+
+	if err = c.Validate(ormAdress); err != nil {
+		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ContactService.FindAddressId(addr.ID)
+	err = models.AddressService.FindAddressByAddressID(ormAdress.ID)
 	if err != nil {
-
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Address id not find", err)
+			log.Logger.Error("[ERROR] ChangeAddress FindAddressByAddressID: Not Found", err)
 
 			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 		}
 
-		log.Logger.Error("Mysql error", err)
+		log.Logger.Error("[ERROR] ChangeAddress FindAddressByAddressID: MySQL ERROR", err)
 
-		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	err = models.ContactService.ChangeAddress(addr)
+	err = models.AddressService.ChangeAddress(ormAdress)
 	if err != nil {
-		log.Logger.Error("Change address with error:", err)
+		log.Logger.Error("[ERROR] ChangeAddress ChangeAddress:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -105,14 +117,20 @@ func ChangeAddress(c echo.Context) error {
 
 func GetAddress(c echo.Context) error {
 	var (
-		err   	 error
-		userId   uint64
-		address  models.OrmContact
-		list     []models.AddressGet
+		err       error
+		userId    uint64
+		ormAdress models.OrmAddress
+		list      []models.AddressGet
 	)
 
-	if err = c.Bind(&address); err != nil {
-		log.Logger.Error("Bind with error:", err)
+	if err = c.Bind(&ormAdress); err != nil {
+		log.Logger.Error("[ERROR] GetAddress Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
+	}
+
+	if err = c.Validate(ormAdress); err != nil {
+		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -121,8 +139,8 @@ func GetAddress(c echo.Context) error {
 	s := session.Get(general.SessionUserID)
 	userId = s.(uint64)
 
-	pageStart, pageEnd := utility.Paging(address.Page, address.PageSize)
-	list, err = models.ContactService.GetAddressByUerId(userId, pageStart, pageEnd)
+	pageStart, pageEnd := utility.Paging(ormAdress.Page, ormAdress.PageSize)
+	list, err = models.AddressService.GetAddressByUerID(userId, pageStart, pageEnd)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("Id not find:", err)
@@ -137,19 +155,19 @@ func GetAddress(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, list)
 }
 
-func Alter(c echo.Context) error {
+func AlterDefault(c echo.Context) error {
 	var (
 		err error
-		m   models.Contact
+		m   models.OrmAddress
 	)
 
 	if err = c.Bind(&m); err != nil {
 		log.Logger.Error("Bind with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
 	}
 
-	err = models.ContactService.AlterDefault(m.ID)
+	err = models.AddressService.AlterDefault(m.ID)
 	if err != nil {
 		log.Logger.Error("Alter Default with error:", err)
 
