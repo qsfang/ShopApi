@@ -47,12 +47,11 @@ var UserService *UserServiceProvider = &UserServiceProvider{}
 
 type User struct {
 	UserID   uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"userid"`
-	OpenID   string    `gorm:"column:openid" json:"openid"`
 	Name     string    `json:"name"`
 	Password string    `json:"password"`
 	Status   uint16    `json:"status"`
-	Type     uint16    `json:"type"`
 	Created  time.Time `json:"created"`
+	Updated  time.Time `json:"updated"`
 }
 
 type UserInfo struct {
@@ -65,24 +64,22 @@ type UserInfo struct {
 }
 
 //todo：连接前端
-type ConUsers struct {
+type OrmUser struct {
 	UserID   uint64    `gorm:"column:id" json:"userid"`
-	OpenID   string    `gorm:"column:openid" json:"openid"`
 	Name     string    `json:"name"`
 	Status   uint16    `json:"status"`
-	Type     uint16    `json:"type"`
 	Created  time.Time `json:"created"`
 	Avatar   string    `json:"avatar"`
 	Nickname string    `json:"nickname"`
 	Email    string    `json:"email"`
 	Phone    string    `json:"phone"`
 	Sex      uint8     `json:"sex"`
-	Pass    *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-	NewPass *string `json:"newpass" validate:"required,alphanum,min=6,max=30"`
+	Password *string   `json:"password" validate:"required,alphanum,min=6,max=30"`
+	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`
 }
 
 func (User) TableName() string {
-	return "users"
+	return "user"
 }
 
 func (UserInfo) TableName() string {
@@ -99,8 +96,8 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 		Name:     *name,
 		Password: string(hashedPass),
 		Status:   general.UserActive,
-		Type:     general.PhoneUser,
 		Created:  time.Now(),
+		Updated:  time.Now(),
 	}
 
 	db := orm.Conn
@@ -179,7 +176,7 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
 func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 	var (
 		err error
-		con Contact
+		con Address
 	)
 
 	change := map[string]interface{}{"phone": Phone}
@@ -187,7 +184,7 @@ func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 	db := orm.Conn
 	err = db.Model(&con).Where("id=?", UserID).Update(change).Limit(1).Error
 
-		return err
+	return err
 }
 
 func (us *UserServiceProvider) GetUerPassword(id uint64) (string, error) {
@@ -222,22 +219,22 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 
 func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) error {
 	var (
-		con Contact
+		con Address
 		nil uint8 = 0
 	)
 
 	changMap := map[string]interface{}{
 		"nickname": info.Nickname,
-		"email"       : info.Email,
-		"phone"     : info.Phone,
-		"sex"           : info.Sex,
-		"avatar"      : info.Avatar,
+		"email":    info.Email,
+		"phone":    info.Phone,
+		"sex":      info.Sex,
+		"avatar":   info.Avatar,
 	}
 
 	db := orm.Conn
 
 	for userInfo, value := range changMap {
-		if value =="" || value == nil {
+		if value == "" || value == nil {
 			delete(changMap, userInfo)
 		}
 	}

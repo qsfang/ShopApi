@@ -46,6 +46,7 @@ const (
 	ErrAccess              = 0xb
 	ErrInvalidPhone        = 0xc
 	ErrInput		 =0xd
+	ErrBind = 0xe
 
 	// 需要登录
 	ErrLoginRequired    = 0x800
