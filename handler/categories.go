@@ -46,7 +46,7 @@ import (
 func CreateCategories(c echo.Context) error {
 	var (
 		err  error
-		cate models.CreateCat
+		cate models.OrmCategories
 	)
 
 	if err = c.Bind(&cate); err != nil {

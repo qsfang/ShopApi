@@ -86,7 +86,9 @@ func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) er
 		Color:     carts.Color,
 		ImageID:   carts.ImageID,
 		Created:   time.Now(),
+		Status:    general.ProInCart,
 	}
+
 
 	db := orm.Conn
 	err := db.Create(&cartsPutIn).Error

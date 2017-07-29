@@ -110,7 +110,7 @@ func ChangeProStatus(c echo.Context) error {
 	}
 
 	if pro.Status != general.ProductOnsale && pro.Status != general.ProductUnsale {
-		err = errors.New("Status unExistence")
+		err = errors.New("Product Status UnExisted")
 		log.Logger.Error("status transformed with error :",err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())

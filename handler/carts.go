@@ -33,6 +33,8 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
@@ -41,14 +43,12 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-	"fmt"
 )
 
 func CartsPutIn(c echo.Context) error {
 	var (
-		err   error
-		carts models.ConCarts
-
+		err     error
+		carts   models.ConCarts
 		ProInfo *models.Product
 	)
 
@@ -70,10 +70,9 @@ func CartsPutIn(c echo.Context) error {
 	carts.ImageID = ProInfo.ImageID
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID)
-	id := userID.(uint64)
+	userID := session.Get(general.SessionUserID).(uint64)
 
-	err = models.CartsService.CreateInCarts(&carts, id)
+	err = models.CartsService.CreateInCarts(&carts, userID)
 	if err != nil {
 		log.Logger.Error("Mysql error in add address:", err)
 
@@ -117,17 +116,24 @@ func Cartsdel(c echo.Context) error {
 
 func AlterCartPro(c echo.Context) error {
 	var (
-		err     error
-		cartpro models.Cart
+		err         error
+		cartProduct models.Cart
 	)
 
-	if err = c.Bind(&cartpro); err != nil {
+	if err = c.Bind(&cartProduct); err != nil {
 		log.Logger.Error("Get crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count,cartpro.PayStatus)
+	if cartProduct.PayStatus != general.PayFinished && cartProduct.PayStatus != general.PayUnfinished {
+		err = errors.New("Pay Status unExistence")
+		log.Logger.Error("status transformed with error :", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.CartsService.AlterCartPro(cartProduct.ID, cartProduct.Count, cartProduct.PayStatus)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
