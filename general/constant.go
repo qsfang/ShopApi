@@ -71,4 +71,8 @@ const (
 	//Pay status
 	PayFinished =  0xec//235
 	PayUnfinished = 0xed//236
+
+	OrderPaid       = 0xf1 // 241
+	OrderUnpaid     = 0xf2 // 240
+
 )

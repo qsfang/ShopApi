@@ -57,9 +57,7 @@ func CartsPutIn(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	ProInfo.ID = carts.ProductID
-
-	ProInfo, err = models.ProductService.GetProInfo(ProInfo.ID)
+	ProInfo, err = models.ProductService.GetProInfo(carts.ProductID)
 
 	if err != nil {
 		log.Logger.Error("Get info with error:", err)
