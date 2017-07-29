@@ -164,7 +164,7 @@ func GetInfo(c echo.Context) error {
 
 func ChangeMobilePassword(c echo.Context) error {
 	var (
-		password     models.OrmUser
+		password     models.Password
 		userId       uint64
 		err          error
 		userPassword string
@@ -172,6 +172,12 @@ func ChangeMobilePassword(c echo.Context) error {
 
 	if err = c.Bind(&password); err != nil {
 		log.Logger.Error("analysis crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(password); err != nil {
+		log.Logger.Error("[ERROR] Password Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
