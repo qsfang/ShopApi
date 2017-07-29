@@ -47,8 +47,8 @@ import (
 
 func CreateProduct(c echo.Context) error {
 	var (
-		err error
-		product   models.ConProduct
+		err       error
+		product   models.CreateProduct
 	)
 
 	if err = c.Bind(&product); err != nil {
@@ -107,11 +107,17 @@ func GetProductList(c echo.Context) error {
 func ChangeProStatus(c echo.Context) error {
 	var (
 		err error
-		pro models.ConProduct
+		pro models.ChangeProStatus
 	)
 
 	if err = c.Bind(&pro); err != nil {
-		log.Logger.Error("[ERROR] ChangeProStatus Bind:", err)
+		log.Logger.Error("[ERROR] Change Product Status Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(pro); err != nil {
+		log.Logger.Error("[ERROR] Product Status Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -123,7 +129,7 @@ func ChangeProStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.ChangeProStatus(pro.ID, pro.Status)
+	err = models.ProductService.ChangeProStatus(&pro)
 	if err != nil {
 		log.Logger.Error("[ERROR] status transformed with error:", err)
 
@@ -160,27 +166,19 @@ func GetProInfo(c echo.Context) error {
 func ChangeCategories(c echo.Context) error {
 	var (
 		err error
-		m   *models.ConProduct
+		m   *models.ChangeCategories
 	)
 
 	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("[ERROR]ChangeCategories Bind with error:", err)
+		log.Logger.Error("[ERROR] ChangeCategories Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	_, err = models.ProductService.GetProInfo(m.ID)
-	if err != nil {
+	if err = c.Validate(m); err != nil {
+		log.Logger.Error("[ERROR] Categories Validate:", err)
 
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] Product not exist", err)
-
-			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
-		}
-
-		log.Logger.Error("[ERROR] Mysql error", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	err = models.ProductService.ChangeCategories(m)

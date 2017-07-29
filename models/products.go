@@ -47,7 +47,7 @@ var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 
 type Product struct {
 	ID            uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
-	Name          string    `json:"name"validate:"required, alphaunicode, min = 2, max = 18"`
+	Name          string    `json:"name"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale"`
 	Category      uint64    `json:"categories"`
 	Price         float64   `json:"price"`
@@ -62,6 +62,37 @@ type Product struct {
 	Created       time.Time `json:"created"`
 	Inventory     uint64    `json:"inventory"`
 }
+
+type CreateProduct struct {
+	ID            uint64    `json:"id"`
+	Name          string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
+	TotalSale     uint64    `json:"totalsale"`
+	Category      uint64    `json:"categories"`
+	Price         float64   `json:"price"`
+	OriginalPrice float64   `json:"originalprice"`
+	Status        uint64    `json:"status"`
+	Size          string    `json:"size"`
+	Color         string    `json:"color"`
+	ImageID       uint64    `json:"imageid" validate:"numeric"`
+	ImageIDs      string    `json:"imageids"`
+	Remark        string    `json:"remark"`
+	Detail        string    `json:"detail"`
+	Created       time.Time `json:"created"`
+	Inventory     uint64    `json:"inventory"`
+	Page          uint64    `json:"page"`
+	PageSize      uint64    `json:"pagesize"`
+}
+
+type ChangeProStatus struct {
+	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
+	Status        uint64    `json:"status" validate:"numeric"`
+}
+
+type ChangeCategories struct {
+	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
+	Category      uint64    `json:"categories" validate:"numeric"`
+}
+
 
 type ConProduct struct {
 	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
@@ -88,42 +119,29 @@ func (Product) TableName() string {
 	return "products"
 }
 
-func (ps *ProductServiceProvider) CreateProduct(pr *ConProduct) error {
+func (ps *ProductServiceProvider) CreateProduct(pr *CreateProduct) error {
 	var (
 		err error
 		pro Product
 	)
 	pro = Product{
-		Name:			pr.Name,
-		TotalSale:		pr.TotalSale,
-		Category: 		pr.Category,
-		Price:			pr.Price,
-		OriginalPrice:	pr.OriginalPrice,
-		Size: 			pr.Size,
-		Color: 			pr.Color,
-		ImageID:		pr.ImageID,
-		ImageIDs:		pr.ImageIDs,
-		Detail:			pr.Detail,
-		Inventory:		pr.Inventory,
-		Status:         general.ProductOnsale,
-		Created:        time.Now(),
+		Name:          pr.Name,
+		TotalSale:     pr.TotalSale,
+		Category:      pr.Category,
+		Price:         pr.Price,
+		OriginalPrice: pr.OriginalPrice,
+		Size:          pr.Size,
+		Color:         pr.Color,
+		ImageID:       pr.ImageID,
+		ImageIDs:      pr.ImageIDs,
+		Detail:        pr.Detail,
+		Inventory:     pr.Inventory,
+		Status:        general.ProductOnsale,
+		Created:       time.Now(),
 	}
 
 	db := orm.Conn
-
-	tx := db.Begin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback().Error
-		} else {
-			err = tx.Commit().Error
-		}
-	}()
-
-	err = tx.Create(&pro).Error
-	if err != nil {
-		return err
-	}
+	err = db.Create(pro).Error
 
 	return err
 }
@@ -162,17 +180,16 @@ func (ps *ProductServiceProvider) GetProduct(cate, pageStart, pageEnd uint64) (*
 	return &s, nil
 }
 
-
-func (ps *ProductServiceProvider) ChangeProStatus(ID uint64, status uint64) error {
+func (ps *ProductServiceProvider) ChangeProStatus(sta *ChangeProStatus) error {
 	var (
-		pro ConProduct
+		pro Product
 		err error
 	)
 
-	change := map[string]interface{}{"status": status}
+	change := map[string]interface{}{"status": sta.Status}
 	db := orm.Conn
 
-	err = db.Model(&pro).Where("id = ?", ID).Updates(change).Limit(1).Error
+	err = db.Model(&pro).Where("id = ?", sta.ID).Updates(change).Limit(1).Error
 
 	return err
 }
@@ -193,7 +210,7 @@ func (ps *ProductServiceProvider) GetProInfo(ProID uint64) (*Product, error) {
 	return ProInfo, nil
 }
 
-func (ps *ProductServiceProvider) ChangeCategories(cate *ConProduct) error {
+func (ps *ProductServiceProvider) ChangeCategories(cate *ChangeCategories) error {
 	var (
 		pro Product
 	)
