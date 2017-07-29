@@ -164,14 +164,20 @@ func GetInfo(c echo.Context) error {
 
 func ChangeMobilePassword(c echo.Context) error {
 	var (
-		password     models.OrmUser
+		password     models.Password
 		userId       uint64
 		err          error
 		userPassword string
 	)
 
 	if err = c.Bind(&password); err != nil {
-		log.Logger.Error("analysis crash with error:", err)
+		log.Logger.Error("[ERROR] Analysis crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(password); err != nil {
+		log.Logger.Error("[ERROR] Password Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -181,26 +187,26 @@ func ChangeMobilePassword(c echo.Context) error {
 
 	userPassword, err = models.UserService.GetUserPassword(userId)
 	if err != nil {
-		log.Logger.Error("User not found:", err)
+		log.Logger.Error("[ERROR] User not found:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 	}
 
 	if !utility.CompareHash([]byte(userPassword), *password.Password) {
-		log.Logger.Debug("Password doesn't match:", err)
+		log.Logger.Debug("[ERROR] Password doesn't match:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysqlfound, errors.New("Password doesn't match").Error())
 	}
 
 	if *password.Password == *password.NewPass {
-		log.Logger.Error("The new password is the same as the old password:", err)
+		log.Logger.Error("[ERROR] The new password is the same as the old password:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInput, errors.New("The new password is the same as the old password").Error())
+		return general.NewErrorWithMessage(errcode.ErrInput, errors.New("[ERROR] The new password is the same as the old password").Error())
 	}
 
 	err = models.UserService.ChangeMobilePassword(password.NewPass, userId)
 	if err != nil {
-		log.Logger.Error("Change faluse:", err)
+		log.Logger.Error("[ERROR] Change faluse:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

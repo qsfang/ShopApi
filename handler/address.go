@@ -92,7 +92,7 @@ func ChangeAddress(c echo.Context) error {
 	if err = c.Bind(&changeAddress); err != nil {
 		log.Logger.Error("[ERROR] ChangeAddress Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(changeAddress); err != nil {
@@ -134,7 +134,7 @@ func GetAddress(c echo.Context) error {
 	if err = c.Bind(&getAddress); err != nil {
 		log.Logger.Error("[ERROR] GetAddress Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(getAddress); err != nil {
@@ -143,7 +143,8 @@ func GetAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	getAddress.UserID = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request()).Get(general.SessionUserID).(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	getAddress.UserID = session.Get(general.SessionUserID).(uint64)
 
 	pageStart := utility.Paging(getAddress.Page, getAddress.PageSize)
 
@@ -174,7 +175,7 @@ func AlterDefault(c echo.Context) error {
 	if err = c.Bind(&alterAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(alterAddress); err != nil {
@@ -196,20 +197,15 @@ func AlterDefault(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	alterAddress.UserID = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request()).Get(general.SessionUserID).(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	alterAddress.UserID = session.Get(general.SessionUserID).(uint64)
 
-	err = models.AddressService.AlterAddressToNotDefault(alterAddress.UserID)
+	err = models.AddressService.AlterAddress(alterAddress)
 	if err != nil {
-		log.Logger.Error("[ERROR] AlterDefault AlterAddressToNotDefault:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrAlterAddressToNotDefault, err.Error())
-	}
-
-	err = models.AddressService.AlterAddressToDefault(alterAddress)
-	if err != nil {
-		log.Logger.Error("[ERROR] AlterDefault AlterAddressToDefault:", err)
+		log.Logger.Error("[ERROR] AlterDefault AlterAddress:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
+
 	return c.JSON(errcode.ErrSucceed, nil)
 }

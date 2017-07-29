@@ -48,12 +48,18 @@ import (
 
 func CreateOrder(c echo.Context) error {
 	var (
-		order models.OrmOrders
+		order models.CreateOrder
 		err   error
 	)
 
 	if err = c.Bind(&order); err != nil {
-		log.Logger.Error("Create crash with error:", err)
+		log.Logger.Error("[ERROR] Create crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(order); err != nil {
+		log.Logger.Error("[ERROR] CreatOrder Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -63,11 +69,6 @@ func CreateOrder(c echo.Context) error {
 
 	err = models.OrderService.CreateOrder(numberID, order)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Carts not found:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
-		}
 		log.Logger.Error("Mysql error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())

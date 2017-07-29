@@ -81,6 +81,10 @@ type OrmUser struct {
 type TestUserInfo struct {
 
 }
+type Password struct {
+	Password *string   `json:"password" validate:"required,alphanum,min=6,max=30"`
+	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`
+}
 
 func (User) TableName() string {
 	return "user"
