@@ -27,6 +27,7 @@
  *     Initial: 2017/07/21         Ai Hao
  *     Modify : 2017/07/21         Zhu Yaqiang
  *     Modify : 2017/07/21         Yu Yi
+ *     Modify : 2017/07/21         Machao
  */
 
 package models
@@ -83,23 +84,16 @@ type ConProduct struct {
 
 }
 
-type GetProList struct {
-	Name          string
-	TotalSale     uint64
-	Price         float64
-	OriginalPrice float64
-	Status        uint64
-	ImageId       uint64
-	Detail        string
-	Inventory     uint64
-}
-
 func (Product) TableName() string {
 	return "products"
 }
 
 func (ps *ProductServiceProvider) CreateProduct(pr *ConProduct) error {
-	pro := Product{
+	var (
+		err error
+		pro Product
+	)
+	pro = Product{
 		Name:			pr.Name,
 		TotalSale:		pr.TotalSale,
 		Category: 		pr.Category,
@@ -111,21 +105,33 @@ func (ps *ProductServiceProvider) CreateProduct(pr *ConProduct) error {
 		ImageIDs:		pr.ImageIDs,
 		Detail:			pr.Detail,
 		Inventory:		pr.Inventory,
+		Status:         general.ProductOnsale,
+		Created:        time.Now(),
 	}
 
-	pro.Status = general.ProductOnsale
-	pro.Created = time.Now()
-
 	db := orm.Conn
-	err := db.Create(&pro).Error
+
+	tx := db.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	err = tx.Create(&pro).Error
+	if err != nil {
+		return err
+	}
 
 	return err
 }
 
-func (ps *ProductServiceProvider) GetProduct(cate, pageStart, pageEnd uint64) (*[]GetProList, error) {
+func (ps *ProductServiceProvider) GetProduct(cate, pageStart, pageEnd uint64) (*[]ConProduct, error) {
 	var (
 		list Product
-		s    []GetProList
+		s    []ConProduct
 	)
 
 	db := orm.Conn
@@ -141,13 +147,13 @@ func (ps *ProductServiceProvider) GetProduct(cate, pageStart, pageEnd uint64) (*
 	for rows.Next()  {
 		db.ScanRows(rows, &list)
 
-		s=append(s, GetProList{
+		s=append(s, ConProduct{
 			Name:          list.Name,
 			TotalSale:     list.TotalSale,
 			Price:         list.Price,
 			OriginalPrice: list.OriginalPrice,
 			Status:        list.Status,
-			ImageId:       list.ImageID,
+			ImageID:       list.ImageID,
 			Detail:        list.Detail,
 			Inventory:     list.Inventory,
 		})

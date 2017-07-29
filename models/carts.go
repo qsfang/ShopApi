@@ -77,7 +77,12 @@ func(Cart) TableName() string {
 }
 
 func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) error {
-	cartsPutIn := Cart{
+	var (
+		err error
+		cartsPutIn Cart
+	)
+
+	cartsPutIn = Cart{
 		UserID:    userID,
 		ProductID: carts.ProductID,
 		Name:      carts.Name,
@@ -89,22 +94,33 @@ func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) er
 		Status:    general.ProInCart,
 	}
 
-
 	db := orm.Conn
-	err := db.Create(&cartsPutIn).Error
+
+	tx := db.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	err = tx.Create(&cartsPutIn).Error
+	if err != nil {
+		return err
+	}
 
 	return err
 }
 
-// 状态0表示商品在购物车，状态1表示商品不在购物车
-func (cs *CartsServiceProvider) CartsDelete(UserID uint64, ProductID uint64, Color *string, Size *string) error {
+func (cs *CartsServiceProvider) CartsDelete(UserID uint64, ID uint64) error {
 	var (
 		cart Cart
 		err  error
 	)
 
 	db := orm.Conn
-	err = db.Model(&cart).Where("userid = ? AND productid = ? AND color = ? AND size = ?", UserID, ProductID, Color, Size).Update("status", general.ProNotInCart).Limit(1).Error
+	err = db.Model(&cart).Where("id = ? AND userid = ?",ID, UserID).Update("status", general.ProNotInCart).Limit(1).Error
 
 	return err
 }
@@ -130,7 +146,7 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
 	)
 
 	db := orm.Conn
-	err = db.Where("userid = ? AND status = ?", UserID, 0).Find(&carts).Error
+	err = db.Where("userid = ? AND status = ?", UserID, general.ProInCart).Find(&carts).Error
 	if err != nil {
 		return browse, err
 	}

@@ -27,6 +27,7 @@
  *     Initial: 2017/07/21       Li Zebang
  *     Modify : 2017/07/21       Zhang Zizhao 添加创建订单
  *	   Modify : 2017/07/21       Ai Hao       订单状态更改
+ *     Modify : 2017/07/21       Ma Chao
  */
 
 package handler
@@ -153,7 +154,7 @@ func ChangeStatus(c echo.Context) error {
 	}
 
 	if st.Status != general.OrderFinished && st.Status != general.OrderUnfinished && st.Status != general.OrderCanceled && st.Status != general.OrderPaid && st.Status != general.OrderUnpaid {
-		err = errors.New("Status unExistence")
+		err = errors.New("Status InExistent")
 		log.Logger.Error("", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())

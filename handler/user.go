@@ -27,8 +27,9 @@
  *     Initial: 2017/07/18        Yusan Kurban
  *	   Modify: 2017/07/19		  Ai Hao         添加用户登出
  *	   Modify: 2017/07/20         Zhang Zizhao   添加用户登录
- *    Modify: 2017/07/21          Xu Haosheng  更改用户信息
+ *     Modify: 2017/07/21         Xu Haosheng  更改用户信息
  *	   Modify: 2017/07/21         Yang Zhengtian  添加修改密码
+ *     Modify: 2017/07/21         Ma Chao
  */
 
 package handler
@@ -117,15 +118,15 @@ func Login(c echo.Context) error {
 		}
 	}
 
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	sess.Set(general.SessionUserID, userID)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	session.Set(general.SessionUserID, userID)
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
 func Logout(c echo.Context) error {
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	err := sess.Delete(general.SessionUserID)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	err := session.Delete(general.SessionUserID)
 
 	if err != nil {
 		log.Logger.Error("Logout with error", err)
@@ -158,8 +159,6 @@ func GetInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Debug("have returned UserInformation.")
-
 	return c.JSON(errcode.ErrSucceed, Output)
 }
 
@@ -172,7 +171,7 @@ func ChangeMobilePassword(c echo.Context) error {
 	)
 
 	if err = c.Bind(&password); err != nil {
-		log.Logger.Error("analysis creash with error:", err)
+		log.Logger.Error("analysis crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -235,7 +234,7 @@ func ChangeUserInfo(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func Changephone(c echo.Context) error {
+func ChangePhone(c echo.Context) error {
 	var (
 		err error
 		m   models.UserInfo
@@ -258,7 +257,7 @@ func Changephone(c echo.Context) error {
 
 	err = models.UserService.ChangePhone(user, m.Phone)
 	if err != nil {
-		log.Logger.Error("changephone crash with error:", err)
+		log.Logger.Error("change phone crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
