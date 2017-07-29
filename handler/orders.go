@@ -127,7 +127,7 @@ func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
 		order  models.Order
-		OutPut *models.OrmOrders
+		OutPut []models.OrmOrders
 	)
 
 	if err = c.Bind(&order); err != nil {
@@ -140,18 +140,6 @@ func GetOneOrder(c echo.Context) error {
 	UserID := session.Get(general.SessionUserID).(uint64)
 
 	OutPut, err = models.OrderService.GetOneOrder(UserID, order.ID)
-
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Find order with error:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
-		}
-
-		log.Logger.Error("Get Order with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
-	}
 
 	return c.JSON(errcode.ErrSucceed, OutPut)
 }

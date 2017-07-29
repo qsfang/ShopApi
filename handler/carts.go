@@ -48,7 +48,7 @@ func CartsPutIn(c echo.Context) error {
 		err   error
 		carts models.ConCarts
 
-		ProInfo *models.Product = new(models.Product)
+		ProInfo *models.Product
 	)
 
 	if err = c.Bind(&carts); err != nil {
@@ -126,7 +126,17 @@ func AlterCartPro(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+
 	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count,cartpro.Status)
+
+	if err = c.Validate(cartpro); err != nil {
+		log.Logger.Error("[ERROR] AlterCartPro Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count)
+
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("This product doesn't exist !", err)

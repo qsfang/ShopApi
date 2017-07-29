@@ -102,7 +102,7 @@ func (cs *CartsServiceProvider) CartsDelete(UserID uint64, ProductID uint64, Col
 	)
 
 	db := orm.Conn
-	err = db.Model(&cart).Where("userid = ? AND productid = ? AND color = ? AND size = ?", UserID, ProductID, Color, Size).Update("status", general.ProductNotInCart).Limit(1).Error
+	err = db.Model(&cart).Where("userid = ? AND productid = ? AND color = ? AND size = ?", UserID, ProductID, Color, Size).Update("status", general.ProNotInCart).Limit(1).Error
 
 	return err
 }
@@ -128,7 +128,7 @@ func (cs *CartsServiceProvider) BrowseCart(UserID uint64) ([]ConCarts, error) {
 	)
 
 	db := orm.Conn
-	err = db.Where("userid = ?", UserID).Find(&carts).Error
+	err = db.Where("userid = ? AND status = ?", UserID, 0).Find(&carts).Error
 	if err != nil {
 		return browse, err
 	}
