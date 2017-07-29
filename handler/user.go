@@ -67,7 +67,7 @@ func Create(c echo.Context) error {
 
 	match := utility.IsValidPhone(*user.Mobile)
 	if !match {
-		log.Logger.Error("[error] Invalid phone:", err)
+		log.Logger.Error("[ERROR] Invalid phone:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -264,7 +264,7 @@ func ChangePhone(c echo.Context) error {
 	}
 
 	if models.UserService.CheckPhone(m.Phone) != gorm.ErrRecordNotFound {
-		err = errors.New("Invalid phone:")
+		err = errors.New("[ERROR] Invalid phone:")
 
 		log.Logger.Error("[ERROR] ChangePhone CheckPhone :", err)
 

@@ -142,7 +142,7 @@ func GetAddress(c echo.Context) error {
 	}
 
 	if len(*addressList) == 0 {
-		err = errors.New("Address Not Found")
+		err = errors.New("[ERROR] Address Not Found")
 
 		log.Logger.Error("[ERROR] GetAddress GetAddressByUserID:", err)
 
