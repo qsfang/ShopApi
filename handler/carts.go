@@ -33,8 +33,6 @@
 package handler
 
 import (
-	"errors"
-
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
@@ -61,7 +59,7 @@ func CartsPutIn(c echo.Context) error {
 	ProInfo, err = models.ProductService.GetProInfo(carts.ProductID)
 
 	if err != nil {
-		log.Logger.Error("Get info with error:", err)
+		log.Logger.Error("Get Information with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -74,7 +72,7 @@ func CartsPutIn(c echo.Context) error {
 
 	err = models.CartsService.CreateInCarts(&carts, userID)
 	if err != nil {
-		log.Logger.Error("Mysql error in add address:", err)
+		log.Logger.Error("Mysql error with adding address:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -82,7 +80,7 @@ func CartsPutIn(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func Cartsdel(c echo.Context) error {
+func CartsDelete(c echo.Context) error {
 	var (
 		err  error
 		cart models.ConCarts
@@ -95,10 +93,9 @@ func Cartsdel(c echo.Context) error {
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID)
-	id := userID.(uint64)
+	UserID := session.Get(general.SessionUserID).(uint64)
 
-	err = models.CartsService.CartsDelete(id, cart.ProductID, &cart.Color, &cart.Size)
+	err = models.CartsService.CartsDelete(UserID, cart.ID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("This product doesn't exist !", err)
@@ -126,22 +123,20 @@ func AlterCartPro(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+<<<<<<< HEAD
+	err = models.CartsService.AlterCartPro(cartProduct.ID, cartProduct.Count, cartProduct.Color, cartProduct.Size)
+=======
 	if cartProduct.PayStatus != general.PayFinished && cartProduct.PayStatus != general.PayUnfinished {
-		err = errors.New("Pay Status unExistence")
+		err = errors.New("Pay Status InExistent")
 		log.Logger.Error("status transformed with error :", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	err = models.CartsService.AlterCartPro(cartProduct.ID, cartProduct.Count, cartProduct.PayStatus)
+>>>>>>> e8b66e69670ae1842e8e72c4c7e3076fd76b57c2
 
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("This product doesn't exist !", err)
-
-			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
-		}
-
 		log.Logger.Error("Alter product with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
