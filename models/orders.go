@@ -44,22 +44,6 @@ type OrderServiceProvider struct {
 
 var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 
-type Orders struct {
-	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
-	UserID     uint64    `gorm:"column:userid" json:"userid"`
-	TotalPrice float64   `gorm:"column:totalprice"json:"totalprice"`
-	Payment    float64   `json:"payment"`
-	Freight    float64   `json:"freight"`
-	Remark     string    `json:"remark"`
-	Discount   uint8     `json:"discount"`
-	Size       string    `json:"size"`
-	Color      string    `json:"color"`
-	Status     uint8     `json:"status"`
-	Created    time.Time `json:"created"`
-	PayWay     uint8     `gorm:"column:payway"json:"payway"`
-	AddressID  uint64    `json:"addressid"`
-}
-
 type Order struct {
 	ID         uint64    `sql:"auto_increment;primary_key;"json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
@@ -145,16 +129,16 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o OrmOrders) error
 	return err
 }
 
-func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStart, pageEnd uint64) (*[]Orders, error) {
+func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStart, pageEnd uint64) (*[]Order, error) {
 	var (
-		order  Orders
-		orders []Orders
+		order  Order
+		orders []Order
 	)
 
 	db := orm.Conn
 
 	if status == general.OrderUnfinished || status == general.OrderFinished {
-		sql := fmt.Sprintf("SELECT * FROM orders WHERE userid = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
+		sql := fmt.Sprintf("SELECT * FROM order WHERE userid = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
 
 		rows, err := db.Raw(sql, userID, status).Rows()
 		defer rows.Close()
@@ -170,7 +154,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 		return &orders, nil
 	}
 
-	sql := fmt.Sprintf("SELECT * FROM orders WHERE userid = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
+	sql := fmt.Sprintf("SELECT * FROM order WHERE userid = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
 
 	rows, err := db.Raw(sql, userID).Rows()
 	defer rows.Close()
@@ -232,7 +216,7 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrd
 }
 
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
-	cha := Orders{
+	cha := Order{
 		Status: status,
 	}
 

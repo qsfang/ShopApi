@@ -44,10 +44,6 @@ import (
 	"ShopApi/utility"
 )
 
-type ChangStatus struct {
-	ID     uint64 `json:"id"`
-	Status uint8  `json:"status"`
-}
 
 func CreateOrder(c echo.Context) error {
 	var (
@@ -83,7 +79,7 @@ func GetOrders(c echo.Context) error {
 	var (
 		err    error
 		orm    models.OrmOrders
-		orders *[]models.Orders
+		orders *[]models.Order
 	)
 
 	if err = c.Bind(&orm); err != nil {
@@ -147,7 +143,7 @@ func GetOneOrder(c echo.Context) error {
 func ChangeStatus(c echo.Context) error {
 	var (
 		err error
-		st  ChangStatus
+		st  models.OrmOrders
 	)
 
 	if err = c.Bind(&st); err != nil {
