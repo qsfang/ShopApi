@@ -65,7 +65,7 @@ func AddAddress(c echo.Context) error {
 
 	addAddress.UserID = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request()).Get(general.SessionUserID).(uint64)
 
-	if addAddress.IsDefault == general.AddressDefault {
+	if addAddress.IsDefault == uint8(general.AddressDefault) {
 		if err = models.AddressService.AlterAddressToNotDefault(addAddress.UserID); err != nil {
 			log.Logger.Error("[ERROR AddAddress AlterAddressToNotDefault]:", err)
 
@@ -127,28 +127,14 @@ func ChangeAddress(c echo.Context) error {
 func GetAddress(c echo.Context) error {
 	var (
 		err         error
-		getAddress  models.GetAddress
+		userID      uint64
 		addressList *[]models.AddressGet
 	)
 
-	if err = c.Bind(&getAddress); err != nil {
-		log.Logger.Error("[ERROR] GetAddress Bind:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	if err = c.Validate(getAddress); err != nil {
-		log.Logger.Error("[ERROR] AddAddress Validate:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	getAddress.UserID = session.Get(general.SessionUserID).(uint64)
+	userID = session.Get(general.SessionUserID).(uint64)
 
-	pageStart := utility.Paging(getAddress.Page, getAddress.PageSize)
-
-	addressList, err = models.AddressService.GetAddressByUserID(getAddress.UserID, pageStart, getAddress.PageSize)
+	addressList, err = models.AddressService.GetAddressByUserID(userID)
 	if err != nil {
 		log.Logger.Error("[ERROR] GetAddress GetAddressByUserID: MySQL ERROR", err)
 
@@ -169,7 +155,7 @@ func GetAddress(c echo.Context) error {
 func AlterDefault(c echo.Context) error {
 	var (
 		err          error
-		alterAddress *models.AddressAlter
+		alterAddress *models.AlterAddress
 	)
 
 	if err = c.Bind(&alterAddress); err != nil {

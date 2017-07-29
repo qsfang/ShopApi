@@ -92,7 +92,7 @@ type AddressGet struct {
 	Address  string `json:"address"`
 }
 
-type AddressAlter struct {
+type AlterAddress struct {
 	ID     uint64 `json:"id" validate:"required"`
 	UserID uint64 `json:"userid"`
 }
@@ -131,7 +131,7 @@ func (asp *AddressServiceProvider) AlterAddressToNotDefault(userID uint64) error
 
 	db := orm.Conn
 
-	updateToNotDefault := map[string]interface{}{"isdefault": general.AddressNotDefault}
+	updateToNotDefault := map[string]uint8{"isdefault": general.AddressNotDefault}
 
 	return db.Model(&address).Where("userid = ?", userID).Update(updateToNotDefault).Limit(1).Error
 }
@@ -165,29 +165,26 @@ func (asp *AddressServiceProvider) FindAddressByAddressID(ID uint64) error {
 	return db.Where("id = ?", ID).First(&address).Error
 }
 
-func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64, pageStart, pageSize uint64) (*[]AddressGet, error) {
+func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]AddressGet, error) {
 	var (
-		address     Address
-		addressList  []AddressGet
+		err         error
+		address     []Address
+		addressList []AddressGet
 	)
 
 	db := orm.Conn
 
-	sql := "SELECT * FROM address WHERE userid = ? LIMIT ?, ? LOCK IN SHARE MODE"
-
-	rows, err := db.Raw(sql, userID, pageStart, pageSize).Rows()
-	defer rows.Close()
+	err = db.Where("userid = ?", userID).Find(&address).Error
 	if err != nil {
 		return nil, err
 	}
 
-	for rows.Next() {
-		db.ScanRows(rows, &address)
+	for _, addr := range address {
 		addressGet := AddressGet{
-			Province: address.Province,
-			City:     address.City,
-			Street:   address.Street,
-			Address:  address.Address,
+			Province: addr.Province,
+			City:     addr.City,
+			Street:   addr.Street,
+			Address:  addr.Address,
 		}
 		addressList = append(addressList, addressGet)
 	}
@@ -195,7 +192,7 @@ func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64, pageStart, 
 	return &addressList, nil
 }
 
-func (asp *AddressServiceProvider) AlterAddress(alterAddress *AddressAlter) (err error) {
+func (asp *AddressServiceProvider) AlterAddress(alterAddress *AlterAddress) (err error) {
 	var (
 		address Address
 	)
@@ -209,16 +206,16 @@ func (asp *AddressServiceProvider) AlterAddress(alterAddress *AddressAlter) (err
 		}
 	}()
 
-	updaterToDefault := map[string]uint8{"isdefault": general.AddressNotDefault}
+	updateToNotDefault := map[string]interface{}{"isdefault": general.AddressNotDefault}
 
-	err = orm.Conn.Model(&address).Where("userid = ?", alterAddress.UserID).Update(updaterToDefault).Limit(1).Error
+	err = tx.Model(&address).Where("userid = ?", alterAddress.UserID).Update(updateToNotDefault).Limit(1).Error
 	if err != nil {
 		return err
 	}
 
-	updateToNotDefault := map[string]interface{}{"isdefault": general.AddressDefault}
+	updaterToDefault := map[string]uint8{"isdefault": general.AddressDefault}
 
-	err = tx.Model(&address).Where("id = ?", alterAddress.ID).Update(updateToNotDefault).Limit(1).Error
+	err = tx.Model(&address).Where("id = ?", alterAddress.ID).Update(updaterToDefault).Limit(1).Error
 	if err != nil {
 		return err
 	}

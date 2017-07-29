@@ -47,33 +47,29 @@ import (
 	"ShopApi/utility"
 )
 
-type Register struct {
-	Mobile *string `json:"mobile" validate:"required,alphanum,min=6,max=30"`
-	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-}
-
 func Create(c echo.Context) error {
 	var (
-		err error
-		u   Register
+		err  error
+		user models.Register
 	)
 
-	if err = c.Bind(&u); err != nil {
-		log.Logger.Error("[error] Create crash with error:", err)
+	if err = c.Bind(&user); err != nil {
+		log.Logger.Error("[ERROR] Create Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	match := utility.IsValidPhone(*u.Mobile)
+	match := utility.IsValidPhone(*user.Mobile)
 	if !match {
 		log.Logger.Error("[error] Invalid phone:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.UserService.Create(u.Mobile, u.Pass)
+	err = models.UserService.Create(user.Mobile, user.Pass)
 	if err != nil {
-		log.Logger.Error("[error] create crash with error:", err)
+
+		log.Logger.Error("[ERROR] Create Mysql:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -83,37 +79,38 @@ func Create(c echo.Context) error {
 
 func Login(c echo.Context) error {
 	var (
-		user Register
+		user models.Register
 		err  error
 	)
 
 	if err = c.Bind(&user); err != nil {
-		log.Logger.Error("[error] analysis crash with error:", err)
+		log.Logger.Error("[ERROR] Login Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	match := utility.IsValidAccount(*user.Mobile)
-	if !match {
-		log.Logger.Error("[error] err name format", err)
+	if err = c.Validate(user); err != nil {
+		log.Logger.Error("[ERROR] Login Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrNameFormat, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	flag, userID, err := models.UserService.Login(user.Mobile, user.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[error] User not found:", err)
+			log.Logger.Error("[ERROR] Login Not Found:", err)
 
 			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 		}
-		log.Logger.Error("[error] Mysql error:", err)
+		log.Logger.Error("[ERROR] Login Mysql:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	} else {
-		if !flag {
-			return general.NewErrorWithMessage(errcode.ErrLoginRequired, errors.New("Name and pass don't match:").Error())
-		}
+	}
+
+	if !flag {
+		log.Logger.Debug("[ERROR] Login mobile and pass not match:")
+
+		return general.NewErrorWithMessage(errcode.ErrLoginRequired, errors.New("[ERROR] Login mobile and pass not match:").Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -121,7 +118,6 @@ func Login(c echo.Context) error {
 
 	return c.JSON(errcode.ErrSucceed, nil)
 }
-
 func Logout(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	err := session.Delete(general.SessionUserID)
@@ -147,12 +143,12 @@ func GetInfo(c echo.Context) error {
 	Output, err = models.UserService.GetInfo(numberID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[error] User information doesn't exist !", err)
+			log.Logger.Error("[ERROR] User information doesn't exist !", err)
 
 			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
 		}
 
-		log.Logger.Error("[error] Getting information exists errors", err)
+		log.Logger.Error("[ERROR] Getting information exists errors", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -219,13 +215,13 @@ func ChangeUserInfo(c echo.Context) error {
 	)
 
 	if err = c.Bind(&info); err != nil {
-		log.Logger.Error("[error] Create crash with error:", err)
+		log.Logger.Error("[ERROR] Create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 	match := utility.IsValidPhone(info.Phone)
 	if !match {
-		log.Logger.Error("[error] Invalid phone:", err)
+		log.Logger.Error("[ERROR] Invalid phone:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
 	}
@@ -235,7 +231,7 @@ func ChangeUserInfo(c echo.Context) error {
 
 	err = models.UserService.ChangeUserInfo(&info, userID)
 	if err != nil {
-		log.Logger.Error("[error] Change User Information with error:", err)
+		log.Logger.Error("[ERROR] Change User Information with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -249,14 +245,14 @@ func ChangePhone(c echo.Context) error {
 		m   models.TestPhone
 	)
 	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("[error] Bind crash with error:", err)
+		log.Logger.Error("[ERROR] Bind crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	match := utility.IsValidPhone(m.Phone)
 	if !match {
-		log.Logger.Error("[error] Invalid phone:", err)
+		log.Logger.Error("[ERROR] Invalid phone:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
 	}
@@ -266,7 +262,7 @@ func ChangePhone(c echo.Context) error {
 
 	err = models.UserService.ChangePhone(UserID, m.Phone)
 	if err != nil {
-		log.Logger.Error("[error] change phone crash with error:", err)
+		log.Logger.Error("[ERROR] change phone crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

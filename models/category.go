@@ -56,9 +56,7 @@ type CreateCategory struct {
 }
 
 type GetCategory struct {
-	PID      uint64 `json:"pid"`
-	Page     uint64 `json:"page" validate:"required"`
-	PageSize uint64 `json:"pagesize" validate:"required"`
+	PID uint64 `json:"pid"`
 }
 
 type CategoryGet struct {
@@ -92,24 +90,21 @@ func (csp *CategoryServiceProvider) CheckPID(pid uint64) (err error) {
 	return db.Where("id =? ", pid).First(&category).Error
 }
 
-func (csp *CategoryServiceProvider) GetCategory(pid, pageStart, pageSize uint64) (*[]CategoryGet, error) {
+func (csp *CategoryServiceProvider) GetCategory(pid uint64) (*[]CategoryGet, error) {
 	var (
-		category     Category
+		err          error
+		categories   []Category
 		categoryList []CategoryGet
 	)
 
-	db := orm.Conn.Begin()
+	db := orm.Conn
 
-	sql := "SELECT * FROM category WHERE pid = ? AND status = ? LIMIT ?, ? LOCK IN SHARE MODE"
-
-	rows, err := db.Raw(sql, pid, general.CategoryOnUse, pageStart, pageSize).Rows()
-	defer rows.Close()
+	err = db.Where("pid = ? AND status = ?", pid, general.CategoryOnUse).Find(&categories).Error
 	if err != nil {
-		return nil, err
+		return nil,err
 	}
 
-	for rows.Next() {
-		db.ScanRows(rows, &category)
+	for _, category := range categories{
 		categoryGet := CategoryGet{Name: category.Name}
 		categoryList = append(categoryList, categoryGet)
 	}

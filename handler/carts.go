@@ -87,7 +87,7 @@ func CartsDelete(c echo.Context) error {
 	)
 
 	if err = c.Bind(cart); err != nil {
-		log.Logger.Error("Analysis crash with error:", err)
+		log.Logger.Error("[ERROR] CarDel Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -103,7 +103,7 @@ func CartsDelete(c echo.Context) error {
 
 	err = models.CartsService.CartsDelete(UserID, cart)
 	if err != nil {
-		log.Logger.Error("Delete product with error:", err)
+		log.Logger.Error("[ERROR] CarDel Mysql:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
