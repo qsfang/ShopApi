@@ -200,14 +200,14 @@ func AlterDefault(c echo.Context) error {
 
 	err = models.AddressService.AlterAddressToNotDefault(alterAddress.UserID)
 	if err != nil {
-		log.Logger.Error("[ERROR AlterDefault AlterAddressToNotDefault]:", err)
+		log.Logger.Error("[ERROR] AlterDefault AlterAddressToNotDefault:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrAlterAddressToNotDefault, err.Error())
 	}
 
 	err = models.AddressService.AlterAddressToDefault(alterAddress)
 	if err != nil {
-		log.Logger.Error("[ERROR AlterDefault AlterAddressToDefault]:", err)
+		log.Logger.Error("[ERROR] AlterDefault AlterAddressToDefault:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
