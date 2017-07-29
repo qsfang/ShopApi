@@ -41,7 +41,6 @@ import (
 	"ShopApi/general/errcode"
 	"ShopApi/log"
 	"ShopApi/models"
-	"ShopApi/utility"
 )
 
 func CreateCategory(c echo.Context) error {
@@ -105,9 +104,7 @@ func GetCategory(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	pageStart := utility.Paging(getCategory.Page, getCategory.PageSize)
-
-	categoryList, err = models.CategoryService.GetCategory(getCategory.PID, pageStart, getCategory.PageSize)
+	categoryList, err = models.CategoryService.GetCategory(getCategory.PID)
 	if err != nil {
 		log.Logger.Error("[ERROR] GetCategory GetCategory: MySQL ERROR", err)
 
