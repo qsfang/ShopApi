@@ -101,9 +101,8 @@ func (Address) TableName() string {
 	return "address"
 }
 
-func (csp *AddressServiceProvider) AddAddress(addAddress *AddAddress) error {
+func (csp *AddressServiceProvider) AddAddress(addAddress *AddAddress) (err error) {
 	var (
-		err     error
 		address *Address
 	)
 
@@ -134,10 +133,9 @@ func (csp *AddressServiceProvider) AddAddress(addAddress *AddAddress) error {
 	return err
 }
 
-func (csp *AddressServiceProvider) ChangeAddress(changeAddress *ChangeAddress) error {
+func (csp *AddressServiceProvider) ChangeAddress(changeAddress *ChangeAddress) (err error) {
 	var (
 		address Address
-		err     error
 	)
 
 	updater := map[string]interface{}{
@@ -163,10 +161,9 @@ func (csp *AddressServiceProvider) ChangeAddress(changeAddress *ChangeAddress) e
 	return err
 }
 
-func (csp *AddressServiceProvider) FindAddressByAddressID(ID uint64) error {
+func (csp *AddressServiceProvider) FindAddressByAddressID(ID uint64) (err error) {
 	var (
 		address Address
-		err     error
 	)
 
 	tx := orm.Conn.Begin()
@@ -183,12 +180,10 @@ func (csp *AddressServiceProvider) FindAddressByAddressID(ID uint64) error {
 	return err
 }
 
-func (csp *AddressServiceProvider) GetAddressByUserID(userID uint64, pageStart, pageSize uint64) (*[]AddressGet, error) {
+func (csp *AddressServiceProvider) GetAddressByUserID(userID uint64, pageStart, pageSize uint64) (addressList *[]AddressGet, err error) {
 	var (
 		address     Address
-		addressGet  AddressGet
-		addressList []AddressGet
-		err         error
+		addresses  []AddressGet
 	)
 
 	tx := orm.Conn.Begin()
@@ -210,22 +205,21 @@ func (csp *AddressServiceProvider) GetAddressByUserID(userID uint64, pageStart, 
 
 	for rows.Next() {
 		tx.ScanRows(rows, &address)
-		addressGet = AddressGet{
+		addressGet := AddressGet{
 			Province: address.Province,
 			City:     address.City,
 			Street:   address.Street,
 			Address:  address.Address,
 		}
-		addressList = append(addressList, addressGet)
+		addresses = append(addresses, addressGet)
 	}
 
-	return &addressList, nil
+	return &addresses, nil
 }
 
-func (csp *AddressServiceProvider) AlterAddressToDefault(alterAddress *AddressAlter) error {
+func (csp *AddressServiceProvider) AlterAddressToDefault(alterAddress *AddressAlter) (err error) {
 	var (
 		address Address
-		err     error
 	)
 
 	updater := map[string]interface{}{"isdefault": general.AddressDefault}
@@ -244,10 +238,9 @@ func (csp *AddressServiceProvider) AlterAddressToDefault(alterAddress *AddressAl
 	return err
 }
 
-func (csp *AddressServiceProvider) AlterAddressToNotDefault(userID uint64) error {
+func (csp *AddressServiceProvider) AlterAddressToNotDefault(userID uint64) (err error) {
 	var (
 		address Address
-		err     error
 	)
 
 	updater := map[string]uint8{"isdefault": general.AddressNotDefault}

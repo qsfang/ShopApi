@@ -52,7 +52,7 @@ type Category struct {
 
 type CreateCategory struct {
 	Name string `json:"name" validate:"required,alphanumunicode"`
-	PID  uint64 `json:"pid" validate:"required"`
+	PID  uint64 `json:"pid"`
 }
 
 type GetCategory struct {
@@ -69,11 +69,7 @@ func (Category) TableName() string {
 	return "category"
 }
 
-func (csp *CategoryServiceProvider) CreateCategory(createCategory CreateCategory) error {
-	var (
-		err error
-	)
-
+func (csp *CategoryServiceProvider) CreateCategory(createCategory CreateCategory) (err error) {
 	category := &Category{
 		Name:    createCategory.Name,
 		PID:     createCategory.PID,
@@ -95,10 +91,9 @@ func (csp *CategoryServiceProvider) CreateCategory(createCategory CreateCategory
 	return err
 }
 
-func (csp *CategoryServiceProvider) CheckPID(pid uint64) error {
+func (csp *CategoryServiceProvider) CheckPID(pid uint64) (err error) {
 	var (
 		category Category
-		err      error
 	)
 
 	tx := orm.Conn.Begin()
@@ -115,11 +110,10 @@ func (csp *CategoryServiceProvider) CheckPID(pid uint64) error {
 	return err
 }
 
-func (csp *CategoryServiceProvider) GetCategory(pid, pageStart, pageSize uint64) (*[]CategoryGet, error) {
+func (csp *CategoryServiceProvider) GetCategory(pid, pageStart, pageSize uint64) (categoryList *[]CategoryGet, err error) {
 	var (
 		category   Category
-		categoryList []CategoryGet
-		err        error
+		categories []CategoryGet
 	)
 
 	tx := orm.Conn.Begin()
@@ -142,8 +136,8 @@ func (csp *CategoryServiceProvider) GetCategory(pid, pageStart, pageSize uint64)
 	for rows.Next() {
 		tx.ScanRows(rows, &category)
 		categoryGet := CategoryGet{Name: category.Name}
-		categoryList = append(categoryList, categoryGet)
+		categories = append(categories, categoryGet)
 	}
 
-	return &categoryList, nil
+	return &categories, nil
 }

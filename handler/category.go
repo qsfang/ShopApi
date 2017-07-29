@@ -78,7 +78,7 @@ func CreateCategory(c echo.Context) error {
 
 	err = models.CategoryService.CreateCategory(createCategory)
 	if err != nil {
-		log.Logger.Error("Create crash with error:", err)
+		log.Logger.Error("[ERROR] CreateCategory CreateCategory:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
