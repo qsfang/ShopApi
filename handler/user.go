@@ -59,6 +59,12 @@ func Create(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+	if err = c.Validate(user); err != nil {
+		log.Logger.Error("[ERROR] Create Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
 	match := utility.IsValidPhone(*user.Mobile)
 	if !match {
 		log.Logger.Error("[error] Invalid phone:", err)
