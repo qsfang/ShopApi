@@ -69,8 +69,8 @@ const (
 	ProNotInCart = 0xeb //234
 
 	//Pay status
-	PayFinished   = 0xec //235
-	PayUnfinished = 0xed //236
+	Buy   = 0xec //235
+	NotBuy = 0xed //236
 
 	OrderPaid   = 0xf1 // 241
 	OrderUnpaid = 0xf2 // 240

@@ -101,7 +101,7 @@ func (Address) TableName() string {
 	return "address"
 }
 
-func (csp *AddressServiceProvider) AddAddress(addAddress *AddAddress) (err error) {
+func (asp *AddressServiceProvider) AddAddress(addAddress *AddAddress) error {
 	var (
 		address *Address
 	)
@@ -119,21 +119,24 @@ func (csp *AddressServiceProvider) AddAddress(addAddress *AddAddress) (err error
 		IsDefault: addAddress.IsDefault,
 	}
 
-	tx := orm.Conn.Begin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback().Error
-		} else {
-			err = tx.Commit().Error
-		}
-	}()
+	db := orm.Conn
 
-	err = tx.Create(address).Error
-
-	return err
+	return db.Create(address).Error
 }
 
-func (csp *AddressServiceProvider) ChangeAddress(changeAddress *ChangeAddress) (err error) {
+func (asp *AddressServiceProvider) AlterAddressToNotDefault(userID uint64) error {
+	var (
+		address Address
+	)
+
+	db := orm.Conn
+
+	updateToNotDefault := map[string]interface{}{"isdefault": general.AddressNotDefault}
+
+	return db.Model(&address).Where("userid = ?", userID).Update(updateToNotDefault).Limit(1).Error
+}
+
+func (asp *AddressServiceProvider) ChangeAddress(changeAddress *ChangeAddress) error {
 	var (
 		address Address
 	)
@@ -147,82 +150,55 @@ func (csp *AddressServiceProvider) ChangeAddress(changeAddress *ChangeAddress) (
 		"address":  changeAddress.Address,
 	}
 
-	tx := orm.Conn.Begin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback().Error
-		} else {
-			err = tx.Commit().Error
-		}
-	}()
+	db := orm.Conn
 
-	err = tx.Model(&address).Where("id = ?", changeAddress.ID).Update(updater).Limit(1).Error
-
-	return err
+	return db.Model(&address).Where("id = ?", changeAddress.ID).Update(updater).Limit(1).Error
 }
 
-func (csp *AddressServiceProvider) FindAddressByAddressID(ID uint64) (err error) {
+func (asp *AddressServiceProvider) FindAddressByAddressID(ID uint64) error {
 	var (
 		address Address
 	)
 
-	tx := orm.Conn.Begin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback().Error
-		} else {
-			err = tx.Commit().Error
-		}
-	}()
+	db := orm.Conn
 
-	err = tx.Where("id = ?", ID).First(&address).Error
-
-	return err
+	return db.Where("id = ?", ID).First(&address).Error
 }
 
-func (csp *AddressServiceProvider) GetAddressByUserID(userID uint64, pageStart, pageSize uint64) (addressList *[]AddressGet, err error) {
+func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64, pageStart, pageSize uint64) (*[]AddressGet, error) {
 	var (
 		address     Address
-		addresses  []AddressGet
+		addressList  []AddressGet
 	)
 
-	tx := orm.Conn.Begin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback().Error
-		} else {
-			err = tx.Commit().Error
-		}
-	}()
+	db := orm.Conn
 
 	sql := "SELECT * FROM address WHERE userid = ? LIMIT ?, ? LOCK IN SHARE MODE"
 
-	rows, err := tx.Raw(sql, userID, pageStart, pageSize).Rows()
+	rows, err := db.Raw(sql, userID, pageStart, pageSize).Rows()
 	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
-		tx.ScanRows(rows, &address)
+		db.ScanRows(rows, &address)
 		addressGet := AddressGet{
 			Province: address.Province,
 			City:     address.City,
 			Street:   address.Street,
 			Address:  address.Address,
 		}
-		addresses = append(addresses, addressGet)
+		addressList = append(addressList, addressGet)
 	}
 
-	return &addresses, nil
+	return &addressList, nil
 }
 
-func (csp *AddressServiceProvider) AlterAddressToDefault(alterAddress *AddressAlter) (err error) {
+func (asp *AddressServiceProvider) AlterAddress(alterAddress *AddressAlter) (err error) {
 	var (
 		address Address
 	)
-
-	updater := map[string]interface{}{"isdefault": general.AddressDefault}
 
 	tx := orm.Conn.Begin()
 	defer func() {
@@ -233,26 +209,19 @@ func (csp *AddressServiceProvider) AlterAddressToDefault(alterAddress *AddressAl
 		}
 	}()
 
-	err = tx.Model(&address).Where("id = ?", alterAddress.ID).Update(updater).Limit(1).Error
+	updaterToDefault := map[string]uint8{"isdefault": general.AddressNotDefault}
 
-	return err
-}
+	err = orm.Conn.Model(&address).Where("userid = ?", alterAddress.UserID).Update(updaterToDefault).Limit(1).Error
+	if err != nil {
+		return err
+	}
 
-func (csp *AddressServiceProvider) AlterAddressToNotDefault(userID uint64) (err error) {
-	var (
-		address Address
-	)
+	updateToNotDefault := map[string]interface{}{"isdefault": general.AddressDefault}
 
-	updater := map[string]uint8{"isdefault": general.AddressNotDefault}
+	err = tx.Model(&address).Where("id = ?", alterAddress.ID).Update(updateToNotDefault).Limit(1).Error
+	if err != nil {
+		return err
+	}
 
-	tx := orm.Conn.Begin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback().Error
-		} else {
-			err = tx.Commit().Error
-		}
-	}()
-
-	return orm.Conn.Model(&address).Where("userid = ?", userID).Update(updater).Limit(1).Error
+	return nil
 }

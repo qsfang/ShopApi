@@ -69,7 +69,7 @@ func (Category) TableName() string {
 	return "category"
 }
 
-func (csp *CategoryServiceProvider) CreateCategory(createCategory CreateCategory) (err error) {
+func (csp *CategoryServiceProvider) CreateCategory(createCategory CreateCategory) error {
 	category := &Category{
 		Name:    createCategory.Name,
 		PID:     createCategory.PID,
@@ -77,18 +77,9 @@ func (csp *CategoryServiceProvider) CreateCategory(createCategory CreateCategory
 		Created: time.Now(),
 	}
 
-	tx := orm.Conn.Begin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback().Error
-		} else {
-			err = tx.Commit().Error
-		}
-	}()
+	db := orm.Conn
 
-	err = tx.Create(&category).Error
-
-	return err
+	return db.Create(&category).Error
 }
 
 func (csp *CategoryServiceProvider) CheckPID(pid uint64) (err error) {
@@ -96,48 +87,32 @@ func (csp *CategoryServiceProvider) CheckPID(pid uint64) (err error) {
 		category Category
 	)
 
-	tx := orm.Conn.Begin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback().Error
-		} else {
-			err = tx.Commit().Error
-		}
-	}()
+	db := orm.Conn
 
-	err = tx.Where("id =? ", pid).First(&category).Error
-
-	return err
+	return db.Where("id =? ", pid).First(&category).Error
 }
 
-func (csp *CategoryServiceProvider) GetCategory(pid, pageStart, pageSize uint64) (categoryList *[]CategoryGet, err error) {
+func (csp *CategoryServiceProvider) GetCategory(pid, pageStart, pageSize uint64) (*[]CategoryGet, error) {
 	var (
-		category   Category
-		categories []CategoryGet
+		category     Category
+		categoryList []CategoryGet
 	)
 
-	tx := orm.Conn.Begin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback().Error
-		} else {
-			err = tx.Commit().Error
-		}
-	}()
+	db := orm.Conn.Begin()
 
 	sql := "SELECT * FROM category WHERE pid = ? AND status = ? LIMIT ?, ? LOCK IN SHARE MODE"
 
-	rows, err := tx.Raw(sql, pid, general.CategoryOnUse, pageStart, pageSize).Rows()
+	rows, err := db.Raw(sql, pid, general.CategoryOnUse, pageStart, pageSize).Rows()
 	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
-		tx.ScanRows(rows, &category)
+		db.ScanRows(rows, &category)
 		categoryGet := CategoryGet{Name: category.Name}
-		categories = append(categories, categoryGet)
+		categoryList = append(categoryList, categoryGet)
 	}
 
-	return &categories, nil
+	return &categoryList, nil
 }

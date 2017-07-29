@@ -74,17 +74,26 @@ type OrmOrders struct {
 	Page       uint64    `json:"page" validate:"required,numeric"`
 	PageSize   uint64    `json:"pagesize" validate:"required,numeric"`
 	AddressID  uint64    `json:"addressid" validate:"required,numeric"`
-	ImageID    uint64    `gorm:"column:imageid"json:"imageid"`
+	ImageID    uint64    `json:"imageid"`
 	Remark     string    `json:"remark"`
 	Created    time.Time `json:"created"`
 	Updated    time.Time `json:"updated"`
+}
+
+type CreateOrder struct{
+	AddressID  uint64    `json:"addressid" validate:"required,numeric"`
+	TotalPrice float64   `json:"totalprice" validate:"required,numeric"`
+	Freight    float64   `json:"freight" validate:"required,numeric"`
+	Payment    float64   `json:"payment" validate:"required,numeric"`
+	Remark     string    `json:"remark"`
+	PayWay     uint8     `json:"payway" validate:"required,numeric"`
 }
 
 func (Order) TableName() string {
 	return "order"
 }
 
-func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o OrmOrders) error {
+func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) error {
 	var (
 		err error
 		car Cart
@@ -92,12 +101,12 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o OrmOrders) error
 
 	order := Order{
 		UserID:     numberID,
-		AddressID:  o.AddressID,
-		TotalPrice: o.TotalPrice,
-		Freight:    o.Freight,
-		Remark:     o.Remark,
-		Status:     general.OrderFinished,
-		PayWay:     o.PayWay,
+		AddressID:  ord.AddressID,
+		TotalPrice: ord.TotalPrice,
+		Freight:    ord.Freight,
+		Remark:     ord.Remark,
+		Status:     general.OrderUnfinished,
+		PayWay:     ord.PayWay,
 		Created:    time.Now(),
 		Updated:    time.Now(),
 	}
@@ -120,17 +129,16 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o OrmOrders) error
 
 	changeMap := map[string]interface{}{
 		"status":    general.ProNotInCart,
-		"paystatus": general.PayUnfinished,
 		"orderid":   order.ID,
 	}
-	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", numberID, general.ProInCart, general.PayUnfinished).Update(changeMap).Limit(1).Error
+	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", numberID, general.ProInCart, general.Buy).Update(changeMap).Limit(1).Error
 
 	return err
 }
 
 func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStart, pageEnd uint64) (*[]Order, error) {
 	var (
-		order  Order
+		order Order
 		orders []Order
 	)
 
@@ -171,8 +179,8 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 
 func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrders, error) {
 	var (
-		err      error
-		order    Order
+		err error
+		order Order
 		carts    []Cart
 		getOrder []OrmOrders
 	)
