@@ -78,6 +78,11 @@ type OrmUser struct {
 	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`
 }
 
+type Register struct {
+	Mobile *string `json:"mobile" validate:"required,numeric,min=6,max=30"`
+	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
+}
+
 type Password struct {
 	Password *string   `json:"password" validate:"required,alphanum,min=6,max=30"`
 	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`

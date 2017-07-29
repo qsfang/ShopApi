@@ -35,7 +35,6 @@ package handler
 import (
 	"errors"
 
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
 	"ShopApi/general"

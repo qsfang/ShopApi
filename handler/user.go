@@ -47,33 +47,27 @@ import (
 	"ShopApi/utility"
 )
 
-type Register struct {
-	Mobile *string `json:"mobile" validate:"required,alphanum,min=6,max=30"`
-	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
-}
-
 func Create(c echo.Context) error {
 	var (
 		err error
-		u   Register
+		user   models.Register
 	)
 
-	if err = c.Bind(&u); err != nil {
-		log.Logger.Error("Create crash with error:", err)
+	if err = c.Bind(&user); err != nil {
+		log.Logger.Error("[ERROR] Create Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	match := utility.IsValidPhone(*u.Mobile)
-	if !match {
-		log.Logger.Error("Invalid phone:", err)
+	if err = c.Validate(user); err != nil {
+		log.Logger.Error("[ERROR] Create Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.UserService.Create(u.Mobile, u.Pass)
+	err = models.UserService.Create(user.Mobile, user.Pass)
 	if err != nil {
-		log.Logger.Error("create crash with error:", err)
+		log.Logger.Error("[ERROR] Create Mysql:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -83,39 +77,38 @@ func Create(c echo.Context) error {
 
 func Login(c echo.Context) error {
 	var (
-		user Register
+		user models.Register
 		err  error
 	)
 
 	if err = c.Bind(&user); err != nil {
-		log.Logger.Error("analysis crash with error:", err)
+		log.Logger.Error("[ERROR] Login Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	match := utility.IsValidAccount(*user.Mobile)
-	if !match {
-		log.Logger.Error("err name format", err)
+	if err = c.Validate(user); err != nil {
+		log.Logger.Error("[ERROR] Login Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrNameFormat, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	flag, userID, err := models.UserService.Login(user.Mobile, user.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("User not found:", err)
+			log.Logger.Error("[ERROR] Login Not Found:", err)
 
 			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 		}
-		log.Logger.Error("Mysql error:", err)
+		log.Logger.Error("[ERROR] Login Mysql:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	} else {
-		if !flag {
-			log.Logger.Debug("Name and pass don't match:")
+	}
 
-			return general.NewErrorWithMessage(errcode.ErrLoginRequired, errors.New("Name and pass don't match:").Error())
-		}
+	if !flag {
+		log.Logger.Debug("[ERROR] Login mobile and pass not match:")
+
+		return general.NewErrorWithMessage(errcode.ErrLoginRequired, errors.New("[ERROR] Login mobile and pass not match:").Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -129,7 +122,7 @@ func Logout(c echo.Context) error {
 	err := session.Delete(general.SessionUserID)
 
 	if err != nil {
-		log.Logger.Error("Logout with error", err)
+		log.Logger.Error("[ERROR] Logout Del:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
 	}
