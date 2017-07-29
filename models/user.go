@@ -48,8 +48,8 @@ var UserService *UserServiceProvider = &UserServiceProvider{}
 
 type User struct {
 	UserID   uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"userid"`
+	Password string    `json:"password" validate:"required,alphanum,min=6,max=30"`
 	Name     string    `json:"name"`
-	Password string    `json:"password"`
 	Status   uint16    `json:"status"`
 	Created  time.Time `json:"created"`
 	Updated  time.Time `json:"updated"`
@@ -57,11 +57,12 @@ type User struct {
 
 type UserInfo struct {
 	UserID   uint64 `sql:"primary_key" gorm:"column:userid" json:"userid"`
+	Phone    string `json:"phone" validate:"required,alphanum,len=11"`
 	Avatar   string `json:"avatar"`
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Sex      uint8  `json:"sex"validate:"required,alphanum,min=0,max=1"`
+
+	Sex      uint8  `json:"sex"`
 }
 
 type OrmUser struct {
@@ -78,8 +79,8 @@ type OrmUser struct {
 	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`
 }
 
-type TestUserInfo struct {
-
+type TestPhone struct {
+	Phone    string    `json:"phone" validate:"required,alphanum,len=11"`
 }
 type Password struct {
 	Password *string   `json:"password" validate:"required,alphanum,min=6,max=30"`
@@ -183,13 +184,13 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
 func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 	var (
 		err error
-		con Address
+		con UserInfo
 	)
 
 	change := map[string]interface{}{"phone": Phone}
 
 	db := orm.Conn
-	err = db.Model(&con).Where("id = ?", UserID).Update(change).Limit(1).Error
+	err = db.Model(&con).Where("userid = ?", UserID).Update(change).Limit(1).Error
 
 	return err
 }
@@ -226,8 +227,7 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 
 func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) error {
 	var (
-		con Address
-		nil uint8 = 0
+		con UserInfo
 	)
 
 	changMap := map[string]interface{}{
@@ -239,12 +239,6 @@ func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) err
 	}
 
 	db := orm.Conn
-
-	for userInfo, value := range changMap {
-		if value == "" || value == nil {
-			delete(changMap, userInfo)
-		}
-	}
 	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
 
 	return err
