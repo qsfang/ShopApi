@@ -95,32 +95,10 @@ func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) er
 	}
 
 	db := orm.Conn
-
-	tx := db.Begin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback().Error
-		} else {
-			err = tx.Commit().Error
-		}
-	}()
-
-	err = tx.Create(&cartsPutIn).Error
+	err = db.Create(&cartsPutIn).Error
 	if err != nil {
 		return err
 	}
-
-	return err
-}
-
-func (cs *CartsServiceProvider) CartsDelete(UserID uint64, ID uint64) error {
-	var (
-		cart Cart
-		err  error
-	)
-
-	db := orm.Conn
-	err = db.Model(&cart).Where("id = ? AND userid = ?",ID, UserID).Update("status", general.ProNotInCart).Limit(1).Error
 
 	return err
 }

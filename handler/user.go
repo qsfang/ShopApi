@@ -179,7 +179,7 @@ func ChangeMobilePassword(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userId = session.Get(general.SessionUserID).(uint64)
 
-	userPassword, err = models.UserService.GetUerPassword(userId)
+	userPassword, err = models.UserService.GetUserPassword(userId)
 	if err != nil {
 		log.Logger.Error("User not found:", err)
 

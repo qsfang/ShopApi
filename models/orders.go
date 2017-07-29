@@ -177,8 +177,18 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrd
 		getOrder []OrmOrders
 	)
 
-	db1 := orm.Conn
-	err = db1.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
+	db := orm.Conn
+	tx := db.Begin()
+
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	err = tx.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
 	if err != nil {
 		return getOrder, err
 	}
@@ -194,8 +204,7 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrd
 	}
 	getOrder = append(getOrder, add1)
 
-	db2 := orm.Conn
-	err = db2.Where("orderid = ?", order.ID).Find(&carts).Error
+	err = tx.Where("orderid = ?", order.ID).Find(&carts).Error
 	if err != nil {
 		return getOrder, err
 	}

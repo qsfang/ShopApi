@@ -137,6 +137,11 @@ func GetOneOrder(c echo.Context) error {
 	UserID := session.Get(general.SessionUserID).(uint64)
 
 	OutPut, err = models.OrderService.GetOneOrder(UserID, order.ID)
+	if err != nil {
+		log.Logger.Error("GetOneOrder with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
+	}
 
 	return c.JSON(errcode.ErrSucceed, OutPut)
 }
