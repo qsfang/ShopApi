@@ -53,7 +53,7 @@ func CreateCategory(c echo.Context) error {
 	if err = c.Bind(&createCategory); err != nil {
 		log.Logger.Error("[ERROR] CreateCategory Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(createCategory); err != nil {
@@ -105,20 +105,6 @@ func GetCategory(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if getCategory.PID != 0 {
-		err = models.CategoryService.CheckPID(getCategory.PID)
-		if err != nil {
-			if err == gorm.ErrRecordNotFound {
-				log.Logger.Error("[ERROR] GetCategory CheckPID: PID Not Found", err)
-
-				return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
-			}
-			log.Logger.Error("[ERROR] GetCategory CheckPID: MySQL ERROR", err)
-
-			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-		}
-	}
-
 	pageStart := utility.Paging(getCategory.Page, getCategory.PageSize)
 
 	categoryList, err = models.CategoryService.GetCategory(getCategory.PID, pageStart, getCategory.PageSize)
@@ -133,7 +119,7 @@ func GetCategory(c echo.Context) error {
 
 		log.Logger.Error("[ERROR] GetCategory GetCategory: ", err)
 
-		return general.NewErrorWithMessage(errcode.ErrCategoriesNotFound, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, *categoryList)
