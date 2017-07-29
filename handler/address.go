@@ -33,6 +33,8 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
@@ -45,26 +47,33 @@ import (
 
 func AddAddress(c echo.Context) error {
 	var (
-		err       error
-		ormAdress models.OrmAddress
+		err        error
+		addAddress models.AddAddress
 	)
 
-	if err = c.Bind(&ormAdress); err != nil {
+	if err = c.Bind(&addAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
 	}
 
-	if err = c.Validate(ormAdress); err != nil {
+	if err = c.Validate(addAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	ormAdress.UserID = session.Get(general.SessionUserID).(uint64)
+	addAddress.UserID = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request()).Get(general.SessionUserID).(uint64)
 
-	err = models.AddressService.AddAddress(&ormAdress)
+	if addAddress.IsDefault == general.AddressDefault {
+		if err = models.AddressService.AlterAddressToNotDefault(addAddress.UserID); err != nil {
+			log.Logger.Error("[ERROR AddAddress AlterAddressToNotDefault]:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrAlterAddressToNotDefault, err.Error())
+		}
+	}
+
+	err = models.AddressService.AddAddress(&addAddress)
 	if err != nil {
 		log.Logger.Error("[ERROR] AddAddress AddAddress:", err)
 
@@ -76,23 +85,23 @@ func AddAddress(c echo.Context) error {
 
 func ChangeAddress(c echo.Context) error {
 	var (
-		err       error
-		ormAdress models.OrmAddress
+		err           error
+		changeAddress models.ChangeAddress
 	)
 
-	if err = c.Bind(&ormAdress); err != nil {
+	if err = c.Bind(&changeAddress); err != nil {
 		log.Logger.Error("[ERROR] ChangeAddress Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
 	}
 
-	if err = c.Validate(ormAdress); err != nil {
+	if err = c.Validate(changeAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.AddressService.FindAddressByAddressID(ormAdress.ID)
+	err = models.AddressService.FindAddressByAddressID(changeAddress.ID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] ChangeAddress FindAddressByAddressID: Not Found", err)
@@ -105,7 +114,7 @@ func ChangeAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	err = models.AddressService.ChangeAddress(ormAdress)
+	err = models.AddressService.ChangeAddress(&changeAddress)
 	if err != nil {
 		log.Logger.Error("[ERROR] ChangeAddress ChangeAddress:", err)
 
@@ -117,59 +126,88 @@ func ChangeAddress(c echo.Context) error {
 
 func GetAddress(c echo.Context) error {
 	var (
-		err       error
-		userId    uint64
-		ormAdress models.OrmAddress
-		list      []models.AddressGet
+		err         error
+		getAddress  models.GetAddress
+		addressList *[]models.AddressGet
 	)
 
-	if err = c.Bind(&ormAdress); err != nil {
+	if err = c.Bind(&getAddress); err != nil {
 		log.Logger.Error("[ERROR] GetAddress Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
 	}
 
-	if err = c.Validate(ormAdress); err != nil {
+	if err = c.Validate(getAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	s := session.Get(general.SessionUserID)
-	userId = s.(uint64)
+	getAddress.UserID = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request()).Get(general.SessionUserID).(uint64)
 
-	pageStart, pageEnd := utility.Paging(ormAdress.Page, ormAdress.PageSize)
-	list, err = models.AddressService.GetAddressByUerID(userId, pageStart, pageEnd)
+	pageStart := utility.Paging(getAddress.Page, getAddress.PageSize)
+
+	addressList, err = models.AddressService.GetAddressByUserID(getAddress.UserID, pageStart, getAddress.PageSize)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Id not find:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
-		}
-		log.Logger.Error("Mysql err", err)
+		log.Logger.Error("[ERROR] GetAddress GetAddressByUserID: MySQL ERROR", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, list)
+	if len(*addressList) == 0 {
+		err = errors.New("Address Not Found")
+
+		log.Logger.Error("[ERROR] GetAddress GetAddressByUserID:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrAddressNotFound, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, addressList)
 }
 
 func AlterDefault(c echo.Context) error {
 	var (
-		err error
-		m   models.OrmAddress
+		err          error
+		alterAddress *models.AddressAlter
 	)
 
-	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("Bind with error:", err)
+	if err = c.Bind(&alterAddress); err != nil {
+		log.Logger.Error("[ERROR] AddAddress Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
 	}
 
-	err = models.AddressService.AlterDefault(m.ID)
+	if err = c.Validate(alterAddress); err != nil {
+		log.Logger.Error("[ERROR] AddAddress Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = models.AddressService.FindAddressByAddressID(alterAddress.ID)
 	if err != nil {
-		log.Logger.Error("Alter Default with error:", err)
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("[ERROR] AlterDefault FindAddressByAddressID: Not Found", err)
+
+			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+		}
+
+		log.Logger.Error("[ERROR] AlterDefault FindAddressByAddressID: MySQL ERROR", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	alterAddress.UserID = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request()).Get(general.SessionUserID).(uint64)
+
+	err = models.AddressService.AlterAddressToNotDefault(alterAddress.UserID)
+	if err != nil {
+		log.Logger.Error("[ERROR AlterDefault AlterAddressToNotDefault]:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrAlterAddressToNotDefault, err.Error())
+	}
+
+	err = models.AddressService.AlterAddressToDefault(alterAddress)
+	if err != nil {
+		log.Logger.Error("[ERROR AlterDefault AlterAddressToDefault]:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

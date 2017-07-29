@@ -103,9 +103,9 @@ func GetOrders(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	pageStart, pageEnd := utility.Paging(orm.Page, orm.PageSize)
+	pageStart := utility.Paging(orm.Page, orm.PageSize)
 
-	orders, err = models.OrderService.GetOrders(userID, orm.Status, pageStart, pageEnd)
+	orders, err = models.OrderService.GetOrders(userID, orm.Status, pageStart, orm.PageSize)
 	if err != nil {
 		log.Logger.Error("Mysql error in GetOrders Function:", err)
 

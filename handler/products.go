@@ -79,8 +79,8 @@ func GetProductList(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	pageStart, pageEnd := utility.Paging(cate.Page, cate.PageSize)
-	list, err = models.ProductService.GetProduct(cate.Category, pageStart, pageEnd)
+	pageStart := utility.Paging(cate.Page, cate.PageSize)
+	list, err = models.ProductService.GetProduct(cate.Category, pageStart, cate.PageSize)
 	if err != nil {
 
 		if err == gorm.ErrRecordNotFound {

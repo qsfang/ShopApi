@@ -30,23 +30,25 @@
 package errcode
 
 const (
-	ErrInformation         = 0x4
-	ErrSucceed             = 0x0
-	ErrInvalidParams       = 0x1
-	ErrMysql               = 0x2
-	ErrDelete              = 0x3 //用户登出错误
-	ErrMysqlfound          = 0x4
-	ErrNameFormat          = 0x5
-	ErrGetsess             = 0x6
-	ErrInvalidOrdersStatus = 0x7
-	ErrOrdersNotFound      = 0x8
-	NoOrder                = 0x11
-	ErrCategoriesNotFound  = 0x9
-	ErrNotFound            = 0xa
-	ErrAccess              = 0xb
-	ErrInvalidPhone        = 0xc
-	ErrInput		 =0xd
-	ErrBind = 0xe
+	ErrInformation              = 0x4
+	ErrSucceed                  = 0x0
+	ErrInvalidParams            = 0x1
+	ErrMysql                    = 0x2
+	ErrDelete                   = 0x3 //用户登出错误
+	ErrMysqlfound               = 0x4
+	ErrNameFormat               = 0x5
+	ErrGetsess                  = 0x6
+	ErrInvalidOrdersStatus      = 0x7
+	ErrOrdersNotFound           = 0x8
+	NoOrder                     = 0x11
+	ErrCategoriesNotFound       = 0x9
+	ErrNotFound                 = 0xa
+	ErrAccess                   = 0xb
+	ErrInvalidPhone             = 0xc
+	ErrInput                    = 0xd
+	ErrBind                     = 0xe
+	ErrAlterAddressToNotDefault = 0x10
+	ErrAddressNotFound          = 0x11
 
 	// 需要登录
 	ErrLoginRequired    = 0x800

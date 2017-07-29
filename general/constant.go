@@ -46,12 +46,12 @@ const (
 	Woman = 0x2
 
 	//Address  Default
-	Default   = 1
-	Undefault = 0
+	AddressDefault    = 0x1
+	AddressNotDefault = 0x0
 
 	//Products Status
-	ProductOnsale = 0xe0 // 224
-	ProductUnsale = 0xe1 // 225
+	ProductOnsale    = 0xe0 // 224
+	ProductUnsale    = 0xe1 // 225
 	ProductNotInCart = 1
 
 	//Categories Status
@@ -61,6 +61,7 @@ const (
 	// Order Status
 	OrderUnfinished = 0xef // 239
 	OrderFinished   = 0xee // 238
-	OrderGetAll		= 0xed // 237, Not order status
+	OrderGetAll     = 0xed // 237, Not order status
 	OrderCanceled   = 0xec // 236
+
 )

@@ -27,6 +27,7 @@
  *     Initial: 2017/07/18        Li Zebang
  *     Modify : 2017/07/20        Yu Yi
  *     Modify : 2017/07/20        Yang Zhengtian
+ *     Modify : 2017/07/20        Li Zebang
  */
 
 package models
@@ -34,6 +35,7 @@ package models
 import (
 	"time"
 
+	"ShopApi/general"
 	"ShopApi/orm"
 )
 
@@ -56,20 +58,31 @@ type Address struct {
 	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault" `
 }
 
-type OrmAddress struct {
-	ID        uint64    `json:"id" validate:"required,numeric"`
-	UserID    uint64    `json:"userid"`
-	Name      string    `json:"name" validate:"required,alphanum,min=6,max=100"`
-	Phone     string    `json:"phone" validate:"required,numeric,min=6,max=20"`
-	Province  string    `json:"province" validate:"required,alphanum,min=6,max=100"`
-	City      string    `json:"city" validate:"required,alphanum,min=6,max=100"`
-	Street    string    `json:"street" validate:"required,alphanum,min=6,max=100"`
-	Address   string    `json:"address" validate:"required,alphanum,min=6,max=200"`
-	Created   time.Time `json:"created"`
-	Updated   time.Time `json:"updated"`
-	IsDefault uint8     `json:"isdefault" validate:"required,numeric"`
-	Page      uint64    `json:"page" validate:"required,numeric"`
-	PageSize  uint64    `json:"pagesize" validate:"required,numeric"`
+type AddAddress struct {
+	UserID    uint64 `json:"userid"`
+	Name      string `json:"name" validate:"required,alphanumunicode"`
+	Phone     string `json:"phone" validate:"required,numeric,len=11"`
+	Province  string `json:"province" validate:"required,alphanumunicode"`
+	City      string `json:"city" validate:"required,alphanumunicode"`
+	Street    string `json:"street" validate:"required,alphanumunicode"`
+	Address   string `json:"address" validate:"required,alphanumunicode"`
+	IsDefault uint8  `json:"isdefault" validate:"max=1,min=0"`
+}
+
+type ChangeAddress struct {
+	ID       uint64 `json:"id" validate:"required"`
+	Name     string `json:"name" validate:"required,alphanumunicode"`
+	Phone    string `json:"phone" validate:"required,numeric,len=11"`
+	Province string `json:"province" validate:"required,alphanumunicode"`
+	City     string `json:"city" validate:"required,alphanumunicode"`
+	Street   string `json:"street" validate:"required,alphanumunicode"`
+	Address  string `json:"address" validate:"required,alphanumunicode"`
+}
+
+type GetAddress struct {
+	UserID   uint64 `json:"userid"`
+	Page     uint64 `json:"page" validate:"required"`
+	PageSize uint64 `json:"pagesize" validate:"required"`
 }
 
 type AddressGet struct {
@@ -79,42 +92,35 @@ type AddressGet struct {
 	Address  string `json:"address"`
 }
 
-type ChangeAddress struct {
-	ID       uint64  `json:"id" validate:"numeric"`
-	Name     *string `json:"name" validate:"required, alphaunicode, min=2,max=18"`
-	Phone    *string `json:"phone" validate:"required, alphanum, min=6,max=30"`
-	Province *string `json:"province" validate:"required, alphaunicode, min=2,max=30"`
-	City     *string `json:"city" validate:"required, alphaunicode, min=2,max=30"`
-	Street   *string `json:"street" validate:"required, alphaunicode, min=2,max=30"`
-	Address  *string `json:"address" validate:"required, alphaunicode, min=2,max=30"`
+type AddressAlter struct {
+	ID     uint64 `json:"id" validate:"required"`
+	UserID uint64 `json:"userid"`
 }
 
 func (Address) TableName() string {
 	return "address"
 }
 
-func (csp *AddressServiceProvider) AddAddress(ormAddress *OrmAddress) error {
+func (csp *AddressServiceProvider) AddAddress(addAddress *AddAddress) error {
 	var (
 		err     error
 		address *Address
 	)
 
 	address = &Address{
-		UserID:    ormAddress.UserID,
-		Name:      ormAddress.Name,
-		Phone:     ormAddress.Phone,
-		Province:  ormAddress.Province,
-		City:      ormAddress.City,
-		Street:    ormAddress.Street,
-		Address:   ormAddress.Address,
+		UserID:    addAddress.UserID,
+		Name:      addAddress.Name,
+		Phone:     addAddress.Phone,
+		Province:  addAddress.Province,
+		City:      addAddress.City,
+		Street:    addAddress.Street,
+		Address:   addAddress.Address,
 		Created:   time.Now(),
 		Updated:   time.Now(),
-		IsDefault: ormAddress.IsDefault,
+		IsDefault: addAddress.IsDefault,
 	}
 
-	db := orm.Conn
-
-	tx := db.Begin()
+	tx := orm.Conn.Begin()
 	defer func() {
 		if err != nil {
 			err = tx.Rollback().Error
@@ -123,79 +129,137 @@ func (csp *AddressServiceProvider) AddAddress(ormAddress *OrmAddress) error {
 		}
 	}()
 
-	return tx.Create(address).Error
+	err = tx.Create(address).Error
+
+	return err
 }
 
-func (csp *AddressServiceProvider) ChangeAddress(OrmAddress OrmAddress) error {
+func (csp *AddressServiceProvider) ChangeAddress(changeAddress *ChangeAddress) error {
 	var (
 		address Address
+		err     error
 	)
 
-	changeMap := map[string]interface{}{
-		"name":     OrmAddress.Name,
-		"phone":    OrmAddress.Phone,
-		"province": OrmAddress.Province,
-		"city":     OrmAddress.City,
-		"street":   OrmAddress.Street,
-		"address":  OrmAddress.Address,
+	updater := map[string]interface{}{
+		"name":     changeAddress.Name,
+		"phone":    changeAddress.Phone,
+		"province": changeAddress.Province,
+		"city":     changeAddress.City,
+		"street":   changeAddress.Street,
+		"address":  changeAddress.Address,
 	}
 
-	return orm.Conn.Model(&address).Where("id = ?", OrmAddress.ID).Update(changeMap).Limit(1).Error
+	tx := orm.Conn.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	err = tx.Model(&address).Where("id = ?", changeAddress.ID).Update(updater).Limit(1).Error
+
+	return err
 }
 
 func (csp *AddressServiceProvider) FindAddressByAddressID(ID uint64) error {
 	var (
 		address Address
+		err     error
 	)
 
-	return orm.Conn.Where("id = ?", ID).First(&address).Error
+	tx := orm.Conn.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	err = tx.Where("id = ?", ID).First(&address).Error
+
+	return err
 }
 
-func (csp *AddressServiceProvider) GetAddressByUerID(userId uint64, pageStart, pageEnd uint64) ([]AddressGet, error) {
+func (csp *AddressServiceProvider) GetAddressByUserID(userID uint64, pageStart, pageSize uint64) (*[]AddressGet, error) {
 	var (
-		list   Address
-		getAdd []AddressGet
+		address     Address
+		addressGet  AddressGet
+		addressList []AddressGet
+		err         error
 	)
 
-	db := orm.Conn
-	err := db.Where("userid =? ", userId).Find(&list).Error
-	if err != nil {
-		return getAdd, err
-	}
+	tx := orm.Conn.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
 
-	sql := "SELECT * FROM contact WHERE userid = ? LIMIT ?, ? LOCK IN SHARE MODE"
+	sql := "SELECT * FROM address WHERE userid = ? LIMIT ?, ? LOCK IN SHARE MODE"
 
-	rows, err := db.Raw(sql, userId, pageStart, pageEnd).Rows()
+	rows, err := tx.Raw(sql, userID, pageStart, pageSize).Rows()
 	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
-		db.ScanRows(rows, &list)
-		add := AddressGet{
-			Province: list.Province,
-			City:     list.City,
-			Street:   list.Street,
-			Address:  list.Address,
+		tx.ScanRows(rows, &address)
+		addressGet = AddressGet{
+			Province: address.Province,
+			City:     address.City,
+			Street:   address.Street,
+			Address:  address.Address,
 		}
-		getAdd = append(getAdd, add)
+		addressList = append(addressList, addressGet)
 	}
 
-	return getAdd, nil
+	return &addressList, nil
 }
 
-func (csp *AddressServiceProvider) AlterDefault(id uint64) error {
+func (csp *AddressServiceProvider) AlterAddressToDefault(alterAddress *AddressAlter) error {
 	var (
-		s   Address
-		con Address
+		address Address
+		err     error
 	)
-	db := orm.Conn
-	err := db.Where("id=?", id).Find(&s).Error
 
-	updater := map[string]interface{}{"isdefault": s.IsDefault ^ 1}
+	updater := map[string]interface{}{"isdefault": general.AddressDefault}
 
-	err = db.Model(&con).Where("id=?", id).Update(updater).Limit(1).Error
+	tx := orm.Conn.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	err = tx.Model(&address).Where("id = ?", alterAddress.ID).Update(updater).Limit(1).Error
 
 	return err
+}
+
+func (csp *AddressServiceProvider) AlterAddressToNotDefault(userID uint64) error {
+	var (
+		address Address
+		err     error
+	)
+
+	updater := map[string]uint8{"isdefault": general.AddressNotDefault}
+
+	tx := orm.Conn.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	return orm.Conn.Model(&address).Where("userid = ?", userID).Update(updater).Limit(1).Error
 }

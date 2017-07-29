@@ -92,9 +92,9 @@ func GetCategories(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	pageStart, pageEnd := utility.Paging(orm.Page, orm.PageSize)
+	pageStart := utility.Paging(orm.Page, orm.PageSize)
 
-	categories, err = models.CategoriesService.GetCategories(orm.Pid, pageStart, pageEnd)
+	categories, err = models.CategoriesService.GetCategories(orm.Pid, pageStart, orm.PageSize)
 	if err != nil {
 		log.Logger.Error("Mysql error in GetCategories Function:", err)
 

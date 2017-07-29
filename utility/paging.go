@@ -29,10 +29,6 @@
 
 package utility
 
-func Paging(page, pageSize uint64) (pageStart, pageEnd uint64) {
-	if page == 0 {
-		page = 1
-	}
-
-	return (page - 1) * pageSize, page * pageSize
+func Paging(page, pageSize uint64) (pageStart uint64) {
+	return (page - 1) * pageSize
 }
