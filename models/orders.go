@@ -105,7 +105,7 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) e
 		TotalPrice: ord.TotalPrice,
 		Freight:    ord.Freight,
 		Remark:     ord.Remark,
-		Status:     general.OrderFinished,
+		Status:     general.OrderUnfinished,
 		PayWay:     ord.PayWay,
 		Created:    time.Now(),
 		Updated:    time.Now(),
@@ -129,10 +129,9 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) e
 
 	changeMap := map[string]interface{}{
 		"status":    general.ProNotInCart,
-		"paystatus": general.PayUnfinished,
 		"orderid":   order.ID,
 	}
-	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", numberID, general.ProInCart, general.PayUnfinished).Update(changeMap).Limit(1).Error
+	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", numberID, general.ProInCart, general.Buy).Update(changeMap).Limit(1).Error
 
 	return err
 }
