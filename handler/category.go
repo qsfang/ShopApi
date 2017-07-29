@@ -26,6 +26,7 @@
  * Revision History:
  *     Initial: 2017/07/21        Yang Zhengtian
  *     Modify : 2017/07/21        Li Zebang
+ *     Modify : 2017/07/29        Li Zebang
  */
 
 package handler
@@ -43,33 +44,39 @@ import (
 	"ShopApi/utility"
 )
 
-func CreateCategories(c echo.Context) error {
+func CreateCategory(c echo.Context) error {
 	var (
-		err  error
-		cate models.OrmCategories
+		err            error
+		createCategory models.CreateCategory
 	)
 
-	if err = c.Bind(&cate); err != nil {
-		log.Logger.Error("Create crash with error:", err)
+	if err = c.Bind(&createCategory); err != nil {
+		log.Logger.Error("[ERROR] CreateCategory Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
+	}
+
+	if err = c.Validate(createCategory); err != nil {
+		log.Logger.Error("[ERROR] CreateCategory Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if cate.Pid != 0 {
-		err = models.CategoriesService.CheckPid(cate.Pid)
+	if createCategory.PID != 0 {
+		err = models.CategoryService.CheckPID(createCategory.PID)
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
-				log.Logger.Error("Pid is invalid:", err)
+				log.Logger.Error("[ERROR] CreateCategory CheckPID: PID Not Found", err)
 
 				return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 			}
-			log.Logger.Error("Mysql error:", err)
+			log.Logger.Error("[ERROR] CreateCategory CheckPID: MySQL ERROR", err)
 
 			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 		}
 	}
 
-	err = models.CategoriesService.Create(cate)
+	err = models.CategoryService.CreateCategory(createCategory)
 	if err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
@@ -79,35 +86,55 @@ func CreateCategories(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, nil)
 }
 
-func GetCategories(c echo.Context) error {
+func GetCategory(c echo.Context) error {
 	var (
-		err        error
-		orm        models.OrmCategories
-		categories *[]models.Categories
+		err          error
+		getCategory  models.GetCategory
+		categoryList *[]models.CategoryGet
 	)
 
-	if err = c.Bind(&orm); err != nil {
-		log.Logger.Error("Bind with error:", err)
+	if err = c.Bind(&getCategory); err != nil {
+		log.Logger.Error("[ERROR] GetCategory Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
+	}
+
+	if err = c.Validate(getCategory); err != nil {
+		log.Logger.Error("[ERROR] GetCategory Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	pageStart := utility.Paging(orm.Page, orm.PageSize)
+	if getCategory.PID != 0 {
+		err = models.CategoryService.CheckPID(getCategory.PID)
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				log.Logger.Error("[ERROR] GetCategory CheckPID: PID Not Found", err)
 
-	categories, err = models.CategoriesService.GetCategories(orm.Pid, pageStart, orm.PageSize)
+				return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+			}
+			log.Logger.Error("[ERROR] GetCategory CheckPID: MySQL ERROR", err)
+
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		}
+	}
+
+	pageStart := utility.Paging(getCategory.Page, getCategory.PageSize)
+
+	categoryList, err = models.CategoryService.GetCategory(getCategory.PID, pageStart, getCategory.PageSize)
 	if err != nil {
-		log.Logger.Error("Mysql error in GetCategories Function:", err)
+		log.Logger.Error("[ERROR] GetCategory GetCategory: MySQL ERROR", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	if len(*categories) == 0 {
+	if len(*categoryList) == 0 {
 		err = errors.New("Categories Not Found")
 
-		log.Logger.Error("Error:", err)
+		log.Logger.Error("[ERROR] GetCategory GetCategory: ", err)
 
 		return general.NewErrorWithMessage(errcode.ErrCategoriesNotFound, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, *categories)
+	return c.JSON(errcode.ErrSucceed, *categoryList)
 }

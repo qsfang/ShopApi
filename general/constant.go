@@ -46,18 +46,17 @@ const (
 	Woman = 0x2
 
 	//Address  Default
-	AddressDefault    = 0x1
 	AddressNotDefault = 0x0
+	AddressDefault    = 0x1
 
+	//Category Status
+	CategoryNotUse = 0x0
+	CategoryOnUse  = 0x1
 
 	//Products Status
 	ProductOnsale    = 0xe0 // 224
 	ProductUnsale    = 0xe1 // 225
 	ProductNotInCart = 1
-
-	//Categories Status
-	CategoriesOnuse = 0xa0 // 160
-	CategoriesUnuse = 0xa1 // 161
 
 	// Order Status
 	OrderUnfinished = 0xef // 239
@@ -66,13 +65,13 @@ const (
 	OrderCanceled   = 0xec // 236
 
 	//CartPro status
-	ProInCart   =  0xea//233
-	ProNotInCart = 0xeb//234
+	ProInCart    = 0xea //233
+	ProNotInCart = 0xeb //234
 
 	//Pay status
-	PayFinished =  0xec//235
-	PayUnfinished = 0xed//236
+	PayFinished   = 0xec //235
+	PayUnfinished = 0xed //236
 
-	OrderPaid       = 0xf1 // 241
-	OrderUnpaid     = 0xf2 // 240
+	OrderPaid   = 0xf1 // 241
+	OrderUnpaid = 0xf2 // 240
 )

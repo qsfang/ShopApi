@@ -48,14 +48,14 @@ func InitRouter(server *echo.Echo) {
 	server.POST("/api/v1/user/changemobilepass",handler.ChangeMobilePassword)
 	server.POST("/api/v1/user/changeinfo", handler.ChangeUserInfo)
 	server.POST("/api/v1/user/changepass",handler.ChangeMobilePassword,handler.MustLogin)
-	server.POST("/api/vl/user/changephone",handler.Changephone)
+	server.POST("/api/vl/user/changephone",handler.ChangePhone)
 	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
 
 
 	server.POST("/api/v1/address/add", handler.AddAddress, handler.MustLogin)
-	server.POST("/api/v1/address/change",handler.ChangeAddress, handler.MustLogin)
+	server.POST("/api/v1/address/change", handler.ChangeAddress, handler.MustLogin)
 	server.POST("/api/v1/address/get", handler.GetAddress, handler.MustLogin)
-	server.POST("/api/vl/address/alter",handler.AlterDefault, handler.MustLogin)
+	server.POST("/api/vl/address/alter", handler.AlterDefault, handler.MustLogin)
 
 	server.POST("/api/v1/products/create",handler.CreateProduct)//创建商品
 	server.POST("/api/v1/product/getinfo",handler.GetProInfo,handler.MustLogin)
@@ -69,10 +69,10 @@ func InitRouter(server *echo.Echo) {
 	server.POST("/api/v1/orders/changestatus",handler.ChangeStatus)
 	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
 
-	server.POST("/api/vl/categories/get", handler.GetCategories)
-	server.POST("/api/v1/categories/create",handler.CreateCategories)
+	server.POST("/api/v1/category/create", handler.CreateCategory)
+	server.POST("/api/vl/category/get", handler.GetCategory)
 
-	server.POST("/api/v1/carts/delete", handler.Cartsdel, handler.MustLogin)
+	server.POST("/api/v1/carts/delete", handler.CartsDelete, handler.MustLogin)
 	server.POST("/api/vl/carts/altercartpro",handler.AlterCartPro)
 	server.POST("/api/vl/carts/cartsput",handler.CartsPutIn, handler.MustLogin)
 	server.GET("/api/v1/carts/browse", handler.BrowseCart, handler.MustLogin)

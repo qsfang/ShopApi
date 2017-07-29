@@ -91,7 +91,6 @@ CREATE TABLE IF NOT EXISTS `category` (
   `name` varchar(64) NOT NULL DEFAULT '',
   `pid` int(16) NOT NULL DEFAULT '0',
   `status` int(16) NOT NULL,
-  `remark` varchar(1024) DEFAULT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
