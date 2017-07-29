@@ -47,6 +47,8 @@ func CartsPutIn(c echo.Context) error {
 	var (
 		err   error
 		carts models.ConCarts
+
+		ProInfo *models.Product
 	)
 
 	if err = c.Bind(&carts); err != nil {
@@ -54,6 +56,17 @@ func CartsPutIn(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
+
+	ProInfo, err = models.ProductService.GetProInfo(carts.ProductID)
+
+	if err != nil {
+		log.Logger.Error("Get info with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	carts.Name = ProInfo.Name
+	carts.ImageID = ProInfo.ImageID
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID)
@@ -81,7 +94,11 @@ func Cartsdel(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.CartsDelete(cart.ID, cart.ProductID)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID)
+	id := userID.(uint64)
+
+	err = models.CartsService.CartsDelete(id, cart.ProductID, &cart.Color, &cart.Size)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("This product doesn't exist !", err)
@@ -100,7 +117,7 @@ func Cartsdel(c echo.Context) error {
 func AlterCartPro(c echo.Context) error {
 	var (
 		err     error
-		cartpro models.ConCarts
+		cartpro models.Cart
 	)
 
 	if err = c.Bind(&cartpro); err != nil {
@@ -109,7 +126,8 @@ func AlterCartPro(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count)
+	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count,cartpro.PayStatus)
+
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("This product doesn't exist !", err)

@@ -32,11 +32,11 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"ShopApi/general"
 	"ShopApi/orm"
-	"fmt"
 )
 
 type OrderServiceProvider struct {
@@ -44,20 +44,17 @@ type OrderServiceProvider struct {
 
 var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 
-// todo：参数检查 结构
-type Orders struct {
-	ID         uint64    `sql:"auto_increment;primary_key;" json:"id"`
+type Order struct {
+	ID         uint64    `sql:"auto_increment;primary_key;"json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
-	TotalPrice float64   `gorm:"column:totalprice"json:"totalprice"`
-	Payment    float64   `json:"payment"`
-	Freight    float64   `json:"freight"`
-	Remark     string    `json:"remark"`
-	Discount   uint8     `json:"discount"`
-	Size       string    `json:"size"`
-	Color      string    `json:"color"`
-	Status     uint8     `json:"status"`
+	AddressID  uint64    `gorm:"column:addressid" json:"addressid"`
+	TotalPrice float64   `gorm:"column:totalprice" json:"totalprice"`
+	Freight    float64   `gorm:"column:freight" json:"freight"`
+	Remark     string    `gorm:"column:remark" json:"remark"`
+	Status     uint8     `gorm:"column:status" json:"status"`
 	Created    time.Time `json:"created"`
-	PayWay     uint8     `gorm:"column:payway"json:"payway"`
+	Updated    time.Time `json:"updated"`
+	PayWay     uint8     `gorm:"column:payway" json:"payway"`
 }
 
 type OrmOrders struct {
@@ -66,78 +63,82 @@ type OrmOrders struct {
 	TotalPrice float64   `json:"totalprice" validate:"required,numeric"`
 	Payment    float64   `json:"payment" validate:"required,numeric"`
 	Freight    float64   `json:"freight" validate:"required,numeric"`
-	Remark     string    `json:"remark" validate:"alphanum"`
 	Discount   uint8     `json:"discount" validate:"numeric"`
+	Name       string    `json:"name"validate:"required, alphaunicode, min = 2, max = 18"`
 	Size       string    `json:"size" validate:"required,alphanum"`
+	Count      uint64    `json:"count"validate:"required,numeric"`
 	Color      string    `json:"color" validate:"required,alphanum"`
 	Status     uint8     `json:"status" validate:"required,numeric"`
-	Created    time.Time `json:"created"`
 	PayWay     uint8     `json:"payway" validate:"required,numeric"`
 	Page       uint64    `json:"page" validate:"required,numeric"`
 	PageSize   uint64    `json:"pagesize" validate:"required,numeric"`
+	AddressID  uint64    `json:"addressid" validate:"required,numeric"`
+	ImageID    uint64    `gorm:"column:imageid"json:"imageid"`
+	Remark     string    `json:"remark"`
+	Created    time.Time `json:"created"`
+	Updated    time.Time `json:"updated"`
 }
 
-type RegisterOrder struct {
-	Name       string  `json:"productname"`
-	TotalPrice float64 `json:"totalprice"`
-	Payment    float64 `json:"payment"`
-	Freight    float64 `json:"freight"`
-	Remark     string  `json:"remark"`
-	Discount   uint8   `json:"discount"`
-	Size       string  `json:"size"`
-	Color      string  `json:"color"`
-	Payway     uint8   `json:"payway"`
+
+
+func (Order) TableName() string {
+	return "order"
 }
 
-func (Orders) TableName() string {
-	return "orders"
-}
-
-// todo：命名
-func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o RegisterOrder) error {
+func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o OrmOrders) error {
 	var (
-		pro Product
 		err error
+		car Cart
 	)
 
-	db := orm.Conn
-	err = db.Where("name = ? AND size = ? AND color = ?", o.Name, o.Size, o.Color).Find(&pro).Error
-	if err != nil {
-		return err
-	}
-
-	order := Orders{
+	order := Order{
 		UserID:     numberID,
+		AddressID:  o.AddressID,
 		TotalPrice: o.TotalPrice,
-		Payment:    o.Payment,
 		Freight:    o.Freight,
 		Remark:     o.Remark,
-		Discount:   o.Discount,
-		Size:       o.Size,
-		Color:      o.Color,
 		Status:     general.OrderFinished,
+		PayWay:     o.PayWay,
 		Created:    time.Now(),
-		PayWay:     o.Payway,
+		Updated:    time.Now(),
 	}
 
-	err = db.Create(&order).Error
+	db := orm.Conn
+
+	tx := db.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	err = tx.Create(&order).Error
 	if err != nil {
 		return err
 	}
 
-	return nil
+	changeMap := map[string]interface{}{
+		"status":  	 0,
+		"paystatus":	 0,
+		"orderid":      order.ID,
+	}
+	err = tx.Model(&car).Where("userid = ? AND status = 1 AND paystatus = 1", numberID).Update(changeMap).Limit(1).Error
+
+	return err
 }
 
-func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStart, pageEnd uint64) (*[]Orders, error) {
+func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStart, pageEnd uint64) (*[]Order, error) {
 	var (
-		order  Orders
-		orders []Orders
+		order  Order
+		orders []Order
 	)
 
 	db := orm.Conn
 
 	if status == general.OrderUnfinished || status == general.OrderFinished {
-		sql := fmt.Sprintf("SELECT * FROM orders WHERE userid = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
+		sql := fmt.Sprintf("SELECT * FROM order WHERE userid = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
 
 		rows, err := db.Raw(sql, userID, status).Rows()
 		defer rows.Close()
@@ -153,7 +154,7 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 		return &orders, nil
 	}
 
-	sql := fmt.Sprintf("SELECT * FROM orders WHERE userid = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
+	sql := fmt.Sprintf("SELECT * FROM order WHERE userid = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
 
 	rows, err := db.Raw(sql, userID).Rows()
 	defer rows.Close()
@@ -169,36 +170,53 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 	return &orders, nil
 }
 
-
-func (osp *OrderServiceProvider) GetOneOrder(ID uint64, UserID uint64) (*OrmOrders, error) {
+func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrders, error) {
 	var (
 		err      error
-		order    Orders
-		getOrder *OrmOrders = &OrmOrders{}
+		order    Order
+		carts    []Cart
+		getOrder []OrmOrders
 	)
 
-	db := orm.Conn
-	err = db.Where("userid = ? AND id = ?", UserID, ID).Find(&order).Error
+	db1 := orm.Conn
+	err = db1.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
 	if err != nil {
 		return getOrder, err
 	}
 
-	*getOrder = OrmOrders{
+	add1 := OrmOrders{
 		TotalPrice: order.TotalPrice,
-		Payment:    order.Payment,
 		Freight:    order.Freight,
-		Discount:   order.Discount,
-		Size:       order.Size,
-		Color:      order.Color,
 		Status:     order.Status,
 		Created:    order.Created,
+		PayWay:     order.PayWay,
+		Updated:    order.Updated,
+		AddressID:  order.AddressID,
+	}
+	getOrder = append(getOrder, add1)
+
+	db2 := orm.Conn
+	err = db2.Where("orderid = ?", order.ID).Find(&carts).Error
+	if err != nil {
+		return getOrder, err
+	}
+
+	for _, v := range carts {
+		add1 := OrmOrders{
+			Name:    v.Name,
+			Count:   v.Count,
+			Size:    v.Size,
+			Color:   v.Color,
+			ImageID: v.ImageID,
+		}
+		getOrder = append(getOrder, add1)
 	}
 
 	return getOrder, nil
 }
 
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
-	cha := Orders{
+	cha := Order{
 		Status: status,
 	}
 

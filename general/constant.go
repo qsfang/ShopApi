@@ -49,6 +49,7 @@ const (
 	AddressDefault    = 0x1
 	AddressNotDefault = 0x0
 
+
 	//Products Status
 	ProductOnsale    = 0xe0 // 224
 	ProductUnsale    = 0xe1 // 225
@@ -64,4 +65,14 @@ const (
 	OrderGetAll     = 0xed // 237, Not order status
 	OrderCanceled   = 0xec // 236
 
+	//Cart status
+	ProInCart   =  0xea//233
+	ProNotInCart = 0xeb//234
+
+	//Pay status
+	PayFinished =  0xec//235
+	PayUnfinished = 0xed//236
+
+	OrderPaid       = 0xf1 // 241
+	OrderUnpaid     = 0xf2 // 240
 )

@@ -44,14 +44,10 @@ import (
 	"ShopApi/utility"
 )
 
-type ChangStatus struct {
-	ID     uint64 `json:"id"`
-	Status uint8  `json:"status"`
-}
 
 func CreateOrder(c echo.Context) error {
 	var (
-		order models.RegisterOrder
+		order models.OrmOrders
 		err   error
 	)
 
@@ -61,13 +57,13 @@ func CreateOrder(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	numberID := sess.Get(general.SessionUserID).(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	numberID := session.Get(general.SessionUserID).(uint64)
 
 	err = models.OrderService.CreateOrder(numberID, order)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Product not found:", err)
+			log.Logger.Error("Carts not found:", err)
 
 			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
 		}
@@ -83,7 +79,7 @@ func GetOrders(c echo.Context) error {
 	var (
 		err    error
 		orm    models.OrmOrders
-		orders *[]models.Orders
+		orders *[]models.Order
 	)
 
 	if err = c.Bind(&orm); err != nil {
@@ -126,8 +122,8 @@ func GetOrders(c echo.Context) error {
 func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
-		order  *models.OrmOrders
-		OutPut *models.OrmOrders
+		order  models.Order
+		OutPut []models.OrmOrders
 	)
 
 	if err = c.Bind(&order); err != nil {
@@ -139,19 +135,7 @@ func GetOneOrder(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	UserID := session.Get(general.SessionUserID).(uint64)
 
-	OutPut, err = models.OrderService.GetOneOrder(order.ID, UserID)
-
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Find order with error:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
-		}
-
-		log.Logger.Error("Get Order with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
-	}
+	OutPut, err = models.OrderService.GetOneOrder(UserID, order.ID)
 
 	return c.JSON(errcode.ErrSucceed, OutPut)
 }
@@ -159,7 +143,7 @@ func GetOneOrder(c echo.Context) error {
 func ChangeStatus(c echo.Context) error {
 	var (
 		err error
-		st  ChangStatus
+		st  models.OrmOrders
 	)
 
 	if err = c.Bind(&st); err != nil {
@@ -168,7 +152,7 @@ func ChangeStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if st.Status != general.OrderFinished && st.Status != general.OrderUnfinished && st.Status != general.OrderCanceled {
+	if st.Status != general.OrderFinished && st.Status != general.OrderUnfinished && st.Status != general.OrderCanceled && st.Status != general.OrderPaid && st.Status != general.OrderUnpaid {
 		err = errors.New("Status unExistence")
 		log.Logger.Error("", err)
 

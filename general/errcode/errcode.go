@@ -30,7 +30,6 @@
 package errcode
 
 const (
-	ErrInformation              = 0x4
 	ErrSucceed                  = 0x0
 	ErrInvalidParams            = 0x1
 	ErrMysql                    = 0x2
@@ -49,6 +48,7 @@ const (
 	ErrBind                     = 0xe
 	ErrAlterAddressToNotDefault = 0x10
 	ErrAddressNotFound          = 0x11
+	ErrInformation         = 0xf
 
 	// 需要登录
 	ErrLoginRequired    = 0x800
