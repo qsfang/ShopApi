@@ -51,7 +51,7 @@ func CartsPutIn(c echo.Context) error {
 	)
 
 	if err = c.Bind(&carts); err != nil {
-		log.Logger.Error("Bind with error:", err)
+		log.Logger.Error("[ERROR] Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -59,7 +59,7 @@ func CartsPutIn(c echo.Context) error {
 	ProInfo, err = models.ProductService.GetProInfo(carts.ProductID)
 
 	if err != nil {
-		log.Logger.Error("Get Information with error:", err)
+		log.Logger.Error("[ERROR] Get Information with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -72,7 +72,7 @@ func CartsPutIn(c echo.Context) error {
 
 	err = models.CartsService.CreateInCarts(&carts, userID)
 	if err != nil {
-		log.Logger.Error("Mysql error with adding address:", err)
+		log.Logger.Error("[ERROR] Mysql error with adding address:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -122,11 +122,16 @@ func AlterCartPro(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
+	if err = c.Validate(cartProduct); err != nil {
+		log.Logger.Error("[ERROR] AlterCartPro Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
 	
 	err = models.CartsService.AlterCartPro(cartProduct.ID, cartProduct.Count, cartProduct.Color, cartProduct.Size)
 
 	if err != nil {
-		log.Logger.Error("Alter product with error:", err)
+		log.Logger.Error("[ERROR] Alter product with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -146,12 +151,12 @@ func BrowseCart(c echo.Context) error {
 	output, err = models.CartsService.BrowseCart(userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Find order with error:", err)
+			log.Logger.Error("[ERROR] Find order with error:", err)
 
 			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
 		}
 
-		log.Logger.Error("Get Order with error:", err)
+		log.Logger.Error("[ERROR] Get Order with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
 	}

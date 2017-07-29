@@ -68,7 +68,7 @@ func CreateOrder(c echo.Context) error {
 
 	err = models.OrderService.CreateOrder(numberID, order)
 	if err != nil {
-		log.Logger.Error("Mysql error:", err)
+		log.Logger.Error("[ERROR] Mysql error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -84,15 +84,15 @@ func GetOrders(c echo.Context) error {
 	)
 
 	if err = c.Bind(&orm); err != nil {
-		log.Logger.Error("Bind with error:", err)
+		log.Logger.Error("[ERROR] Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	if orm.Status != general.OrderUnfinished && orm.Status != general.OrderFinished && orm.Status != general.OrderGetAll {
-		err = errors.New("Invalid Orders Status")
+		err = errors.New("[ERROR] Invalid Orders Status")
 
-		log.Logger.Error("Error:", err)
+		log.Logger.Error("[ERROR] Error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidOrdersStatus, err.Error())
 	}
@@ -104,15 +104,15 @@ func GetOrders(c echo.Context) error {
 
 	orders, err = models.OrderService.GetOrders(userID, orm.Status, pageStart, orm.PageSize)
 	if err != nil {
-		log.Logger.Error("Mysql error in GetOrders Function:", err)
+		log.Logger.Error("[ERROR] Mysql error in GetOrders Function:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	if len(*orders) == 0 {
-		err = errors.New("Orders Not Found")
+		err = errors.New("[ERROR] Orders Not Found")
 
-		log.Logger.Error("Error:", err)
+		log.Logger.Error("[ERROR] Error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
 	}
@@ -128,7 +128,7 @@ func GetOneOrder(c echo.Context) error {
 	)
 
 	if err = c.Bind(&order); err != nil {
-		log.Logger.Error("Bind with error:", err)
+		log.Logger.Error("[ERROR] Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -138,7 +138,7 @@ func GetOneOrder(c echo.Context) error {
 
 	OutPut, err = models.OrderService.GetOneOrder(UserID, order.ID)
 	if err != nil {
-		log.Logger.Error("GetOneOrder with error:", err)
+		log.Logger.Error("[ERROR] GetOneOrder with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
 	}
@@ -153,20 +153,20 @@ func ChangeStatus(c echo.Context) error {
 	)
 
 	if err = c.Bind(&st); err != nil {
-		log.Logger.Error("Input order status with error:", err)
+		log.Logger.Error("[ERROR] Input order status with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	if st.Status != general.OrderFinished && st.Status != general.OrderUnfinished && st.Status != general.OrderCanceled && st.Status != general.OrderPaid && st.Status != general.OrderUnpaid {
-		err = errors.New("Status InExistent")
+		err = errors.New("[ERROR] Status InExistent")
 		log.Logger.Error("", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 	err = models.OrderService.ChangeStatus(st.ID, st.Status)
 	if err != nil {
-		log.Logger.Error("Change status with error:", err)
+		log.Logger.Error("[ERROR] Change status with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}

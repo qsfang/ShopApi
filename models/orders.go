@@ -239,6 +239,6 @@ func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
 	updater := map[string]interface{}{"status": status}
 	db := orm.Conn
 
-	err := db.Model(&cha).Where("id=?", id).Update(updater).Limit(1).Error
+	err := db.Model(&cha).Where("id = ?", id).Update(updater).Limit(1).Error
 	return err
 }

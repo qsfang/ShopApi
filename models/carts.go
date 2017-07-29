@@ -48,34 +48,32 @@ type Cart struct {
 	ID        uint64    `sql:"primary_key;" gorm:"column:id" json:"id"`
 	ProductID uint64    `gorm:"column:productid" json:"productid"`
 	OrderID   uint64    `gorm:"column:orderid" json:"orderid"`
-	Name      string    `json:"name"`
 	Count     uint64    `json:"count" validate:"required,numeric"`
-	Size      string    `json:"size"`
-	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	ImageID   uint64    `gorm:"column:imageid" json:"imageid"`
-	Status    uint64     `json:"status"`
-	PayStatus uint64     `gorm:"column:paystatus" json:"paystatus"`
+	PayStatus uint64    `gorm:"column:paystatus" json:"paystatus"`
+	Size      string    `json:"size"`
+	Color     string    `json:"color"`
+	Name      string    `json:"name"`
+	Status    uint64    `json:"status"`
 	Created   time.Time `json:"created"`
+}
+
+type ConCarts struct {
+	ProductID uint64    `json:"productid" validate:"numeric"`
+	Status    uint64    `json:"status" validate:"required, numeric, max = 1"`
+	Name      string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
+	Count     uint64    `json:"count" validate:"numeric"`
+	ImageID   uint64    `json:"imageid" validate:"numeric"`
+	Created   time.Time `json:"created"`
+	Size      string    `json:"size"`
+	Color     string    `json:"color"`
 }
 
 type CartDel struct {
 	ProductID uint64    `json:"productid" validate:"required"`
 	Size      string    `json:"size" validate:"required,alphanumunicode"`
 	Color     string    `json:"color" validate:"required,alphanumunicode"`
-}
-
-type ConCarts struct {
-	ID        uint64    `gorm:"column:id" json:"id" validate:"numeric"`
-	ProductID uint64    `gorm:"column:productid" json:"productid" validate:"numeric"`
-	Name      string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
-	Count     uint64    `json:"count" validate:"numeric"`
-	Size      string    `json:"size"`
-	Color     string    `json:"color"`
-	UserID    uint64    `gorm:"column:userid" json:"userid"`
-	ImageID   uint64    `gorm:"column:imageid"json:"imageid" validate:"numeric"`
-	Status    uint64     `json:"status" validate:"required, numeric, max = 1"`
-	Created   time.Time `json:"created"`
 }
 
 func(Cart) TableName() string {
