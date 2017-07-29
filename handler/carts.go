@@ -122,19 +122,8 @@ func AlterCartPro(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
-
-<<<<<<< HEAD
+	
 	err = models.CartsService.AlterCartPro(cartProduct.ID, cartProduct.Count, cartProduct.Color, cartProduct.Size)
-=======
-	if cartProduct.PayStatus != general.PayFinished && cartProduct.PayStatus != general.PayUnfinished {
-		err = errors.New("Pay Status InExistent")
-		log.Logger.Error("status transformed with error :", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	err = models.CartsService.AlterCartPro(cartProduct.ID, cartProduct.Count, cartProduct.PayStatus)
->>>>>>> e8b66e69670ae1842e8e72c4c7e3076fd76b57c2
 
 	if err != nil {
 		log.Logger.Error("Alter product with error:", err)
