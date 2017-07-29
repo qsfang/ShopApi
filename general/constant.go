@@ -65,7 +65,7 @@ const (
 	OrderGetAll     = 0xed // 237, Not order status
 	OrderCanceled   = 0xec // 236
 
-	//Cart status
+	//CartPro status
 	ProInCart   =  0xea//233
 	ProNotInCart = 0xeb//234
 

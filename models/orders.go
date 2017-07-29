@@ -79,8 +79,6 @@ type OrmOrders struct {
 	Updated    time.Time `json:"updated"`
 }
 
-
-
 func (Order) TableName() string {
 	return "order"
 }
@@ -120,9 +118,9 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o OrmOrders) error
 	}
 
 	changeMap := map[string]interface{}{
-		"status":  	 0,
-		"paystatus":	 0,
-		"orderid":      order.ID,
+		"status":    0,
+		"paystatus": 0,
+		"orderid":   order.ID,
 	}
 	err = tx.Model(&car).Where("userid = ? AND status = 1 AND paystatus = 1", numberID).Update(changeMap).Limit(1).Error
 

@@ -70,7 +70,7 @@ type CreateCat struct {
 }
 
 func (Categories) TableName() string {
-	return "categories"
+	return "category"
 }
 
 func (csp *CategoriesServiceProvider) CheckPid(pid uint64) error {
@@ -88,7 +88,7 @@ func (csp *CategoriesServiceProvider) CheckPid(pid uint64) error {
 	return nil
 }
 
-func (csp *CategoriesServiceProvider) Create(ca CreateCat) error {
+func (csp *CategoriesServiceProvider) Create(ca OrmCategories) error {
 	cate := Categories{
 		Name:    ca.Name,
 		Pid:     ca.Pid,
