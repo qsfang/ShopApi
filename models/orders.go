@@ -25,8 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Li Zebang
- *	   Modify : 2017/07/21		 Ai Hao       订单状态更改
- *	   Modify : 2017/07/21		 Zhang Zizhao 创建订单
+ *	   Modify : 2017/07/21		 Ai Hao
+ *	   Modify : 2017/07/21		 Zhang Zizhao
  *     Modify : 2017/07/21       Ma Chao
  */
 
