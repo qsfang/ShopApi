@@ -47,19 +47,25 @@ import (
 
 func CreateProduct(c echo.Context) error {
 	var (
-		err error
-		product   models.ConProduct
+		err       error
+		product   models.CreateProduct
 	)
 
 	if err = c.Bind(&product); err != nil {
-		log.Logger.Error("Create crash with error:", err)
+		log.Logger.Error("[ERROR] CreateProduct Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(product); err != nil {
+		log.Logger.Error("[ERROR] CreateProduct Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	err = models.ProductService.CreateProduct(&product)
 	if err != nil {
-		log.Logger.Error("Create product with error:", err)
+		log.Logger.Error("[ERROR] CreateProduct CreateProduct:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -75,7 +81,7 @@ func GetProductList(c echo.Context) error {
 	)
 
 	if err = c.Bind(&cate); err != nil {
-		log.Logger.Error("Bind get categories with error:", err)
+		log.Logger.Error("[ERROR] GetProductList Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -85,12 +91,12 @@ func GetProductList(c echo.Context) error {
 	if err != nil {
 
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Categories not exist", err)
+			log.Logger.Error("[ERROR] Categories not exist", err)
 
 			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 		}
 
-		log.Logger.Error("Get categories with error", err)
+		log.Logger.Error("[ERROR] Get categories with error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -101,25 +107,31 @@ func GetProductList(c echo.Context) error {
 func ChangeProStatus(c echo.Context) error {
 	var (
 		err error
-		pro models.ConProduct
+		pro models.ChangeProStatus
 	)
 
 	if err = c.Bind(&pro); err != nil {
-		log.Logger.Error("Bind with error:", err)
+		log.Logger.Error("[ERROR] Change Product Status Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(pro); err != nil {
+		log.Logger.Error("[ERROR] Product Status Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	if pro.Status != general.ProductOnsale && pro.Status != general.ProductUnsale {
-		err = errors.New("Product Status InExistent")
-		log.Logger.Error("status transformed with error :",err)
+		err = errors.New("[ERROR] Product Status InExistent")
+		log.Logger.Error("[ERROR] status transformed with error :",err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.ChangeProStatus(pro.ID, pro.Status)
+	err = models.ProductService.ChangeProStatus(&pro)
 	if err != nil {
-		log.Logger.Error("status transformed with error:", err)
+		log.Logger.Error("[ERROR] status transformed with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -135,7 +147,7 @@ func GetProInfo(c echo.Context) error {
 	)
 
 	if err = c.Bind(&ProInfo); err != nil {
-		log.Logger.Error("Analysis crash with error:", err)
+		log.Logger.Error("[ERROR] GetProInfo Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -143,7 +155,7 @@ func GetProInfo(c echo.Context) error {
 	ProInfoReturn, err = models.ProductService.GetProInfo(ProInfo.ID)
 
 	if err != nil {
-		log.Logger.Error("Get info with error:", err)
+		log.Logger.Error("[ERROR] Get info with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -154,33 +166,25 @@ func GetProInfo(c echo.Context) error {
 func ChangeCategories(c echo.Context) error {
 	var (
 		err error
-		m   *models.ConProduct
+		m   *models.ChangeCategories
 	)
 
 	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("Bind categories change with error:", err)
+		log.Logger.Error("[ERROR] ChangeCategories Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	_, err = models.ProductService.GetProInfo(m.ID)
-	if err != nil {
+	if err = c.Validate(m); err != nil {
+		log.Logger.Error("[ERROR] Categories Validate:", err)
 
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("Product not exist", err)
-
-			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
-		}
-
-		log.Logger.Error("Mysql error", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	err = models.ProductService.ChangeCategories(m)
 	if err != nil {
 
-		log.Logger.Error("Categories change with error:", err)
+		log.Logger.Error("[ERROR] Categories change with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
