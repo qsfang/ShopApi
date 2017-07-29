@@ -83,11 +83,17 @@ func CartsPutIn(c echo.Context) error {
 func CartsDelete(c echo.Context) error {
 	var (
 		err  error
-		cart models.ConCarts
+		cart *models.CartDel = new(models.CartDel)
 	)
 
-	if err = c.Bind(&cart); err != nil {
+	if err = c.Bind(cart); err != nil {
 		log.Logger.Error("Analysis crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(*cart); err != nil {
+		log.Logger.Error("[ERROR] CartDel Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -95,14 +101,8 @@ func CartsDelete(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	UserID := session.Get(general.SessionUserID).(uint64)
 
-	err = models.CartsService.CartsDelete(UserID, cart.ID)
+	err = models.CartsService.CartsDelete(UserID, cart)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("This product doesn't exist !", err)
-
-			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
-		}
-
 		log.Logger.Error("Delete product with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())

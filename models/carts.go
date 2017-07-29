@@ -54,9 +54,15 @@ type Cart struct {
 	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	ImageID   uint64    `gorm:"column:imageid" json:"imageid"`
-	Status    uint8     `json:"status"`
-	PayStatus uint8     `gorm:"column:paystatus" json:"paystatus"`
+	Status    uint64     `json:"status"`
+	PayStatus uint64     `gorm:"column:paystatus" json:"paystatus"`
 	Created   time.Time `json:"created"`
+}
+
+type CartDel struct {
+	ProductID uint64    `json:"productid" validate:"required"`
+	Size      string    `json:"size" validate:"required,alphanumunicode"`
+	Color     string    `json:"color" validate:"required,alphanumunicode"`
 }
 
 type ConCarts struct {
@@ -68,7 +74,7 @@ type ConCarts struct {
 	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	ImageID   uint64    `gorm:"column:imageid"json:"imageid" validate:"numeric"`
-	Status    uint8     `json:"status" validate:"required, numeric, max = 1"`
+	Status    uint64     `json:"status" validate:"required, numeric, max = 1"`
 	Created   time.Time `json:"created"`
 }
 
@@ -113,14 +119,14 @@ func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) er
 	return err
 }
 
-func (cs *CartsServiceProvider) CartsDelete(UserID uint64, ID uint64) error {
+func (cs *CartsServiceProvider) CartsDelete(UserID uint64, carts *CartDel) error {
 	var (
 		cart Cart
 		err  error
 	)
 
 	db := orm.Conn
-	err = db.Model(&cart).Where("id = ? AND userid = ?",ID, UserID).Update("status", general.ProNotInCart).Limit(1).Error
+	err = db.Model(&cart).Where("productid = ? AND userid = ? AND size = ? AND color = ?", carts.ProductID, UserID, carts.Size, carts.Color).Update("status", general.ProNotInCart).Limit(1).Error
 
 	return err
 }

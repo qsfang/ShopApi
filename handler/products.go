@@ -77,7 +77,7 @@ func GetProductList(c echo.Context) error {
 	if err = c.Bind(&cate); err != nil {
 		log.Logger.Error("Bind get categories with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
 	pageStart := utility.Paging(cate.Page, cate.PageSize)
