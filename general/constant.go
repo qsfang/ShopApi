@@ -64,4 +64,6 @@ const (
 	OrderFinished   = 0xee // 238
 	OrderGetAll		= 0xed // 237, Not order status
 	OrderCanceled   = 0xec // 236
+	OrderPaid       = 0xeb // 235
+	OrderUnpaid     = 0xea // 234
 )
