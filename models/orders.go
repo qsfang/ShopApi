@@ -186,21 +186,21 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 	return &orders, nil
 }
 
-func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) (*OrmOrders, error) {
+func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrders, error) {
 	var (
 		err      error
 		order    Order
-		carts    Cart
-		getOrder OrmOrders
+		carts    []Cart
+		getOrder []OrmOrders
 	)
 
 	db1 := orm.Conn
 	err = db1.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
 	if err != nil {
-		return &getOrder, err
+		return getOrder, err
 	}
 
-	getOrder = OrmOrders{
+	add1 := OrmOrders{
 		TotalPrice: order.TotalPrice,
 		Freight:    order.Freight,
 		Status:     order.Status,
@@ -209,22 +209,26 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) (*OrmOrde
 		Updated:    order.Updated,
 		AddressID:  order.AddressID,
 	}
+	getOrder = append(getOrder, add1)
 
 	db2 := orm.Conn
-	err = db2.Where("orderid = ?", order.ID).First(&carts).Error
+	err = db2.Where("orderid = ?", order.ID).Find(&carts).Error
 	if err != nil {
-		return &getOrder, err
+		return getOrder, err
 	}
 
-	getOrder = OrmOrders{
-		Name:    carts.Name,
-		Count:   carts.Count,
-		Size:    carts.Size,
-		Color:   carts.Color,
-		ImageID: carts.ImageID,
+	for _, v := range carts {
+		add1 := OrmOrders{
+			Name:    v.Name,
+			Count:   v.Count,
+			Size:    v.Size,
+			Color:   v.Color,
+			ImageID: v.ImageID,
+		}
+		getOrder = append(getOrder, add1)
 	}
 
-	return &getOrder, nil
+	return getOrder, nil
 }
 
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {

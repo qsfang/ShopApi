@@ -53,7 +53,6 @@ const (
 	//Products Status
 	ProductOnsale = 0xe0 // 224
 	ProductUnsale = 0xe1 // 225
-	ProductNotInCart = 1
 
 	//Categories Status
 	CategoriesOnuse = 0xa0 // 160
@@ -64,4 +63,12 @@ const (
 	OrderFinished   = 0xee // 238
 	OrderGetAll		= 0xed // 237, Not order status
 	OrderCanceled   = 0xec // 236
+
+	//Cart status
+	ProInCart   =  0xea//233
+	ProNotInCart = 0xeb//234
+
+	//Pay status
+	PayFinished =  0xec//235
+	PayUnfinished = 0xed//236
 )

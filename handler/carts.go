@@ -48,7 +48,7 @@ func CartsPutIn(c echo.Context) error {
 		err   error
 		carts models.ConCarts
 
-		ProInfo *models.Product = new(models.Product)
+		ProInfo *models.Product
 	)
 
 	if err = c.Bind(&carts); err != nil {
@@ -124,6 +124,12 @@ func AlterCartPro(c echo.Context) error {
 
 	if err = c.Bind(&cartpro); err != nil {
 		log.Logger.Error("Get crash with error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(cartpro); err != nil {
+		log.Logger.Error("[ERROR] AlterCartPro Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
