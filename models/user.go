@@ -28,6 +28,7 @@
  *     Modify: 2017/07/21         Xu Haosheng    更改用户信息
  *     Modify: 2017/07/20	      Zhang Zizhao   登录检查
  *     Modify: 2017/07/21         Yang Zhengtian 添加判断用户是否存在和修改密码
+ *     Modify: 2017/07/19         Ma Chao        返回用户信息
  */
 
 package models
@@ -63,7 +64,6 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
-//todo：连接前端
 type OrmUser struct {
 	UserID   uint64    `gorm:"column:id" json:"userid"`
 	Name     string    `json:"name"`
@@ -135,7 +135,6 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 	return nil
 }
 
-// todo: 代码风格
 func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	var (
 		u   User
@@ -182,7 +181,7 @@ func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 	change := map[string]interface{}{"phone": Phone}
 
 	db := orm.Conn
-	err = db.Model(&con).Where("id=?", UserID).Update(change).Limit(1).Error
+	err = db.Model(&con).Where("id = ?", UserID).Update(change).Limit(1).Error
 
 	return err
 }

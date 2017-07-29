@@ -27,6 +27,7 @@
  *      Initial: 2017/07/21         Ai Hao
  *      Modify : 2017/07/21         Zhu Yaqiang
  *      Modify : 2017/07/21         Yu Yi
+ *      Modify : 2017/07/21         Ma Chao
  */
 
 package handler
@@ -47,16 +48,16 @@ import (
 func CreateProduct(c echo.Context) error {
 	var (
 		err error
-		p   models.ConProduct
+		product   models.ConProduct
 	)
 
-	if err = c.Bind(&p); err != nil {
+	if err = c.Bind(&product); err != nil {
 		log.Logger.Error("Create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.CreateProduct(&p)
+	err = models.ProductService.CreateProduct(&product)
 	if err != nil {
 		log.Logger.Error("Create product with error:", err)
 
@@ -70,7 +71,7 @@ func GetProductList(c echo.Context) error {
 	var (
 		err  error
 		cate models.ConProduct
-		list *[]models.GetProList
+		list *[]models.ConProduct
 	)
 
 	if err = c.Bind(&cate); err != nil {
@@ -110,7 +111,7 @@ func ChangeProStatus(c echo.Context) error {
 	}
 
 	if pro.Status != general.ProductOnsale && pro.Status != general.ProductUnsale {
-		err = errors.New("Product Status UnExisted")
+		err = errors.New("Product Status InExistent")
 		log.Logger.Error("status transformed with error :",err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())

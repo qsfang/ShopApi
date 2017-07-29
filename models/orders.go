@@ -27,6 +27,7 @@
  *     Initial: 2017/07/21       Li Zebang
  *	   Modify : 2017/07/21		 Ai Hao       订单状态更改
  *	   Modify : 2017/07/21		 Zhang Zizhao 创建订单
+ *     Modify : 2017/07/21       Ma Chao
  */
 
 package models
@@ -49,12 +50,12 @@ type Order struct {
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
 	AddressID  uint64    `gorm:"column:addressid" json:"addressid"`
 	TotalPrice float64   `gorm:"column:totalprice" json:"totalprice"`
-	Freight    float64   `gorm:"column:freight" json:"freight"`
-	Remark     string    `gorm:"column:remark" json:"remark"`
-	Status     uint8     `gorm:"column:status" json:"status"`
+	PayWay     uint8     `gorm:"column:payway" json:"payway"`
+	Freight    float64   `json:"freight"`
+	Remark     string    `json:"remark"`
+	Status     uint8     `json:"status"`
 	Created    time.Time `json:"created"`
 	Updated    time.Time `json:"updated"`
-	PayWay     uint8     `gorm:"column:payway" json:"payway"`
 }
 
 type OrmOrders struct {
@@ -118,11 +119,11 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, o OrmOrders) error
 	}
 
 	changeMap := map[string]interface{}{
-		"status":    0,
-		"paystatus": 0,
+		"status":    general.ProNotInCart,
+		"paystatus": general.PayUnfinished,
 		"orderid":   order.ID,
 	}
-	err = tx.Model(&car).Where("userid = ? AND status = 1 AND paystatus = 1", numberID).Update(changeMap).Limit(1).Error
+	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", numberID, general.ProInCart, general.PayUnfinished).Update(changeMap).Limit(1).Error
 
 	return err
 }
