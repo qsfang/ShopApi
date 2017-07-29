@@ -41,6 +41,7 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
+	"fmt"
 )
 
 func CartsPutIn(c echo.Context) error {
@@ -117,7 +118,7 @@ func Cartsdel(c echo.Context) error {
 func AlterCartPro(c echo.Context) error {
 	var (
 		err     error
-		cartpro models.ConCarts
+		cartpro models.Cart
 	)
 
 	if err = c.Bind(&cartpro); err != nil {
@@ -126,16 +127,7 @@ func AlterCartPro(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-
-	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count,cartpro.Status)
-
-	if err = c.Validate(cartpro); err != nil {
-		log.Logger.Error("[ERROR] AlterCartPro Validate:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count)
+	err = models.CartsService.AlterCartPro(cartpro.ID, cartpro.Count,cartpro.PayStatus)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

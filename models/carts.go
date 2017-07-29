@@ -49,7 +49,7 @@ type Cart struct {
 	ProductID uint64    `gorm:"column:productid" json:"productid"`
 	OrderID   uint64    `gorm:"column:orderid" json:"orderid"`
 	Name      string    `json:"name"`
-	Count     uint64    `json:"count"validate:"required,numeric"`
+	Count     uint64    `json:"count" validate:"required,numeric"`
 	Size      string    `json:"size"`
 	Color     string    `json:"color"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
@@ -107,12 +107,12 @@ func (cs *CartsServiceProvider) CartsDelete(UserID uint64, ProductID uint64, Col
 	return err
 }
 
-func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64,Status uint8) error {
+func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64,PayStatus uint8) error {
 	var (
 		cart Cart
 	)
 
-	updater := map[string]interface{}{"count": Count,"paystatus":Status }
+	updater := map[string]interface{}{"count": Count,"paystatus":PayStatus }
 
 	db := orm.Conn
 	err := db.Model(&cart).Where("id = ?", CartsID).Update(updater).Limit(1).Error
