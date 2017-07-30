@@ -99,7 +99,7 @@ func GetCategory(c echo.Context) error {
 	}
 
 	if len(*categoryList) == 0 {
-		err = errors.New("Categories Not Found")
+		err = errors.New("[ERROR] Categories Not Found")
 
 		log.Logger.Error("[ERROR] GetCategory GetCategory: ", err)
 

@@ -115,7 +115,7 @@ func GetOrders(c echo.Context) error {
 	}
 
 	if len(*orders) == 0 {
-		err = errors.New("Orders Not Found")
+		err = errors.New("[ERROR] Orders Not Found")
 
 		log.Logger.Error("[ERROR] Error:", err)
 
