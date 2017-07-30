@@ -65,35 +65,35 @@ type Product struct {
 
 type CreateProduct struct {
 	ID            uint64    `json:"id"`
-	Name          string    `json:"name"validate:"required, alphaunicode, min = 2, max = 18"`
-	TotalSale     uint64    `json:"totalsale"validate:"eq = 0"`
-	Category      uint64    `json:"categories"validate:"required"`
+	Name          string    `json:"name"validate:"required,alphaunicode,min=2,max=18"`
+	TotalSale     uint64    `json:"totalsale"validate:"eq=0"`
+	Category      uint64    `json:"category"validate:"required"`
 	Price         float64   `json:"price"validate:"required"`
 	OriginalPrice float64   `json:"originalprice"validate:"required"`
-	Size          string    `json:"size"validate:"required, alphanumunicode"`
-	Color         string    `json:"color"validate:"required, alphaunicode"`
+	Size          string    `json:"size"validate:"required,alphanumunicode"`
+	Color         string    `json:"color"validate:"required,alphaunicode"`
 	ImageID       uint64    `json:"imageid"validate:"required"`
-	ImageIDs      string    `json:"imageids"validate:"required, numeric"`
+	ImageIDs      string    `json:"imageids"validate:"required,numeric"`
 	Detail        string    `json:"detail"validate:"required"`
-	Created       time.Time `json:"created"validate:"required"`
+	Created       time.Time `json:"created"`
 	Inventory     uint64    `json:"inventory"validate:"required"`
 }
 
 type ChangeProStatus struct {
 	ID            uint64    `json:"id"`
-	Status        uint64    `json:"status" validate:"required"`
+	Status        uint64    `json:"status"validate:"required"`
 }
 
 type ChangeCategories struct {
 	ID            uint64    `json:"id"`
-	Category      uint64    `json:"categories" validate:"required"`
+	Category      uint64    `json:"category"validate:"required"`
 }
 
 type ConProduct struct {
 	ID            uint64    `json:"id"`
 	Name          string    `json:"name"`
 	TotalSale     uint64    `json:"totalsale"`
-	Category      uint64    `json:"categories"`
+	Category      uint64    `json:"category"`
 	Price         float64   `json:"price"`
 	OriginalPrice float64   `json:"originalprice"`
 	Status        uint64    `json:"status"`
@@ -111,9 +111,9 @@ func (Product) TableName() string {
 func (ps *ProductServiceProvider) CreateProduct(pr *CreateProduct) error {
 	var (
 		err error
-		pro Product
+		pro *Product
 	)
-	pro = Product{
+	pro = &Product{
 		ID:            pr.ID,
 		Name:          pr.Name,
 		TotalSale:     pr.TotalSale,
