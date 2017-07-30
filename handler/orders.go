@@ -44,7 +44,6 @@ import (
 	"ShopApi/utility"
 )
 
-
 func CreateOrder(c echo.Context) error {
 	var (
 		order models.CreateOrder
@@ -58,7 +57,7 @@ func CreateOrder(c echo.Context) error {
 	}
 
 	if err = c.Validate(order); err != nil {
-		log.Logger.Error("[ERROR] CreatOrder Validate:", err)
+		log.Logger.Error("[ERROR] CreateOrder Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -78,18 +77,24 @@ func CreateOrder(c echo.Context) error {
 
 func GetOrders(c echo.Context) error {
 	var (
-		err    error
-		orm    models.OrmOrders
-		orders *[]models.Order
+		err       error
+		getOrders models.GetOrders
+		orders    *[]models.OrdersGet
 	)
 
-	if err = c.Bind(&orm); err != nil {
+	if err = c.Bind(&getOrders); err != nil {
 		log.Logger.Error("[ERROR] Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if orm.Status != general.OrderUnfinished && orm.Status != general.OrderFinished && orm.Status != general.OrderGetAll {
+	if err = c.Validate(getOrders); err != nil  {
+		log.Logger.Error("[ERROR] GetOrders Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if getOrders.Status != general.OrderUnfinished && getOrders.Status != general.OrderFinished && getOrders.Status != general.OrderGetAll && getOrders.Status != general.OrderCanceled {
 		err = errors.New("[ERROR] Invalid Orders Status")
 
 		log.Logger.Error("[ERROR] Error:", err)
@@ -98,11 +103,11 @@ func GetOrders(c echo.Context) error {
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID).(uint64)
+	getOrders.UserID = session.Get(general.SessionUserID).(uint64)
 
-	pageStart := utility.Paging(orm.Page, orm.PageSize)
+	pageStart := utility.Paging(getOrders.Page, getOrders.PageSize)
 
-	orders, err = models.OrderService.GetOrders(userID, orm.Status, pageStart, orm.PageSize)
+	orders, err = models.OrderService.GetOrders(&getOrders, pageStart)
 	if err != nil {
 		log.Logger.Error("[ERROR] Mysql error in GetOrders Function:", err)
 
@@ -110,11 +115,11 @@ func GetOrders(c echo.Context) error {
 	}
 
 	if len(*orders) == 0 {
-		err = errors.New("[ERROR] Orders Not Found")
+		err = errors.New("Orders Not Found")
 
 		log.Logger.Error("[ERROR] Error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, orders)
@@ -123,7 +128,7 @@ func GetOrders(c echo.Context) error {
 func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
-		order  models.Order
+		order  models.Orders
 		OutPut []models.OrmOrders
 	)
 

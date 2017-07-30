@@ -45,7 +45,7 @@ type OrderServiceProvider struct {
 
 var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 
-type Order struct {
+type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;"json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
 	AddressID  uint64    `gorm:"column:addressid" json:"addressid"`
@@ -80,17 +80,31 @@ type OrmOrders struct {
 	Updated    time.Time `json:"updated"`
 }
 
-type CreateOrder struct{
-	AddressID  uint64    `json:"addressid" validate:"required,numeric"`
-	TotalPrice float64   `json:"totalprice" validate:"required,numeric"`
-	Freight    float64   `json:"freight" validate:"required,numeric"`
-	Payment    float64   `json:"payment" validate:"required,numeric"`
-	Remark     string    `json:"remark"`
-	PayWay     uint8     `json:"payway" validate:"required,numeric"`
+type CreateOrder struct {
+	AddressID  uint64  `json:"addressid" validate:"required"`
+	TotalPrice float64 `json:"totalprice" validate:"required"`
+	Freight    float64 `json:"freight" validate:"required"`
+	Payment    float64 `json:"payment" validate:"required"`
+	Remark     string  `json:"remark"`
+	PayWay     uint8   `json:"payway" validate:"required"`
 }
 
-func (Order) TableName() string {
-	return "order"
+type GetOrders struct {
+	UserID   uint64 `json:"userid"`
+	Status   uint8  `json:"status" validate:"required,max=239,min=236"`
+	Page     uint64 `json:"page" validate:"required"`
+	PageSize uint64 `json:"pagesize" validate:"required"`
+}
+
+type OrdersGet struct {
+	TotalPrice float64 `json:"totalprice"`
+	Freight    float64 `json:"freight"`
+	Remark     string  `json:"remark"`
+	Status     uint8   `json:"status"`
+}
+
+func (Orders) TableName() string {
+	return "orders"
 }
 
 func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) error {
@@ -99,7 +113,7 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) e
 		car Cart
 	)
 
-	order := Order{
+	order := Orders{
 		UserID:     numberID,
 		AddressID:  ord.AddressID,
 		TotalPrice: ord.TotalPrice,
@@ -128,42 +142,31 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) e
 	}
 
 	changeMap := map[string]interface{}{
-		"status":    general.ProNotInCart,
-		"orderid":   order.ID,
+		"status":  general.ProNotInCart,
+		"orderid": order.ID,
 	}
 	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", numberID, general.ProInCart, general.Buy).Update(changeMap).Limit(1).Error
 
 	return err
 }
 
-func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStart, pageEnd uint64) (*[]Order, error) {
+func (osp *OrderServiceProvider) GetOrders(getOrders *GetOrders, pageStart uint64) (*[]OrdersGet, error) {
 	var (
-		order Order
-		orders []Order
+		sql        string
+		order      Orders
+		orderGet   OrdersGet
+		ordersList []OrdersGet
 	)
 
 	db := orm.Conn
 
-	if status == general.OrderUnfinished || status == general.OrderFinished {
-		sql := fmt.Sprintf("SELECT * FROM order WHERE userid = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
-
-		rows, err := db.Raw(sql, userID, status).Rows()
-		defer rows.Close()
-		if err != nil {
-			return nil, err
-		}
-
-		for rows.Next() {
-			db.ScanRows(rows, &order)
-			orders = append(orders, order)
-		}
-
-		return &orders, nil
+	if getOrders.Status == general.OrderUnfinished || getOrders.Status == general.OrderFinished || getOrders.Status == general.OrderCanceled {
+		sql = fmt.Sprintf("SELECT * FROM orders WHERE userid = %d AND status = %d LIMIT %d, %d LOCK IN SHARE MODE", getOrders.UserID, getOrders.Status, pageStart, getOrders.PageSize)
+	} else {
+		sql = fmt.Sprintf("SELECT * FROM orders WHERE userid = %d LIMIT %d, %d LOCK IN SHARE MODE", getOrders.UserID, pageStart, getOrders.PageSize)
 	}
 
-	sql := fmt.Sprintf("SELECT * FROM order WHERE userid = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
-
-	rows, err := db.Raw(sql, userID).Rows()
+	rows, err := db.Raw(sql).Rows()
 	defer rows.Close()
 	if err != nil {
 		return nil, err
@@ -171,16 +174,23 @@ func (osp *OrderServiceProvider) GetOrders(userID uint64, status uint8, pageStar
 
 	for rows.Next() {
 		db.ScanRows(rows, &order)
-		orders = append(orders, order)
+		fmt.Println(order)
+		orderGet = OrdersGet{
+			TotalPrice: order.TotalPrice,
+			Freight:    order.Freight,
+			Remark:     order.Remark,
+			Status:     order.Status,
+		}
+		ordersList = append(ordersList, orderGet)
 	}
 
-	return &orders, nil
+	return &ordersList, nil
 }
 
 func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrders, error) {
 	var (
-		err error
-		order Order
+		err      error
+		order    Orders
 		carts    []Cart
 		getOrder []OrmOrders
 	)
@@ -232,7 +242,7 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrd
 }
 
 func (osp *OrderServiceProvider) ChangeStatus(id uint64, status uint8) error {
-	cha := Order{
+	cha := Orders{
 		Status: status,
 	}
 

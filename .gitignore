@@ -4,3 +4,5 @@
 server/server
 *.exe
 server/server.exe
+server/config.json
+server/config.json

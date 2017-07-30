@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `address` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
-CREATE TABLE IF NOT EXISTS `order` (
+CREATE TABLE IF NOT EXISTS `orders` (
   `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
   `userid` int(16) NOT NULL,
   `addressid` int(16) NOT NULL,

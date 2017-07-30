@@ -61,8 +61,8 @@ const (
 	// Order Status
 	OrderUnfinished = 0xef // 239
 	OrderFinished   = 0xee // 238
-	OrderGetAll     = 0xed // 237, Not order status
-	OrderCanceled   = 0xec // 236
+	OrderCanceled   = 0xed // 237
+	OrderGetAll     = 0xec // 236, Not order status
 
 	//CartPro status
 	ProInCart    = 0xea //233
