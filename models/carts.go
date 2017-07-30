@@ -80,12 +80,6 @@ type CartUse struct {
 	Created   time.Time `json:"created"`
 }
 
-type CartDel struct {
-	ProductID uint64    `json:"productid"`
-	Size      string    `json:"size"`
-	Color     string    `json:"color"`
-}
-
 func(Cart) TableName() string {
 	return "cart"
 }
@@ -114,7 +108,7 @@ func (cs *CartsServiceProvider) CreateInCarts(carts *CartUse, userID uint64) err
 	return err
 }
 
-func (cs *CartsServiceProvider) CartsDelete(UserID uint64, carts *CartDel) error {
+func (cs *CartsServiceProvider) CartsDelete(UserID uint64, carts *CartUse) error {
 	var (
 		cart Cart
 		err  error

@@ -83,7 +83,7 @@ func CartsPutIn(c echo.Context) error {
 func CartsDelete(c echo.Context) error {
 	var (
 		err  error
-		cart *models.CartDel = new(models.CartDel)
+		cart *models.CartUse = new(models.CartUse)
 	)
 
 	if err = c.Bind(cart); err != nil {
