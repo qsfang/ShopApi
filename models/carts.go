@@ -25,7 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/21       Zhu Yaqiang
- *     Modify : 2017/07/22       Xu Haosheng    添加购物车
+ *     Modify : 2017/07/22       Xu Haosheng
  *     Modify : 2017/07/23       Wang Ke
  *     Modify : 2017/07/24       Ma Chao
  */
@@ -70,6 +70,16 @@ type ConCarts struct {
 	Color     string    `json:"color"`
 }
 
+type CartUse struct {
+	Name      string    `json:"name"`
+	ProductID uint64    `json:"productid"`
+	Count     uint64    `json:"count"`
+	Size      string    `json:"size"`
+	Color     string    `json:"color"`
+	ImageID   uint64    `json:"imageid"`
+	Created   time.Time `json:"created"`
+}
+
 type CartDel struct {
 	ProductID uint64    `json:"productid"`
 	Size      string    `json:"size"`
@@ -80,29 +90,26 @@ func(Cart) TableName() string {
 	return "cart"
 }
 
-func (cs *CartsServiceProvider) CreateInCarts(carts *ConCarts, userID uint64) error {
+func (cs *CartsServiceProvider) CreateInCarts(carts *CartUse, userID uint64) error {
 	var (
-		err error
-		cartsPutIn Cart
+		err                     error
+		cartsPutIn         Cart
 	)
 
 	cartsPutIn = Cart{
-		UserID:    userID,
-		ProductID: carts.ProductID,
-		Name:      carts.Name,
-		Count:     carts.Count,
-		Size:      carts.Size,
-		Color:     carts.Color,
-		ImageID:   carts.ImageID,
-		Created:   time.Now(),
-		Status:    general.ProInCart,
+		UserID:                   userID,
+		ProductID:             carts.ProductID,
+		Name:                    carts.Name,
+		Count:                    carts.Count,
+		Size:                        carts.Size,
+		Color:                     carts.Color,
+		ImageID:                carts.ImageID,
+		Created:                 time.Now(),
+		Status:                    general.ProInCart,
 	}
 
 	db := orm.Conn
 	err = db.Create(&cartsPutIn).Error
-	if err != nil {
-		return err
-	}
 
 	return err
 }

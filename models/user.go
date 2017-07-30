@@ -198,7 +198,13 @@ func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
 	change := map[string]interface{}{"phone": Phone}
 
 	db := orm.Conn
-	err = db.Model(&con).Where("userid = ?", UserID).Update(change).Limit(1).Error
+	err = db.Where("phone = ?", change[Phone]).First(&con).Error
+
+	if err != nil {
+		err = db.Model(&con).Where("userid = ?", UserID).Update(change).Limit(1).Error
+
+		return err
+	}
 
 	return err
 }
@@ -236,9 +242,10 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) error {
 	var (
 		con UserInfo
+		empty int8 = 0
 	)
 
-	changMap := map[string]interface{}{
+	changeMap := map[string]interface{}{
 		"nickname": info.Nickname,
 		"email":    info.Email,
 		"phone":    info.Phone,
@@ -246,8 +253,14 @@ func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) err
 		"avatar":   info.Avatar,
 	}
 
-	db := orm.Conn
-	err := db.Model(&con).Where("userid = ?", userID).Updates(changMap).Limit(1).Error
+	for key, value := range changeMap {
+		if value == "" || value == empty {
+			delete(changeMap, key)
+		}
+	}
 
-	return err
+	db := orm.Conn
+	err := db.Model(&con).Where("userid =? ", userID).Update(changeMap).Limit(1).Error
+
+return err
 }

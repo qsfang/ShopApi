@@ -46,7 +46,7 @@ import (
 func CartsPutIn(c echo.Context) error {
 	var (
 		err     error
-		carts   models.ConCarts
+		carts   models.CartUse
 		ProInfo *models.Product
 	)
 

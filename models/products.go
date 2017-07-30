@@ -65,48 +65,42 @@ type Product struct {
 
 type CreateProduct struct {
 	ID            uint64    `json:"id"`
-	Name          string    `json:"name" validate:"required,alphanumunicode,min=2,max=18"`
+	Name          string    `json:"name"validate:"required, alphaunicode, min = 2, max = 18"`
+	TotalSale     uint64    `json:"totalsale"validate:"eq = 0"`
+	Category      uint64    `json:"categories"validate:"required"`
+	Price         float64   `json:"price"validate:"required"`
+	OriginalPrice float64   `json:"originalprice"validate:"required"`
+	Size          string    `json:"size"validate:"required, alphanumunicode"`
+	Color         string    `json:"color"validate:"required, alphaunicode"`
+	ImageID       uint64    `json:"imageid"validate:"required"`
+	ImageIDs      string    `json:"imageids"validate:"required, numeric"`
+	Detail        string    `json:"detail"validate:"required"`
+	Created       time.Time `json:"created"validate:"required"`
+	Inventory     uint64    `json:"inventory"validate:"required"`
+}
+
+type ChangeProStatus struct {
+	ID            uint64    `json:"id"`
+	Status        uint64    `json:"status" validate:"required"`
+}
+
+type ChangeCategories struct {
+	ID            uint64    `json:"id"`
+	Category      uint64    `json:"categories" validate:"required"`
+}
+
+type ConProduct struct {
+	ID            uint64    `json:"id"`
+	Name          string    `json:"name"`
 	TotalSale     uint64    `json:"totalsale"`
 	Category      uint64    `json:"categories"`
 	Price         float64   `json:"price"`
 	OriginalPrice float64   `json:"originalprice"`
-	Size          string    `json:"size" validate:"required,alphanumunicode"`
-	Color         string    `json:"color" validate:"required,alphanumunicode"`
+	Status        uint64    `json:"status"`
 	ImageID       uint64    `json:"imageid"`
-	ImageIDs      string    `json:"imageids" validate:"required,numeric"`
-	Detail        string    `json:"detail" validate:"required,alphanumunicode"`
-	Inventory     uint64    `json:"inventory"`
-}
-
-type ChangeProStatus struct {
-	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
-	Status        uint64    `json:"status" validate:"numeric"`
-}
-
-type ChangeCategories struct {
-	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
-	Category      uint64    `json:"categories" validate:"numeric"`
-}
-
-
-type ConProduct struct {
-	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
-	Name          string    `json:"name" validate:"required,alphaunicode,min=2,max=18"`
-	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale" validate:"numeric"`
-	Category      uint64    `json:"categories" validate:"numeric"`
-	Price         float64   `json:"price" validate:"numeric"`
-	OriginalPrice float64   `gorm:"column:originalprice" json:"originalprice" validate:"numeric"`
-	Status        uint64    `json:"status" validate:"numeric"`
-	Size          string    `json:"size"`
-	Color         string    `json:"color"`
-	ImageID       uint64    `gorm:"column:imageid" json:"imageid" validate:"numeric"`
-	ImageIDs      string    `gorm:"column:imageids" json:"imageids"`
-	Remark        string    `json:"remark"`
-	Detail        string    `json:"detail"`
-	Created       time.Time `json:"created"`
 	Inventory     uint64    `json:"inventory"`
 	Page          uint64    `json:"page"`
-	PageSize      uint64    `gorm:"column: pagesize" json:"pagesize"`
+	PageSize      uint64    `json:"pagesize"`
 
 }
 
@@ -168,7 +162,6 @@ func (ps *ProductServiceProvider) GetProduct(cate, pageStart, pageEnd uint64) (*
 			OriginalPrice: list.OriginalPrice,
 			Status:        list.Status,
 			ImageID:       list.ImageID,
-			Detail:        list.Detail,
 			Inventory:     list.Inventory,
 		})
 	}
