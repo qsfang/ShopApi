@@ -57,7 +57,7 @@ func InitRouter(server *echo.Echo) {
 	server.GET("/api/v1/address/get", handler.GetAddress, handler.MustLogin)
 	server.POST("/api/vl/address/alter", handler.AlterDefault, handler.MustLogin)
 
-	server.POST("/api/v1/products/create",handler.CreateProduct)//创建商品
+	server.POST("/api/v1/products/create",handler.CreateProduct)
 	server.POST("/api/v1/product/getinfo",handler.GetProInfo,handler.MustLogin)
 	server.POST("/api/v1/products/changestatus", handler.ChangeProStatus)
 	server.POST("/api/v1/products/getlist", handler.GetProductList)
@@ -69,7 +69,7 @@ func InitRouter(server *echo.Echo) {
 	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
 
 	server.POST("/api/v1/category/create", handler.CreateCategory)
-	server.POST("/api/vl/category/get", handler.GetCategory)
+	server.GET("/api/vl/category/get", handler.GetCategory)
 
 	server.POST("/api/v1/carts/delete", handler.CartsDelete, handler.MustLogin)
 	server.POST("/api/vl/carts/altercartpro",handler.AlterCartPro)

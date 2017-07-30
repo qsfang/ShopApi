@@ -25,10 +25,10 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *	   Modify: 2017/07/19		  Ai Hao         添加用户登出
- *	   Modify: 2017/07/20         Zhang Zizhao   添加用户登录
- *     Modify: 2017/07/21         Xu Haosheng  更改用户信息
- *	   Modify: 2017/07/21         Yang Zhengtian  添加修改密码
+ *	   Modify: 2017/07/19		  Ai Hao
+ *	   Modify: 2017/07/20         Zhang Zizhao
+ *     Modify: 2017/07/21         Xu Haosheng
+ *	   Modify: 2017/07/21         Yang Zhengtian
  *     Modify: 2017/07/21         Ma Chao
  */
 
@@ -72,6 +72,23 @@ func Create(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+	err =  models.UserService.CheckName(user.Mobile)
+		if err == nil {
+			err = errors.New("Phone Repetition")
+
+			log.Logger.Error("[ERROR]", err)
+
+			return general.NewErrorWithMessage(errcode.ErrPhoneRepetition, err.Error())
+		} else {
+			if err == gorm.ErrRecordNotFound {
+				goto create
+			}
+			log.Logger.Error("[ERROR] MySQL Error", err)
+
+			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		}
+
+create:
 	err = models.UserService.Create(user.Mobile, user.Pass)
 	if err != nil {
 
@@ -217,19 +234,13 @@ func ChangeMobilePassword(c echo.Context) error {
 func ChangeUserInfo(c echo.Context) error {
 	var (
 		err  error
-		info models.UserInfo
+		info models.ChangeUserInfo
 	)
 
 	if err = c.Bind(&info); err != nil {
 		log.Logger.Error("[ERROR] Create crash with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-	match := utility.IsValidPhone(info.Phone)
-	if !match {
-		log.Logger.Error("[ERROR] Invalid phone:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -263,14 +274,24 @@ func ChangePhone(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
 	}
 
-	if models.UserService.CheckPhone(m.Phone) != gorm.ErrRecordNotFound {
-		err = errors.New("Invalid phone:")
+	err = models.UserService.CheckPhone(m.Phone)
+	if err == nil {
+		err = errors.New("Phone Repetition")
 
-		log.Logger.Error("[ERROR] ChangePhone CheckPhone :", err)
+		log.Logger.Error("[ERROR]", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrPhoneRepetition, err.Error())
+	} else {
+		if err == gorm.ErrRecordNotFound {
+			goto change
+		}
+
+		log.Logger.Error("[ERROR] MySQL Error", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
+change:
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	UserID := session.Get(general.SessionUserID).(uint64)
 

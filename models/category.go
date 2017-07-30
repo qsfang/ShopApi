@@ -90,7 +90,7 @@ func (csp *CategoryServiceProvider) CheckPID(pid uint64) (err error) {
 	return db.Where("id =? ", pid).First(&category).Error
 }
 
-func (csp *CategoryServiceProvider) GetCategory(pid uint64) (*[]CategoryGet, error) {
+func (csp *CategoryServiceProvider) GetCategory() (*[]CategoryGet, error) {
 	var (
 		err          error
 		categories   []Category
@@ -99,7 +99,7 @@ func (csp *CategoryServiceProvider) GetCategory(pid uint64) (*[]CategoryGet, err
 
 	db := orm.Conn
 
-	err = db.Where("pid = ? AND status = ?", pid, general.CategoryOnUse).Find(&categories).Error
+	err = db.Where("status = ?", general.CategoryOnUse).Find(&categories).Error
 	if err != nil {
 		return nil,err
 	}

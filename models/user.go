@@ -25,10 +25,10 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *     Modify: 2017/07/21         Xu Haosheng    更改用户信息
- *     Modify: 2017/07/20	      Zhang Zizhao   登录检查
- *     Modify: 2017/07/21         Yang Zhengtian 添加判断用户是否存在和修改密码
- *     Modify: 2017/07/19         Ma Chao        返回用户信息
+ *     Modify: 2017/07/21         Xu Haosheng
+ *     Modify: 2017/07/20	      Zhang Zizhao
+ *     Modify: 2017/07/21         Yang Zhengtian
+ *     Modify: 2017/07/19         Ma Chao
  */
 
 package models
@@ -57,28 +57,12 @@ type User struct {
 
 type UserInfo struct {
 	UserID   uint64 `sql:"primary_key" gorm:"column:userid" json:"userid"`
-	Phone    string `json:"phone" validate:"required,alphanum,len=11"`
+	Phone    string `json:"phone"`
 	Avatar   string `json:"avatar"`
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
-
 	Sex      uint8  `json:"sex"`
 }
-
-type OrmUser struct {
-	UserID   uint64    `gorm:"column:id" json:"userid"`
-	Name     string    `json:"name"`
-	Status   uint16    `json:"status"`
-	Created  time.Time `json:"created"`
-	Avatar   string    `json:"avatar"`
-	Nickname string    `json:"nickname"`
-	Email    string    `json:"email"`
-	Phone    string    `json:"phone"`
-	Sex      uint8     `json:"sex"`
-	Password *string   `json:"password" validate:"required,alphanum,min=6,max=30"`
-	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`
-}
-
 
 type TestPhone struct {
 	Phone    string    `json:"phone" validate:"required,alphanum,len=11"`
@@ -89,10 +73,17 @@ type Register struct {
 	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
 }
 
-
 type Password struct {
 	Password *string   `json:"password" validate:"required,alphanum,min=6,max=30"`
 	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`
+}
+
+type ChangeUserInfo struct {
+	UserID   uint64 `json:"userid"`
+	Avatar   string `json:"avatar"`
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Sex      uint8  `json:"sex"`
 }
 
 func (User) TableName() string {
@@ -152,6 +143,16 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 	return nil
 }
 
+func (us *UserServiceProvider) CheckName(name *string) error {
+	var (
+		con User
+	)
+
+	db := orm.Conn
+
+	return db.Where("name = ?", name).First(&con).Error
+}
+
 func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	var (
 		u   User
@@ -191,14 +192,34 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
 
 func (us *UserServiceProvider) ChangePhone(userID uint64, phone string) error {
 	var (
-		con UserInfo
+		err error
+		user User
+		info UserInfo
 	)
 
-	change := map[string]string{"phone": phone}
+	changeUser := map[string]string{"name":phone}
+	changeInfo := map[string]string{"phone": phone}
 
-	db := orm.Conn
+	tx := orm.Conn.Begin()
+	defer func() {
+		if err != nil  {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
 
-	return  db.Model(&con).Where("userid = ?", userID).Update(change).Limit(1).Error
+	err = tx.Model(&user).Where("id = ?", userID).Update(changeUser).Limit(1).Error
+	if err != nil {
+		return err
+	}
+
+	err = tx.Model(&info).Where("userid = ?", userID).Update(changeInfo).Limit(1).Error
+	if err != nil {
+		return err
+	}
+
+	return  err
 }
 
 func (us *UserServiceProvider) CheckPhone(phone string) error {
@@ -241,7 +262,7 @@ func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) 
 	return err
 }
 
-func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) error {
+func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint64) error {
 	var (
 		con UserInfo
 		empty int8 = 0
@@ -250,7 +271,6 @@ func (us *UserServiceProvider) ChangeUserInfo(info *UserInfo, userID uint64) err
 	changeMap := map[string]interface{}{
 		"nickname": info.Nickname,
 		"email":    info.Email,
-		"phone":    info.Phone,
 		"sex":      info.Sex,
 		"avatar":   info.Avatar,
 	}

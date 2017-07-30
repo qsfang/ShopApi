@@ -39,8 +39,6 @@ const (
 	ErrGetsess                  = 0x6
 	ErrInvalidOrdersStatus      = 0x7
 	ErrOrdersNotFound           = 0x8
-	NoOrder                     = 0x11
-	ErrCategoriesNotFound       = 0x9
 	ErrNotFound                 = 0xa
 	ErrAccess                   = 0xb
 	ErrInvalidPhone             = 0xc
@@ -48,7 +46,8 @@ const (
 	ErrBind                     = 0xe
 	ErrAlterAddressToNotDefault = 0x10
 	ErrAddressNotFound          = 0x11
-	ErrInformation         = 0xf
+	ErrInformation              = 0xf
+	ErrPhoneRepetition          = 0x12
 
 	// 需要登录
 	ErrLoginRequired    = 0x800

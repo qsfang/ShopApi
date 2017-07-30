@@ -88,23 +88,10 @@ func CreateCategory(c echo.Context) error {
 func GetCategory(c echo.Context) error {
 	var (
 		err          error
-		getCategory  models.GetCategory
 		categoryList *[]models.CategoryGet
 	)
 
-	if err = c.Bind(&getCategory); err != nil {
-		log.Logger.Error("[ERROR] GetCategory Bind:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
-	}
-
-	if err = c.Validate(getCategory); err != nil {
-		log.Logger.Error("[ERROR] GetCategory Validate:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	categoryList, err = models.CategoryService.GetCategory(getCategory.PID)
+	categoryList, err = models.CategoryService.GetCategory()
 	if err != nil {
 		log.Logger.Error("[ERROR] GetCategory GetCategory: MySQL ERROR", err)
 
