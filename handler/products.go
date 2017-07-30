@@ -89,7 +89,6 @@ func GetProductList(c echo.Context) error {
 	pageStart := utility.Paging(cate.Page, cate.PageSize)
 	list, err = models.ProductService.GetProduct(cate.Category, pageStart, cate.PageSize)
 	if err != nil {
-
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] Categories not exist", err)
 
