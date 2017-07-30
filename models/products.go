@@ -70,10 +70,10 @@ type CreateProduct struct {
 	Category      uint64    `json:"categories"validate:"required"`
 	Price         float64   `json:"price"validate:"required"`
 	OriginalPrice float64   `json:"originalprice"validate:"required"`
-	Size          string    `json:"size"validate:"required, numeric"`
+	Size          string    `json:"size"validate:"required, alphanumunicode"`
 	Color         string    `json:"color"validate:"required, alphaunicode"`
 	ImageID       uint64    `json:"imageid"validate:"required"`
-	ImageIDs      string    `json:"imageids"validate:"required"`
+	ImageIDs      string    `json:"imageids"validate:"required, numeric"`
 	Detail        string    `json:"detail"validate:"required"`
 	Created       time.Time `json:"created"validate:"required"`
 	Inventory     uint64    `json:"inventory"validate:"required"`
@@ -114,6 +114,7 @@ func (ps *ProductServiceProvider) CreateProduct(pr *CreateProduct) error {
 		pro Product
 	)
 	pro = Product{
+		ID:            pr.ID,
 		Name:          pr.Name,
 		TotalSale:     pr.TotalSale,
 		Category:      pr.Category,
