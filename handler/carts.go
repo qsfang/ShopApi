@@ -92,12 +92,6 @@ func CartsDelete(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if err = c.Validate(*cart); err != nil {
-		log.Logger.Error("[ERROR] CartDel Validate:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	UserID := session.Get(general.SessionUserID).(uint64)
 

@@ -71,9 +71,9 @@ type ConCarts struct {
 }
 
 type CartDel struct {
-	ProductID uint64    `json:"productid" validate:"required"`
-	Size      string    `json:"size" validate:"required,alphanumunicode"`
-	Color     string    `json:"color" validate:"required,alphanumunicode"`
+	ProductID uint64    `json:"productid"`
+	Size      string    `json:"size"`
+	Color     string    `json:"color"`
 }
 
 func(Cart) TableName() string {
