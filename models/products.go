@@ -65,22 +65,17 @@ type Product struct {
 
 type CreateProduct struct {
 	ID            uint64    `json:"id"`
-	Name          string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
+	Name          string    `json:"name" validate:"required,alphanumunicode,min=2,max=18"`
 	TotalSale     uint64    `json:"totalsale"`
 	Category      uint64    `json:"categories"`
 	Price         float64   `json:"price"`
 	OriginalPrice float64   `json:"originalprice"`
-	Status        uint64    `json:"status"`
-	Size          string    `json:"size"`
-	Color         string    `json:"color"`
-	ImageID       uint64    `json:"imageid" validate:"numeric"`
-	ImageIDs      string    `json:"imageids"`
-	Remark        string    `json:"remark"`
-	Detail        string    `json:"detail"`
-	Created       time.Time `json:"created"`
+	Size          string    `json:"size" validate:"required,alphanumunicode"`
+	Color         string    `json:"color" validate:"required,alphanumunicode"`
+	ImageID       uint64    `json:"imageid"`
+	ImageIDs      string    `json:"imageids" validate:"required,numeric"`
+	Detail        string    `json:"detail" validate:"required,alphanumunicode"`
 	Inventory     uint64    `json:"inventory"`
-	Page          uint64    `json:"page"`
-	PageSize      uint64    `json:"pagesize"`
 }
 
 type ChangeProStatus struct {
@@ -96,7 +91,7 @@ type ChangeCategories struct {
 
 type ConProduct struct {
 	ID            uint64    `gorm:"column:id" json:"id" validate:"numeric"`
-	Name          string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
+	Name          string    `json:"name" validate:"required,alphaunicode,min=2,max=18"`
 	TotalSale     uint64    `gorm:"column:totalsale" json:"totalsale" validate:"numeric"`
 	Category      uint64    `json:"categories" validate:"numeric"`
 	Price         float64   `json:"price" validate:"numeric"`
@@ -125,6 +120,7 @@ func (ps *ProductServiceProvider) CreateProduct(pr *CreateProduct) error {
 		pro Product
 	)
 	pro = Product{
+		ID:            pr.ID,
 		Name:          pr.Name,
 		TotalSale:     pr.TotalSale,
 		Category:      pr.Category,
