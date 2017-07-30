@@ -189,24 +189,26 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
 	return ui, nil
 }
 
-func (us *UserServiceProvider) ChangePhone(UserID uint64, Phone string) error {
+func (us *UserServiceProvider) ChangePhone(userID uint64, phone string) error {
 	var (
-		err error
 		con UserInfo
 	)
 
-	change := map[string]interface{}{"phone": Phone}
+	change := map[string]string{"phone": phone}
 
 	db := orm.Conn
-	err = db.Where("phone = ?", change[Phone]).First(&con).Error
 
-	if err != nil {
-		err = db.Model(&con).Where("userid = ?", UserID).Update(change).Limit(1).Error
+	return  db.Model(&con).Where("userid = ?", userID).Update(change).Limit(1).Error
+}
 
-		return err
-	}
+func (us *UserServiceProvider) CheckPhone(phone string) error {
+	var (
+		con UserInfo
+	)
 
-	return err
+	db := orm.Conn
+
+	return db.Where("phone = ?", phone).First(&con).Error
 }
 
 func (us *UserServiceProvider) GetUserPassword(id uint64) (string, error) {
@@ -216,7 +218,7 @@ func (us *UserServiceProvider) GetUserPassword(id uint64) (string, error) {
 	)
 
 	db := orm.Conn
-	err = db.Where("id = ?", id).First(&user).Error
+	err = db.Where("id = ?", id).Find(&user).Error
 
 	return user.Password, err
 }

@@ -263,6 +263,14 @@ func ChangePhone(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
 	}
 
+	if models.UserService.CheckPhone(m.Phone) != gorm.ErrRecordNotFound {
+		err = errors.New("Invalid phone:")
+
+		log.Logger.Error("[ERROR] ChangePhone CheckPhone :", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
+	}
+
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	UserID := session.Get(general.SessionUserID).(uint64)
 
