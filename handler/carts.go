@@ -112,7 +112,7 @@ func AlterCartPro(c echo.Context) error {
 	)
 
 	if err = c.Bind(&cartProduct); err != nil {
-		log.Logger.Error("Get crash with error:", err)
+		log.Logger.Error("[ERROR] AlterCartPro Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
