@@ -136,15 +136,14 @@ func (ps *ProductServiceProvider) CreateProduct(pr *CreateProduct) error {
 	return err
 }
 
-func (ps *ProductServiceProvider) GetProduct(cate, pageStart, pageEnd uint64) (*[]ConProduct, error) {
+func (ps *ProductServiceProvider) GetProduct(cate, pageStart, pageSize uint64) (*[]ConProduct, error) {
 	var (
 		list Product
 		s    []ConProduct
 	)
 
 	db := orm.Conn
-	sql := fmt.Sprintf("SELECT * FROM products WHERE category = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageEnd)
-
+	sql := fmt.Sprintf("SELECT * FROM products WHERE category = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageSize)
 	rows, err := db.Raw(sql, cate, general.ProductOnsale).Rows()
 	defer rows.Close()
 
@@ -154,7 +153,6 @@ func (ps *ProductServiceProvider) GetProduct(cate, pageStart, pageEnd uint64) (*
 
 	for rows.Next()  {
 		db.ScanRows(rows, &list)
-
 		s=append(s, ConProduct{
 			Name:          list.Name,
 			TotalSale:     list.TotalSale,
