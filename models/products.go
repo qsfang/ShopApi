@@ -105,7 +105,7 @@ type ConProduct struct {
 }
 
 func (Product) TableName() string {
-	return "products"
+	return "product"
 }
 
 func (ps *ProductServiceProvider) CreateProduct(pr *CreateProduct) error {

@@ -61,8 +61,8 @@ type Cart struct {
 
 type ConCarts struct {
 	ProductID uint64    `json:"productid" validate:"numeric"`
-	Status    uint64    `json:"status" validate:"required, numeric, max = 1"`
-	Name      string    `json:"name" validate:"required, alphaunicode, min = 2, max = 18"`
+	Status    uint64    `json:"status" validate:"required,numeric,max=1"`
+	Name      string    `json:"name" validate:"required,alphaunicode,min=2,max=18"`
 	Count     uint64    `json:"count" validate:"numeric"`
 	ImageID   uint64    `json:"imageid" validate:"numeric"`
 	Created   time.Time `json:"created"`

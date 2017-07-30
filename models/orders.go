@@ -65,7 +65,7 @@ type OrmOrders struct {
 	Payment    float64   `json:"payment" validate:"required,numeric"`
 	Freight    float64   `json:"freight" validate:"required,numeric"`
 	Discount   uint8     `json:"discount" validate:"numeric"`
-	Name       string    `json:"name"validate:"required, alphaunicode, min = 2, max = 18"`
+	Name       string    `json:"name"validate:"required, alphaunicode,min=2,max=18"`
 	Size       string    `json:"size" validate:"required,alphanum"`
 	Count      uint64    `json:"count"validate:"required,numeric"`
 	Color      string    `json:"color" validate:"required,alphanum"`
