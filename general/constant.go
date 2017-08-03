@@ -30,48 +30,47 @@
 package general
 
 const (
-	// User Type
-	PhoneUser  = 0xff
-	WechatUser = 0xfe
-
-	// User Status
-	UserActive   = 0xf0
-	UserInactive = 0xf1
-
+	// General
 	// Login session
 	SessionUserID = "userid"
 
-	// sex
-	Man   = 0x1
-	Woman = 0x2
-
+	// Address
 	//Address  Default
 	AddressNotDefault = 0x0
 	AddressDefault    = 0x1
 
+	// Carts
+	//CartPro status
+	ProInCart    = 0xea //233
+	ProNotInCart = 0xeb //234
+	//Pay status
+	Buy   = 0xec //235
+	NotBuy = 0xed //236
+
+	// Category
 	//Category Status
 	CategoryNotUse = 0x0
 	CategoryOnUse  = 0x1
 
-	//Products Status
-	ProductOnsale    = 0xe0 // 224
-	ProductUnsale    = 0xe1 // 225
-	ProductNotInCart = 1
-
+	// Orders
 	// Order Status
 	OrderUnfinished = 0xef // 239
 	OrderFinished   = 0xee // 238
 	OrderCanceled   = 0xed // 237
 	OrderGetAll     = 0xec // 236, Not order status
-
-	//CartPro status
-	ProInCart    = 0xea //233
-	ProNotInCart = 0xeb //234
-
-	//Pay status
-	Buy   = 0xec //235
-	NotBuy = 0xed //236
-
 	OrderPaid   = 0xf1 // 241
 	OrderUnpaid = 0xf2 // 240
+
+	// Products
+	//Products Status
+	ProductOnsale    = 0xe0 // 224
+	ProductUnsale    = 0xe1 // 225
+
+	//User
+	// User Status
+	UserActive   = 0xf0
+	UserInactive = 0xf1
+	// sex
+	Man   = 0x1
+	Woman = 0x2
 )

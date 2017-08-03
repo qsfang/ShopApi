@@ -34,6 +34,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 
 	"ShopApi/log"
 	"ShopApi/orm"
@@ -48,6 +49,7 @@ var (
 
 func startServer() {
 	server = echo.New()
+	server.Use(middleware.CORS())
 
 	server.HTTPErrorHandler = general.EchoRestfulErrorHandler
 	server.Validator = general.NewEchoValidator()

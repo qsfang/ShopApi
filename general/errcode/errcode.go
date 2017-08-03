@@ -30,9 +30,22 @@
 package errcode
 
 const (
-	ErrSucceed                  = 0x0
-	ErrInvalidParams            = 0x1
-	ErrMysql                    = 0x2
+	// General
+	ErrSucceed       = 0x0
+	ErrInvalidParams = 0x1
+	ErrMysql         = 0x2
+	ErrLoginRequired    = 0x800
+	ErrPermissionDenied = 0x801
+	ErrNoConnection      = 0x1000
+	ErrDBOperationFailed = 0x1001
+
+	// Address
+	// Carts
+	// Category
+	// Middleware
+	// Orders
+	// Products
+	//User
 	ErrDelete                   = 0x3 //用户登出错误
 	ErrMysqlfound               = 0x4
 	ErrNameFormat               = 0x5
@@ -48,12 +61,4 @@ const (
 	ErrAddressNotFound          = 0x11
 	ErrInformation              = 0xf
 	ErrPhoneRepetition          = 0x12
-
-	// 需要登录
-	ErrLoginRequired    = 0x800
-	ErrPermissionDenied = 0x801
-
-	// 严重错误
-	ErrNoConnection      = 0x1000
-	ErrDBOperationFailed = 0x1001
 )
