@@ -74,10 +74,6 @@ type Login struct {
 	Pass   *string `json:"password" validate:"required,alphanum,min=6,max=64"`
 }
 
-type Logout struct {
-	UserID uint64 `json:"userid" validate:"required"`
-}
-
 type ChangeUserInfo struct {
 	Avatar   string `json:"avatar"`
 	Nickname string `json:"nickname"`
@@ -135,7 +131,7 @@ func (us *UserServiceProvider) Register(name, pass *string) error {
 	info := UserInfo{
 		UserID: u.UserID,
 		Phone:  *name,
-		Sex:    general.Hidden,
+		Sex:    general.Man,
 	}
 
 	err = tx.Create(&info).Error

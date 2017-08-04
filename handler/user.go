@@ -57,20 +57,20 @@ func Register(c echo.Context) error {
 	if err = c.Bind(&register); err != nil {
 		log.Logger.Error("[ERROR] Register Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrRegisterInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(register); err != nil {
 		log.Logger.Error("[ERROR] Register Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrRegisterInvalidParams, err.Error())
 	}
 
 	match := utility.IsValidPhone(*register.Mobile)
 	if !match {
 		log.Logger.Error("[ERROR] Register IsValidPhone: InvalidPhone", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrRegisterInvalidParams, err.Error())
 	}
 
 	err = models.UserService.Register(register.Mobile, register.Pass)
@@ -78,7 +78,7 @@ func Register(c echo.Context) error {
 		if strings.Contains(err.Error(), general.DuplicateEntry) {
 			log.Logger.Error("[ERROR] Register Register: Mobile Duplicate", err)
 
-			return general.NewErrorWithMessage(errcode.ErrDuplicate, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrRegisterUserDuplicate, err.Error())
 		}
 
 		log.Logger.Error("[ERROR] Register Register: Mysql Error", err)
@@ -88,7 +88,7 @@ func Register(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] Register: Mobile %s", *register.Mobile)
 
-	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
+	return c.JSON(errcode.RegisterSucceed, general.NewMessage(errcode.RegisterSucceed))
 }
 
 func Login(c echo.Context) error {
@@ -100,13 +100,13 @@ func Login(c echo.Context) error {
 	if err = c.Bind(&login); err != nil {
 		log.Logger.Error("[ERROR] Login Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrLoginInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(login); err != nil {
 		log.Logger.Error("[ERROR] Login Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrLoginInvalidParams, err.Error())
 	}
 
 	flag, userID, err := models.UserService.Login(login.Mobile, login.Pass)
@@ -114,7 +114,7 @@ func Login(c echo.Context) error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] Login Login: User doesn't exist", err)
 
-			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrLoginUserNotFound, err.Error())
 		}
 
 		log.Logger.Error("[ERROR] Login Login: Mysql Error", err)
@@ -127,7 +127,7 @@ func Login(c echo.Context) error {
 
 		log.Logger.Error("[ERROR] Login Login:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidPassword, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrLoginInvalidPassword, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -135,37 +135,16 @@ func Login(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] Login: User ID %d", userID)
 
-	return c.JSON(errcode.ErrSucceed, general.LoginMessage(errcode.ErrSucceed, userID))
+	return c.JSON(errcode.LoginSucceed, general.NewMessage(errcode.LoginSucceed))
 }
 
 func Logout(c echo.Context) error {
 	var (
-		logout models.Logout
 		err    error
 	)
 
-	if err = c.Bind(&logout); err != nil {
-		log.Logger.Error("[ERROR] Logout Bind:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	if err = c.Validate(logout); err != nil {
-		log.Logger.Error("[ERROR] Logout Validate:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-
 	userID := session.Get(general.SessionUserID)
-	if logout.UserID != userID {
-		err = errors.New("UserID Not Match.")
-
-		log.Logger.Error("[ERROR] Logout:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
 
 	err = session.Delete(general.SessionUserID)
 	if err != nil {

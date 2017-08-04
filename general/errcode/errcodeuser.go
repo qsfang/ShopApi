@@ -24,29 +24,20 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Feng Yifei
+ *     Initial: 2017/05/14        Li Zebang
  */
 
 package errcode
 
 const (
-	// General
-	ErrSucceed       = 0x0
-	ErrInvalidParams = 0x1
+	//Register
+	RegisterSucceed          = 0x0
+	ErrRegisterInvalidParams = 0x1
+	ErrRegisterUserDuplicate = 0x2
 
-	ErrDuplicate = 0x3
-	ErrMustLogin = 0x4
-	ErrMysql     = 0xfff
-	//User
-	ErrUserNotFound    = 0x2
-	ErrInvalidPassword = 0x3
-	ErrLogout          = 0x12
-
-	ErrInvalidOrdersStatus      = 0x7
-	ErrOrdersNotFound           = 0x8
-	ErrNotFound                 = 0xa
-	ErrBind                     = 0xe
-	ErrAlterAddressToNotDefault = 0x10
-	ErrAddressNotFound          = 0x11
-	ErrInformation              = 0xf
+	// Login
+	LoginSucceed            = 0x0
+	ErrLoginInvalidParams   = 0x1
+	ErrLoginUserNotFound    = 0x2
+	ErrLoginInvalidPassword = 0x3
 )
