@@ -38,6 +38,19 @@ type ErrorResp struct {
 	Message string `json:"message"`
 }
 
+type Resp struct {
+	Code int `json:"status"`
+}
+
+type LoginResp struct {
+	Code int      `json:"status"`
+	Data UserData `json:"data"`
+}
+
+type UserData struct {
+	UserID uint64 `json:"userid"`
+}
+
 func NewErrorWithMessage(code int, msg string) *ErrorResp {
 	if code == errcode.ErrSucceed {
 		msg = ""
@@ -51,4 +64,19 @@ func NewErrorWithMessage(code int, msg string) *ErrorResp {
 
 func (this *ErrorResp) Error() string {
 	return this.Message
+}
+
+func NewMessage(code int) *Resp {
+	return &Resp{
+		Code: code,
+	}
+}
+
+func LoginMessage(code int, userID uint64) *LoginResp {
+	return &LoginResp{
+		Code: code,
+		Data: UserData{
+			UserID: userID,
+		},
+	}
 }

@@ -30,21 +30,26 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/labstack/echo"
 
 	"ShopApi/general"
 	"ShopApi/general/errcode"
+	"ShopApi/log"
 	"ShopApi/utility"
-	"fmt"
 )
 
 func MustLogin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		sess := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 		id := sess.Get(general.SessionUserID)
-		fmt.Println(id)
 		if id == nil {
-			return general.NewErrorWithMessage(errcode.ErrLoginRequired, "User Must Login.")
+			err := errors.New("User Must Login.")
+
+			log.Logger.Error("[ERROR] MustLogin:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrMustLogin, err.Error())
 		}
 
 		return next(c)

@@ -36,6 +36,7 @@ package handler
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
@@ -47,111 +48,135 @@ import (
 	"ShopApi/utility"
 )
 
-func Create(c echo.Context) error {
+func Register(c echo.Context) error {
 	var (
-		err  error
-		user models.Register
+		err      error
+		register models.Register
 	)
 
-	if err = c.Bind(&user); err != nil {
-		log.Logger.Error("[ERROR] Create Bind:", err)
+	if err = c.Bind(&register); err != nil {
+		log.Logger.Error("[ERROR] Register Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if err = c.Validate(user); err != nil {
-		log.Logger.Error("[ERROR] Create Validate:", err)
+	if err = c.Validate(register); err != nil {
+		log.Logger.Error("[ERROR] Register Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	match := utility.IsValidPhone(*user.Mobile)
+	match := utility.IsValidPhone(*register.Mobile)
 	if !match {
-		log.Logger.Error("[ERROR] Invalid phone:", err)
+		log.Logger.Error("[ERROR] Register IsValidPhone: InvalidPhone", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err =  models.UserService.CheckName(user.Mobile)
-		if err == nil {
-			err = errors.New("Phone Repetition")
+	err = models.UserService.Register(register.Mobile, register.Pass)
+	if err != nil {
+		if strings.Contains(err.Error(), general.DuplicateEntry) {
+			log.Logger.Error("[ERROR] Register Register: Mobile Duplicate", err)
 
-			log.Logger.Error("[ERROR]", err)
-
-			return general.NewErrorWithMessage(errcode.ErrPhoneRepetition, err.Error())
-		} else {
-			if err == gorm.ErrRecordNotFound {
-				goto create
-			}
-			log.Logger.Error("[ERROR] MySQL Error", err)
-
-			return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrDuplicate, err.Error())
 		}
 
-create:
-	err = models.UserService.Create(user.Mobile, user.Pass)
-	if err != nil {
-
-		log.Logger.Error("[ERROR] Create Mysql:", err)
+		log.Logger.Error("[ERROR] Register Register: Mysql Error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, nil)
+	log.Logger.Info("[SUCCEED] Register: Mobile %s", *register.Mobile)
+
+	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
 }
 
 func Login(c echo.Context) error {
 	var (
-		user models.Register
-		err  error
+		err   error
+		login models.Login
 	)
 
-	if err = c.Bind(&user); err != nil {
+	if err = c.Bind(&login); err != nil {
 		log.Logger.Error("[ERROR] Login Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	if err = c.Validate(user); err != nil {
+	if err = c.Validate(login); err != nil {
 		log.Logger.Error("[ERROR] Login Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	flag, userID, err := models.UserService.Login(user.Mobile, user.Pass)
+	flag, userID, err := models.UserService.Login(login.Mobile, login.Pass)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] Login Not Found:", err)
+			log.Logger.Error("[ERROR] Login Login: User doesn't exist", err)
 
-			return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 		}
-		log.Logger.Error("[ERROR] Login Mysql:", err)
+
+		log.Logger.Error("[ERROR] Login Login: Mysql Error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	if !flag {
-		log.Logger.Debug("[ERROR] Login mobile and pass not match:")
+		err = errors.New("Login mobile and password not match.")
 
-		return general.NewErrorWithMessage(errcode.ErrLoginRequired, errors.New("[ERROR] Login mobile and pass not match:").Error())
+		log.Logger.Error("[ERROR] Login Login:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidPassword, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	session.Set(general.SessionUserID, userID)
 
-	return c.JSON(errcode.ErrSucceed, nil)
+	log.Logger.Info("[SUCCEED] Login: User ID %d", userID)
+
+	return c.JSON(errcode.ErrSucceed, general.LoginMessage(errcode.ErrSucceed, userID))
 }
+
 func Logout(c echo.Context) error {
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	err := session.Delete(general.SessionUserID)
+	var (
+		logout models.Logout
+		err    error
+	)
 
-	if err != nil {
-		log.Logger.Error("[error] Logout with error", err)
+	if err = c.Bind(&logout); err != nil {
+		log.Logger.Error("[ERROR] Logout Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrDelete, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, nil)
+	if err = c.Validate(logout); err != nil {
+		log.Logger.Error("[ERROR] Logout Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+
+	userID := session.Get(general.SessionUserID)
+	if logout.UserID != userID {
+		err = errors.New("UserID Not Match.")
+
+		log.Logger.Error("[ERROR] Logout:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	err = session.Delete(general.SessionUserID)
+	if err != nil {
+		log.Logger.Error("[ERROR] Logout:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrLogout, err.Error())
+	}
+
+	log.Logger.Info("[SUCCEED] Logout: User ID %d", userID)
+
+	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
 }
 
 func GetInfo(c echo.Context) error {
@@ -161,14 +186,14 @@ func GetInfo(c echo.Context) error {
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	numberID := session.Get(general.SessionUserID).(uint64)
+	userID := session.Get(general.SessionUserID).(uint64)
 
-	Output, err = models.UserService.GetInfo(numberID)
+	Output, err = models.UserService.GetInfo(userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] User information doesn't exist !", err)
 
-			return general.NewErrorWithMessage(errcode.ErrInformation, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 		}
 
 		log.Logger.Error("[ERROR] Getting information exists errors", err)
@@ -179,58 +204,6 @@ func GetInfo(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, Output)
 }
 
-func ChangeMobilePassword(c echo.Context) error {
-	var (
-		password     models.Password
-		userId       uint64
-		err          error
-		userPassword string
-	)
-
-	if err = c.Bind(&password); err != nil {
-		log.Logger.Error("[ERROR] Analysis crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	if err = c.Validate(password); err != nil {
-		log.Logger.Error("[ERROR] Password Validate:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
-	}
-
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userId = session.Get(general.SessionUserID).(uint64)
-
-	userPassword, err = models.UserService.GetUserPassword(userId)
-	if err != nil {
-		log.Logger.Error("[ERROR] User not found:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysqlfound, err.Error())
-	}
-
-	if !utility.CompareHash([]byte(userPassword), *password.Password) {
-		log.Logger.Debug("[ERROR] Password doesn't match:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysqlfound, errors.New("Password doesn't match").Error())
-	}
-
-	if *password.Password == *password.NewPass {
-		log.Logger.Error("[ERROR] The new password is the same as the old password:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInput, errors.New("[ERROR] The new password is the same as the old password").Error())
-	}
-
-	err = models.UserService.ChangeMobilePassword(password.NewPass, userId)
-	if err != nil {
-		log.Logger.Error("[ERROR] Change false:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, nil)
-}
-
 func ChangeUserInfo(c echo.Context) error {
 	var (
 		err  error
@@ -238,7 +211,7 @@ func ChangeUserInfo(c echo.Context) error {
 	)
 
 	if err = c.Bind(&info); err != nil {
-		log.Logger.Error("[ERROR] Create crash with error:", err)
+		log.Logger.Error("[ERROR] ChangeUserInfo Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
@@ -248,59 +221,115 @@ func ChangeUserInfo(c echo.Context) error {
 
 	err = models.UserService.ChangeUserInfo(&info, userID)
 	if err != nil {
-		log.Logger.Error("[ERROR] Change User Information with error:", err)
+		log.Logger.Error("[ERROR] ChangeUserInfo ChangeUserInfo:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, nil)
+	log.Logger.Info("[SUCCEED] ChangeUserInfo: User ID %d", userID)
+
+	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
+
 }
 
 func ChangePhone(c echo.Context) error {
 	var (
-		err error
-		m   models.TestPhone
+		err         error
+		changePhone models.ChangePhone
 	)
-	if err = c.Bind(&m); err != nil {
-		log.Logger.Error("[ERROR] Bind crash with error:", err)
+	if err = c.Bind(&changePhone); err != nil {
+		log.Logger.Error("[ERROR] ChangePhone Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	match := utility.IsValidPhone(m.Phone)
-	if !match {
-		log.Logger.Error("[ERROR] Invalid phone:", err)
+	if err = c.Validate(changePhone); err != nil {
+		log.Logger.Error("[ERROR] ChangePhone Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidPhone, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	err = models.UserService.CheckPhone(m.Phone)
-	if err == nil {
-		err = errors.New("Phone Repetition")
+	match := utility.IsValidPhone(changePhone.Phone)
+	if !match {
+		log.Logger.Error("[ERROR] ChangePhone IsValidPhone: Invalid Phone", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID).(uint64)
+
+	err = models.UserService.ChangePhone(userID, changePhone.Phone)
+	if err != nil {
+		if strings.Contains(err.Error(), general.DuplicateEntry) {
+			log.Logger.Error("[ERROR] ChangePhone ChangePhone: Mobile Duplicate", err)
+
+			return general.NewErrorWithMessage(errcode.ErrDuplicate, err.Error())
+		}
+
+		log.Logger.Error("[ERROR] ChangePhone ChangePhone: Mysql Error", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	err = session.Delete(general.SessionUserID)
+	if err != nil {
+		log.Logger.Error("[ERROR] ChangePhone Delete:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrLogout, err.Error())
+	}
+
+	log.Logger.Info("[SUCCEED] ChangePhone: User ID %d", userID)
+
+	return c.JSON(errcode.ErrSucceed, general.LoginMessage(errcode.ErrSucceed, userID))
+}
+
+func ChangePassword(c echo.Context) error {
+	var (
+		changePassword models.ChangePassword
+		userID         uint64
+		err            error
+	)
+
+	if err = c.Bind(&changePassword); err != nil {
+		log.Logger.Error("[ERROR] ChangePassword Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(changePassword); err != nil {
+		log.Logger.Error("[ERROR] ChangePassword Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if *changePassword.Password == *changePassword.NewPass {
+		err = errors.New("The password hasn't change.")
+
+		log.Logger.Error("[ERROR] ChangePassword:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID = session.Get(general.SessionUserID).(uint64)
+
+	ok, err := models.UserService.ChangePassword(&changePassword, userID)
+	if err != nil {
+		log.Logger.Error("[ERROR] ChangePassword ChangePassword: Mysql Error", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	if !ok {
+		err = errors.New("Password is wrong.")
 
 		log.Logger.Error("[ERROR]", err)
 
-		return general.NewErrorWithMessage(errcode.ErrPhoneRepetition, err.Error())
-	} else {
-		if err == gorm.ErrRecordNotFound {
-			goto change
-		}
-
-		log.Logger.Error("[ERROR] MySQL Error", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrInvalidPassword, err.Error())
 	}
 
-change:
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	UserID := session.Get(general.SessionUserID).(uint64)
+	log.Logger.Info("[SUCCEED] ChangePassword: User ID %d", userID)
 
-	err = models.UserService.ChangePhone(UserID, m.Phone)
-	if err != nil {
-		log.Logger.Error("[ERROR] change phone crash with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	return c.JSON(errcode.ErrSucceed, nil)
+	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
 }

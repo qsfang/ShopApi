@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `admin` (
 
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) DEFAULT NULL UNIQUE ,
+  `name` varchar(20) UNIQUE DEFAULT NULL,
   `password` varchar(128) NOT NULL DEFAULT '',
   `status` int(8) DEFAULT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `userinfo` (
   `avatar` text,
   `nickname` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
-  `phone` varchar(20) NOT NULL DEFAULT '',
+  `phone` varchar(20) UNIQUE NOT NULL DEFAULT '',
   `sex` TINYINT(1) DEFAULT NULL COMMENT '0:男;1:女',
   PRIMARY KEY (`userid`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

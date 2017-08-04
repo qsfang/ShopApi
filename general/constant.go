@@ -32,7 +32,18 @@ package general
 const (
 	// General
 	// Login session
-	SessionUserID = "userid"
+	SessionUserID   = "userid"
+	DuplicateEntry  = "Duplicate"
+	InvalidPassword = "match"
+
+	//User
+	// User Status
+	UserActive   = 0xf0
+	UserInactive = 0xf1
+	// sex
+	Hidden = 0x0
+	Man    = 0x1
+	Woman  = 0x2
 
 	// Address
 	//Address  Default
@@ -44,7 +55,7 @@ const (
 	ProInCart    = 0xea //233
 	ProNotInCart = 0xeb //234
 	//Pay status
-	Buy   = 0xec //235
+	Buy    = 0xec //235
 	NotBuy = 0xed //236
 
 	// Category
@@ -58,19 +69,11 @@ const (
 	OrderFinished   = 0xee // 238
 	OrderCanceled   = 0xed // 237
 	OrderGetAll     = 0xec // 236, Not order status
-	OrderPaid   = 0xf1 // 241
-	OrderUnpaid = 0xf2 // 240
+	OrderPaid       = 0xf1 // 241
+	OrderUnpaid     = 0xf2 // 240
 
 	// Products
 	//Products Status
-	ProductOnsale    = 0xe0 // 224
-	ProductUnsale    = 0xe1 // 225
-
-	//User
-	// User Status
-	UserActive   = 0xf0
-	UserInactive = 0xf1
-	// sex
-	Man   = 0x1
-	Woman = 0x2
+	ProductOnsale = 0xe0 // 224
+	ProductUnsale = 0xe1 // 225
 )

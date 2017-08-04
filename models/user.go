@@ -64,26 +64,34 @@ type UserInfo struct {
 	Sex      uint8  `json:"sex"`
 }
 
-type TestPhone struct {
-	Phone    string    `json:"phone" validate:"required,alphanum,len=11"`
-}
-
 type Register struct {
-	Mobile *string `json:"mobile" validate:"required,numeric,min=6,max=30"`
-	Pass   *string `json:"pass" validate:"required,alphanum,min=6,max=30"`
+	Mobile *string `json:"mobile" validate:"required,numeric,len=11"`
+	Pass   *string `json:"password" validate:"required,alphanum,min=6,max=64"`
 }
 
-type Password struct {
-	Password *string   `json:"password" validate:"required,alphanum,min=6,max=30"`
-	NewPass  *string   `json:"newpass" validate:"required,alphanum,min=6,max=30"`
+type Login struct {
+	Mobile *string `json:"mobile" validate:"required,numeric,len=11"`
+	Pass   *string `json:"password" validate:"required,alphanum,min=6,max=64"`
+}
+
+type Logout struct {
+	UserID uint64 `json:"userid" validate:"required"`
 }
 
 type ChangeUserInfo struct {
-	UserID   uint64 `json:"userid"`
 	Avatar   string `json:"avatar"`
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
 	Sex      uint8  `json:"sex"`
+}
+
+type ChangePhone struct {
+	Phone string `json:"phone" validate:"required,numeric,len=11"`
+}
+
+type ChangePassword struct {
+	Password *string `json:"password" validate:"required,alphanum,min=6,max=64"`
+	NewPass  *string `json:"newpassword" validate:"required,alphanum,min=6,max=64"`
 }
 
 func (User) TableName() string {
@@ -94,7 +102,7 @@ func (UserInfo) TableName() string {
 	return "userinfo"
 }
 
-func (us *UserServiceProvider) Create(name, pass *string) error {
+func (us *UserServiceProvider) Register(name, pass *string) error {
 	hashedPass, err := utility.GenerateHash(*pass)
 	if err != nil {
 		return err
@@ -127,7 +135,7 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 	info := UserInfo{
 		UserID: u.UserID,
 		Phone:  *name,
-		Sex:    general.Man,
+		Sex:    general.Hidden,
 	}
 
 	err = tx.Create(&info).Error
@@ -143,16 +151,6 @@ func (us *UserServiceProvider) Create(name, pass *string) error {
 	return nil
 }
 
-func (us *UserServiceProvider) CheckName(name *string) error {
-	var (
-		con User
-	)
-
-	db := orm.Conn
-
-	return db.Where("name = ?", name).First(&con).Error
-}
-
 func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	var (
 		u   User
@@ -162,12 +160,10 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	db := orm.Conn
 	err = db.Where("name = ?", *name).First(&u).Error
 	if err != nil {
-
 		return false, 0, err
 	}
 
 	if !utility.CompareHash([]byte(u.Password), *pass) {
-
 		return false, 0, nil
 	}
 
@@ -190,19 +186,44 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
 	return ui, nil
 }
 
+func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint64) error {
+	var (
+		con   UserInfo
+		empty int8
+	)
+
+	updater := map[string]interface{}{
+		"nickname": info.Nickname,
+		"email":    info.Email,
+		"sex":      info.Sex,
+		"avatar":   info.Avatar,
+	}
+
+	for key, value := range updater {
+		if value == "" || value == empty {
+			delete(updater, key)
+		}
+	}
+
+	db := orm.Conn
+	err := db.Model(&con).Where("userid =? ", userID).Update(updater).Limit(1).Error
+
+	return err
+}
+
 func (us *UserServiceProvider) ChangePhone(userID uint64, phone string) error {
 	var (
-		err error
+		err  error
 		user User
 		info UserInfo
 	)
 
-	changeUser := map[string]string{"name":phone}
+	changeUser := map[string]string{"name": phone}
 	changeInfo := map[string]string{"phone": phone}
 
 	tx := orm.Conn.Begin()
 	defer func() {
-		if err != nil  {
+		if err != nil {
 			err = tx.Rollback().Error
 		} else {
 			err = tx.Commit().Error
@@ -219,70 +240,38 @@ func (us *UserServiceProvider) ChangePhone(userID uint64, phone string) error {
 		return err
 	}
 
-	return  err
-}
-
-func (us *UserServiceProvider) CheckPhone(phone string) error {
-	var (
-		con UserInfo
-	)
-
-	db := orm.Conn
-
-	return db.Where("phone = ?", phone).First(&con).Error
-}
-
-func (us *UserServiceProvider) GetUserPassword(id uint64) (string, error) {
-	var (
-		user User
-		err  error
-	)
-
-	db := orm.Conn
-	err = db.Where("id = ?", id).Find(&user).Error
-
-	return user.Password, err
-}
-
-func (us *UserServiceProvider) ChangeMobilePassword(newPass *string, id uint64) error {
-	var (
-		user User
-		err  error
-	)
-
-	db := orm.Conn
-	hashPass, err := utility.GenerateHash(*newPass)
-	if err != nil {
-		return err
-	}
-
-	updater := map[string]interface{}{"password": hashPass}
-	err = db.Model(&user).Where("id =? ", id).Update(updater).Limit(1).Error
-
 	return err
 }
 
-func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint64) error {
+func (us *UserServiceProvider) ChangePassword(changePassword *ChangePassword, id uint64) (bool, error) {
 	var (
-		con UserInfo
-		empty int8 = 0
+		user User
+		err  error
 	)
 
-	changeMap := map[string]interface{}{
-		"nickname": info.Nickname,
-		"email":    info.Email,
-		"sex":      info.Sex,
-		"avatar":   info.Avatar,
-	}
-
-	for key, value := range changeMap {
-		if value == "" || value == empty {
-			delete(changeMap, key)
+	tx := orm.Conn.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
 		}
+	}()
+
+	err = tx.Where("id = ?", id).Find(&user).Error
+	if err != nil {
+		return false, err
 	}
 
-	db := orm.Conn
-	err := db.Model(&con).Where("userid =? ", userID).Update(changeMap).Limit(1).Error
+	if !utility.CompareHash([]byte(user.Password), *changePassword.Password) {
+		return false, nil
+	}
 
-return err
+	hashPass, err := utility.GenerateHash(*changePassword.NewPass)
+
+	updater := map[string]interface{}{"password": hashPass}
+
+	err = tx.Model(&user).Where("id =? ", id).Update(updater).Limit(1).Error
+
+	return true, err
 }

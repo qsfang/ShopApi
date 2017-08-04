@@ -25,8 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *     Modify: 2017/07/19         Yang Zhengtian   添加返回收获地址
- *     Modify: 2017/07/20         Yang Zhengtain    添加修改密码
+ *     Modify: 2017/07/19         Yang Zhengtian
+ *     Modify: 2017/07/20         Yang Zhengtain
  */
 
 package router
@@ -42,35 +42,39 @@ func InitRouter(server *echo.Echo) {
 		panic("[InitRouter], server couldn't be nil")
 	}
 
-	server.POST("/api/v1/user/create", handler.Create)
+	// user
+	server.POST("/api/v1/user/register", handler.Register)
 	server.POST("/api/v1/user/login", handler.Login)
-	server.GET("/api/v1/user/logout", handler.Logout)
-	server.POST("/api/v1/user/changemobilepass",handler.ChangeMobilePassword)
-	server.POST("/api/v1/user/changeinfo", handler.ChangeUserInfo,handler.MustLogin)
-	server.POST("/api/v1/user/changepass",handler.ChangeMobilePassword,handler.MustLogin)
-	server.POST("/api/vl/user/changephone",handler.ChangePhone, handler.MustLogin)
+	server.POST("/api/v1/user/logout", handler.Logout, handler.MustLogin)
 	server.GET("/api/v1/user/getInfo", handler.GetInfo, handler.MustLogin)
+	server.POST("/api/v1/user/changeinfo", handler.ChangeUserInfo, handler.MustLogin)
+	server.POST("/api/vl/user/changephone",handler.ChangePhone, handler.MustLogin)
+	server.POST("/api/v1/user/changepass",handler.ChangePassword, handler.MustLogin)
 
-
+	// address
 	server.POST("/api/v1/address/add", handler.AddAddress, handler.MustLogin)
 	server.POST("/api/v1/address/change", handler.ChangeAddress, handler.MustLogin)
 	server.GET("/api/v1/address/get", handler.GetAddress, handler.MustLogin)
 	server.POST("/api/vl/address/alter", handler.AlterDefault, handler.MustLogin)
 
+	// products
 	server.POST("/api/v1/products/create",handler.CreateProduct)
 	server.POST("/api/v1/product/getinfo",handler.GetProInfo,handler.MustLogin)
 	server.POST("/api/v1/products/changestatus", handler.ChangeProStatus)
 	server.POST("/api/v1/products/getlist", handler.GetProductList)
 	server.POST("/api/v1/products/changecate",handler.ChangeCategories)
 
+	// orders
 	server.POST("/api/v1/orders/create", handler.CreateOrder, handler.MustLogin)
 	server.POST("/api/v1/orders/getone", handler.GetOneOrder)
 	server.POST("/api/v1/orders/changestatus",handler.ChangeStatus)
 	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
 
+	// category
 	server.POST("/api/v1/category/create", handler.CreateCategory)
 	server.GET("/api/vl/category/get", handler.GetCategory)
 
+	// carts
 	server.POST("/api/v1/carts/delete", handler.CartsDelete, handler.MustLogin)
 	server.POST("/api/vl/carts/altercartpro",handler.AlterCartPro)
 	server.POST("/api/vl/carts/cartsput",handler.CartsPutIn, handler.MustLogin)
