@@ -30,22 +30,21 @@
 package errcode
 
 const (
-	// General
-	ErrSucceed       = 0x0
-	ErrInvalidParams = 0x1
+	//AddAddress
+	AddAddressSucceed           = 0x0
+	ErrAddAddressInvalidParams  = 0x1
+	ErrAlterAddressToNotDefault = 0x2
 
-	ErrDuplicate = 0x3
-	ErrMustLogin = 0x4
-	ErrMysql     = 0xfff
-	//User
-	ErrUserNotFound    = 0x2
-	ErrInvalidPassword = 0x3
-	ErrLogout          = 0x12
+	//ChangeAddress
+	ChangeAddressSucceed          = 0x0
+	ErrChangeAddressInvalidParams = 0x1
 
-	ErrInvalidOrdersStatus      = 0x7
-	ErrOrdersNotFound           = 0x8
-	ErrNotFound                 = 0xa
-	ErrBind                     = 0xe
-	ErrInformation              = 0xf
-	ErrAddressIdNotFound        = 0x9
+	//GetAddress
+	GetAddressSucceed            = 0x0
+	ErrGetAddressNotFound        = 0x1
+
+	//AlterDefault
+	AlterDefaultSucceed          = 0x0
+	ErrAlterDefaultInvalidParams = 0x1
+
 )

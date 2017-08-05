@@ -54,13 +54,13 @@ func AddAddress(c echo.Context) error {
 	if err = c.Bind(&addAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrBind, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrAddAddressInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(addAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrAddAddressInvalidParams, err.Error())
 	}
 
 	addAddress.UserID = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request()).Get(general.SessionUserID).(uint64)
@@ -80,7 +80,9 @@ func AddAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, nil)
+
+	log.Logger.Info("[SUCCEED] Add address: %d", addAddress.Address)
+	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.AddAddressSucceed))
 }
 
 func ChangeAddress(c echo.Context) error {
@@ -92,13 +94,13 @@ func ChangeAddress(c echo.Context) error {
 	if err = c.Bind(&changeAddress); err != nil {
 		log.Logger.Error("[ERROR] ChangeAddress Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangeAddressInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(changeAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangeAddressInvalidParams, err.Error())
 	}
 
 	err = models.AddressService.FindAddressByAddressID(changeAddress.ID)
@@ -106,7 +108,7 @@ func ChangeAddress(c echo.Context) error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] ChangeAddress FindAddressByAddressID: Not Found", err)
 
-			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrAddressIdNotFound, err.Error())
 		}
 
 		log.Logger.Error("[ERROR] ChangeAddress FindAddressByAddressID: MySQL ERROR", err)
@@ -121,7 +123,9 @@ func ChangeAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, nil)
+	log.Logger.Info("[SUCCEED] Change address: %d", changeAddress.Address)
+
+	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ChangeAddressSucceed))
 }
 
 func GetAddress(c echo.Context) error {
@@ -146,8 +150,10 @@ func GetAddress(c echo.Context) error {
 
 		log.Logger.Error("[ERROR] GetAddress GetAddressByUserID:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrAddressNotFound, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrGetAddressNotFound, err.Error())
 	}
+
+	log.Logger.Info("[SUCCEED] Get address by userId: %d", userID)
 
 	return c.JSON(errcode.ErrSucceed, addressList)
 }
@@ -161,13 +167,13 @@ func AlterDefault(c echo.Context) error {
 	if err = c.Bind(&alterAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrAlterDefaultInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(alterAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrAlterDefaultInvalidParams, err.Error())
 	}
 
 	err = models.AddressService.FindAddressByAddressID(alterAddress.ID)
@@ -175,7 +181,7 @@ func AlterDefault(c echo.Context) error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] AlterDefault FindAddressByAddressID: Not Found", err)
 
-			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrAddressIdNotFound, err.Error())
 		}
 
 		log.Logger.Error("[ERROR] AlterDefault FindAddressByAddressID: MySQL ERROR", err)
@@ -193,5 +199,5 @@ func AlterDefault(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, nil)
+	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.AlterDefaultSucceed))
 }
