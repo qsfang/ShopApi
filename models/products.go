@@ -143,7 +143,7 @@ func (ps *ProductServiceProvider) GetProduct(cate, pageStart, pageSize uint64) (
 	)
 
 	db := orm.Conn
-	sql := fmt.Sprintf("SELECT * FROM products WHERE category = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageSize)
+	sql := fmt.Sprintf("SELECT * FROM product WHERE category = ? AND status = ? LIMIT %d, %d LOCK IN SHARE MODE", pageStart, pageSize)
 	rows, err := db.Raw(sql, cate, general.ProductOnsale).Rows()
 	defer rows.Close()
 
