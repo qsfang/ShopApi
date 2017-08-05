@@ -34,16 +34,17 @@ import (
 )
 
 type shopServerConfig struct {
-	address   string
-	isDebug   bool
-	corsHosts []string
-	tokenKey  string
-	mysqlHost string
-	mysqlPort string
-	mysqlUser string
-	mysqlPass string
-	mysqlDb   string
-	mysqlSize int
+	address    string
+	isDebug    bool
+	corsHosts  []string
+	tokenKey   string
+	mysqlHost  string
+	mysqlPort  string
+	mysqlUser  string
+	mysqlPass  string
+	mysqlDb    string
+	mysqlSize  int
+	MgoUrl     string
 }
 
 var (
@@ -59,15 +60,16 @@ func readConfiguration() {
 	}
 
 	configuration = &shopServerConfig{
-		address:   viper.GetString("server.address"),
-		isDebug:   viper.GetBool("server.debug"),
-		corsHosts: viper.GetStringSlice("middleware.cors.hosts"),
-		tokenKey:  viper.GetString("middleware.jwt.tokenkey"),
-		mysqlHost: viper.GetString("mysql.host"),
-		mysqlPort: viper.GetString("mysql.port"),
-		mysqlUser: viper.GetString("mysql.user"),
-		mysqlPass: viper.GetString("mysql.pass"),
-		mysqlDb:   viper.GetString("mysql.db"),
-		mysqlSize: viper.GetInt("mysql.size"),
+		address:    viper.GetString("server.address"),
+		isDebug:    viper.GetBool("server.debug"),
+		corsHosts:  viper.GetStringSlice("middleware.cors.hosts"),
+		tokenKey:   viper.GetString("middleware.jwt.tokenkey"),
+		mysqlHost:  viper.GetString("mysql.host"),
+		mysqlPort:  viper.GetString("mysql.port"),
+		mysqlUser:  viper.GetString("mysql.user"),
+		mysqlPass:  viper.GetString("mysql.pass"),
+		mysqlDb:    viper.GetString("mysql.db"),
+		mysqlSize:  viper.GetInt("mysql.size"),
+		MgoUrl:     viper.GetString("mongodb.url"),
 	}
 }

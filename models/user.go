@@ -36,6 +36,8 @@ package models
 import (
 	"time"
 
+	"gopkg.in/mgo.v2/bson"
+
 	"ShopApi/general"
 	"ShopApi/orm"
 	"ShopApi/utility"
@@ -58,10 +60,14 @@ type User struct {
 type UserInfo struct {
 	UserID   uint64 `sql:"primary_key" gorm:"column:userid" json:"userid"`
 	Phone    string `json:"phone"`
-	Avatar   string `json:"avatar"`
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
 	Sex      uint8  `json:"sex"`
+}
+
+type UserAvatar struct {
+	UserID uint64 `bson:"_id,omitempty" json:"userid"`
+	Avatar string `bson:"avatar" json:"avatar" validate:"required"`
 }
 
 type Register struct {
@@ -75,10 +81,9 @@ type Login struct {
 }
 
 type ChangeUserInfo struct {
-	Avatar   string `json:"avatar"`
-	Nickname string `json:"nickname"`
+	Nickname string `json:"name"`
 	Email    string `json:"email"`
-	Sex      uint8  `json:"sex"`
+	Sex      bool   `json:"sex"`
 }
 
 type ChangePhone struct {
@@ -191,8 +196,7 @@ func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint6
 	updater := map[string]interface{}{
 		"nickname": info.Nickname,
 		"email":    info.Email,
-		"sex":      info.Sex,
-		"avatar":   info.Avatar,
+		"sex":      utility.BoolToUint8(info.Sex),
 	}
 
 	for key, value := range updater {
@@ -203,6 +207,14 @@ func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint6
 
 	db := orm.Conn
 	err := db.Model(&con).Where("userid =? ", userID).Update(updater).Limit(1).Error
+
+	return err
+}
+
+func (us *UserServiceProvider) ChangeUserAvatar(avatar *UserAvatar) error {
+	collection := orm.MDSession.DB(orm.MD).C("useravatar")
+	orm.MDSession.Refresh()
+	_, err := collection.Upsert(bson.M{"_id": avatar.UserID}, avatar)
 
 	return err
 }

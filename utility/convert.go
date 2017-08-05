@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 SmartestEE Inc.
+ * Copyright (c) 2017 SmartestEE Co.,Ltd..
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,29 +24,21 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Feng Yifei
+ *     Initial: 2017/08/01        Li Zebang
  */
 
-package errcode
+package utility
 
-const (
-	// General
-	ErrSucceed       = 0x0
-	ErrInvalidParams = 0x1
+func Uint8ToBool(n uint8) bool {
+	if n == 0 {
+		return false
+	}
+	return true
+}
 
-	ErrDuplicate = 0x3
-	ErrMustLogin = 0x4
-	ErrMysql     = 0xff
-	ErrMongo     = 0xfe
-	//User
-	ErrUserNotFound    = 0x2
-	ErrInvalidPassword = 0x3
-	ErrLogout          = 0x12
-
-	ErrInvalidOrdersStatus = 0x7
-	ErrOrdersNotFound      = 0x8
-	ErrNotFound            = 0xa
-	ErrBind                = 0xe
-	ErrInformation         = 0xf
-	ErrAddressIdNotFound   = 0x9
-)
+func BoolToUint8(b bool) uint8 {
+	if b {
+		return 1
+	}
+	return 0
+}

@@ -140,7 +140,7 @@ func Login(c echo.Context) error {
 
 func Logout(c echo.Context) error {
 	var (
-		err    error
+		err error
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -211,6 +211,36 @@ func ChangeUserInfo(c echo.Context) error {
 
 }
 
+func ChangeUserAvatar(c echo.Context) error {
+	var (
+		err    error
+		avatar models.UserAvatar
+	)
+
+	if err = c.Bind(&avatar); err != nil {
+		log.Logger.Error("[ERROR] ChangeUserAvatar Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(&avatar); err != nil {
+		log.Logger.Error("[ERROR] ChangeUserAvatar Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+	}
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	avatar.UserID = session.Get(general.SessionUserID).(uint64)
+
+	err = models.UserService.ChangeUserAvatar(&avatar)
+	if err != nil {
+		log.Logger.Error("[ERROR] ChangeUserAvatar ChangeUserAvatar:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMongo, err.Error())
+	}
+
+	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
+}
+
 func ChangePhone(c echo.Context) error {
 	var (
 		err         error
@@ -260,7 +290,7 @@ func ChangePhone(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] ChangePhone: User ID %d", userID)
 
-	return c.JSON(errcode.ErrSucceed, general.LoginMessage(errcode.ErrSucceed, userID))
+	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
 }
 
 func ChangePassword(c echo.Context) error {

@@ -32,9 +32,17 @@ package orm
 import (
 	"ShopApi/log"
 	"github.com/jinzhu/gorm"
+	"gopkg.in/mgo.v2"
 )
 
-const sql = "mysql"
+var (
+	MDSession *mgo.Session
+)
+
+const (
+	sql = "mysql"
+	MD = "shop"
+)
 
 var (
 	Conn *gorm.DB

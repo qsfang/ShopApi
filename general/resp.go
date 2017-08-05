@@ -42,11 +42,6 @@ type Resp struct {
 	Code int `json:"status"`
 }
 
-type LoginResp struct {
-	Code int      `json:"status"`
-	Data UserData `json:"data"`
-}
-
 type UserData struct {
 	UserID uint64 `json:"userid"`
 }
@@ -69,14 +64,5 @@ func (this *ErrorResp) Error() string {
 func NewMessage(code int) *Resp {
 	return &Resp{
 		Code: code,
-	}
-}
-
-func LoginMessage(code int, userID uint64) *LoginResp {
-	return &LoginResp{
-		Code: code,
-		Data: UserData{
-			UserID: userID,
-		},
 	}
 }

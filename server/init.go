@@ -31,10 +31,12 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"gopkg.in/mgo.v2"
 
 	"ShopApi/log"
 	"ShopApi/orm"
@@ -62,6 +64,7 @@ func startServer() {
 func init() {
 	readConfiguration()
 	initMysql()
+	InitMetal()
 	startServer()
 }
 
@@ -75,4 +78,19 @@ func initMysql() {
 	conf := fmt.Sprintf(user + ":" + pass + "@" + "tcp(" + url + port + ")/" + sqlName + "?charset=utf8&parseTime=True&loc=Local")
 
 	orm.InitOrm(conf)
+}
+
+func InitMetal() {
+	var err error
+	url := configuration.MgoUrl
+
+	orm.MDSession, err = mgo.DialWithTimeout(url, time.Second)
+
+	if err != nil {
+		panic(err)
+	}
+
+	log.Logger.Debug("the MongoDB of %s connected!", orm.MD)
+
+	orm.MDSession.SetMode(mgo.Monotonic, true)
 }

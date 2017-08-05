@@ -41,8 +41,8 @@ const (
 	UserActive   = 0xf0
 	UserInactive = 0xf1
 	// sex
-	Man    = 0x0
-	Woman  = 0x1
+	Woman  = 0x0
+	Man    = 0x1
 
 	// Address
 	//Address  Default
