@@ -81,7 +81,7 @@ func AddAddress(c echo.Context) error {
 	}
 
 
-	log.Logger.Info("[SUCCEED] Add address: %d", addAddress.Address)
+	log.Logger.Info("[SUCCEED] Add address by userId: %d", addAddress.UserID)
 	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.AddAddressSucceed))
 }
 
@@ -123,7 +123,7 @@ func ChangeAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] Change address: %d", changeAddress.Address)
+	log.Logger.Info("[SUCCEED] Change address by address id: %d", changeAddress.ID)
 
 	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ChangeAddressSucceed))
 }
@@ -140,7 +140,7 @@ func GetAddress(c echo.Context) error {
 
 	addressList, err = models.AddressService.GetAddressByUserID(userID)
 	if err != nil {
-		log.Logger.Error("[ERROR] GetAddress GetAddressByUserID: MySQL ERROR", err)
+		log.Logger.Error("[ERROR] GetAddress GetAddressByUserID ", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -198,6 +198,8 @@ func AlterDefault(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
+
+	log.Logger.Info("[SUCCEED] AlterDefault by userId:", alterAddress.UserID)
 
 	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.AlterDefaultSucceed))
 }
