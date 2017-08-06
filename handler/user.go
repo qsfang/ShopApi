@@ -183,6 +183,33 @@ func GetInfo(c echo.Context) error {
 	return c.JSON(errcode.ErrSucceed, Output)
 }
 
+func GetUserAvatar(c echo.Context) error {
+	var (
+		err    error
+		avatar = new(models.UserAvatar)
+	)
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	avatar.UserID = session.Get(general.SessionUserID).(uint64)
+
+	avatar, err = models.UserService.GetUserAvatar(avatar.UserID)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			log.Logger.Error("[ERROR] GetUserAvatar GetUserAvatar:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+		}
+
+		log.Logger.Error("[ERROR] GetUserAvatar GetUserAvatar:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMongo, err.Error())
+	}
+
+	log.Logger.Info("[SUCCEED] GetUserAvatar: User ID %d", avatar.UserID)
+
+	return c.JSON(errcode.ErrSucceed, avatar)
+}
+
 func ChangeUserInfo(c echo.Context) error {
 	var (
 		err  error
@@ -237,6 +264,8 @@ func ChangeUserAvatar(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrMongo, err.Error())
 	}
+
+	log.Logger.Info("[SUCCEED] ChangeUserAvatar: User ID %d", avatar.UserID)
 
 	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
 }

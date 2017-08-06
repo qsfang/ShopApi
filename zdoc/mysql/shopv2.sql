@@ -29,7 +29,6 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 CREATE TABLE IF NOT EXISTS `userinfo` (
   `userid`   int(16),
-  `avatar` text,
   `nickname` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `phone` varchar(20) UNIQUE NOT NULL DEFAULT '',

@@ -66,7 +66,7 @@ type UserInfo struct {
 }
 
 type UserAvatar struct {
-	UserID uint64 `bson:"_id,omitempty" json:"userid"`
+	UserID uint64 `bson:"_id,omitempty" json:"id"`
 	Avatar string `bson:"avatar" json:"avatar" validate:"required"`
 }
 
@@ -172,7 +172,6 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 }
 
 func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
-
 	var (
 		err error
 		ui  *UserInfo = &UserInfo{}
@@ -185,6 +184,19 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
 	}
 
 	return ui, nil
+}
+
+func (us *UserServiceProvider) GetUserAvatar(userID uint64) (*UserAvatar, error) {
+	var (
+		err    error
+		avatar *UserAvatar
+	)
+
+	collection := orm.MDSession.DB(orm.MD).C("useravatar")
+	orm.MDSession.Refresh()
+	err = collection.Find(bson.M{"_id": userID}).One(avatar)
+
+	return avatar, err
 }
 
 func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint64) error {
