@@ -70,6 +70,15 @@ type UserAvatar struct {
 	Avatar string `bson:"avatar" json:"avatar" validate:"required"`
 }
 
+type UserGet struct {
+	UserID   uint64 `json:"userid"`
+	Phone    string `json:"phone"`
+	Avatar   string `json:"avatar"`
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Sex      bool  `json:"sex"`
+}
+
 type Register struct {
 	Mobile *string `json:"mobile" validate:"required,numeric,len=11"`
 	Pass   *string `json:"password" validate:"required,alphanum,min=6,max=64"`
@@ -171,32 +180,41 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return true, u.UserID, nil
 }
 
-func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserInfo, error) {
+func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserGet, error) {
 	var (
 		err error
-		ui  *UserInfo = &UserInfo{}
+		ui  UserInfo
+		ug  UserGet
 	)
 
 	db := orm.Conn
 	err = db.Where("userid = ?", UserID).First(&ui).Error
 	if err != nil {
-		return ui, err
+		return nil, err
 	}
 
-	return ui, nil
+	ug = UserGet{
+		UserID: ui.UserID,
+		Phone: ui.Phone,
+		Nickname: ui.Nickname,
+		Email: ui.Email,
+		Sex: utility.Uint8ToBool(ui.Sex),
+	}
+
+	return &ug, nil
 }
 
 func (us *UserServiceProvider) GetUserAvatar(userID uint64) (*UserAvatar, error) {
 	var (
 		err    error
-		avatar *UserAvatar
+		avatar UserAvatar
 	)
 
 	collection := orm.MDSession.DB(orm.MD).C("useravatar")
 	orm.MDSession.Refresh()
-	err = collection.Find(bson.M{"_id": userID}).One(avatar)
+	err = collection.Find(bson.M{"_id": userID}).One(&avatar)
 
-	return avatar, err
+	return &avatar, err
 }
 
 func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint64) error {

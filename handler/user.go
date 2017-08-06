@@ -161,26 +161,44 @@ func Logout(c echo.Context) error {
 func GetInfo(c echo.Context) error {
 	var (
 		err    error
-		Output *models.UserInfo
+		output = new(models.UserGet)
+		avatar = new(models.UserAvatar)
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	Output, err = models.UserService.GetInfo(userID)
+	output, err = models.UserService.GetInfo(userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] User information doesn't exist !", err)
+			log.Logger.Error("[ERROR] GetInfo GetInfo: User Information Not Found", err)
 
 			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 		}
 
-		log.Logger.Error("[ERROR] Getting information exists errors", err)
+		log.Logger.Error("[ERROR] GetInfo GetInfo: Mysql Error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, Output)
+	avatar, err = models.UserService.GetUserAvatar(userID)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			log.Logger.Error("[ERROR] GetInfo GetUserAvatar: User Avatar Not Dound", err)
+
+			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
+		}
+
+		log.Logger.Error("[ERROR] GetInfo GetUserAvatar: Mongo Error", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMongo, err.Error())
+	}
+
+	output.Avatar = avatar.Avatar
+
+	log.Logger.Info("[SUCCEED] GetInfo: User ID %d", userID)
+
+	return c.JSON(errcode.ErrSucceed, output)
 }
 
 func GetUserAvatar(c echo.Context) error {
@@ -195,12 +213,12 @@ func GetUserAvatar(c echo.Context) error {
 	avatar, err = models.UserService.GetUserAvatar(avatar.UserID)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			log.Logger.Error("[ERROR] GetUserAvatar GetUserAvatar:", err)
+			log.Logger.Error("[ERROR] GetUserAvatar GetUserAvatar: User Avatar Not Dound", err)
 
 			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 		}
 
-		log.Logger.Error("[ERROR] GetUserAvatar GetUserAvatar:", err)
+		log.Logger.Error("[ERROR] GetUserAvatar GetUserAvatar: Mongo Error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMongo, err.Error())
 	}
