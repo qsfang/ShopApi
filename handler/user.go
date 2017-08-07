@@ -156,10 +156,10 @@ func Logout(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] Logout: User ID %d", userID)
 
-	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
+	return c.JSON(errcode.LogoutSucceed, general.NewMessage(errcode.LogoutSucceed))
 }
 
-func GetInfo(c echo.Context) error {
+func GetUserInfo(c echo.Context) error {
 	var (
 		err    error
 		output = new(models.UserGet)
@@ -169,58 +169,31 @@ func GetInfo(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	output, err = models.UserService.GetInfo(userID)
+	output, err = models.UserService.GetUserInfo(userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] GetInfo GetInfo: User Information Not Found", err)
+			log.Logger.Error("[ERROR] GetUserInfo GetUserInfo: User Information Not Found", err)
 
-			return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrGetUserInfoInvalidParams, err.Error())
 		}
 
-		log.Logger.Error("[ERROR] GetInfo GetInfo: Mysql Error", err)
+		log.Logger.Error("[ERROR] GetUserInfo GetUserInfo: Mysql Error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
 	avatar, err = models.UserService.GetUserAvatar(userID)
 	if err != nil && !strings.Contains(err.Error(), "not found") {
-		log.Logger.Error("[ERROR] GetInfo GetUserAvatar: Mongo Error", err)
+		log.Logger.Error("[ERROR] GetUserInfo GetUserAvatar: Mongo Error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMongo, err.Error())
 	}
 
 	output.Avatar = avatar.Avatar
 
-	log.Logger.Info("[SUCCEED] GetInfo: User ID %d", userID)
+	log.Logger.Info("[SUCCEED] GetUserInfo: User ID %d", userID)
 
-	return c.JSON(errcode.ErrSucceed, output)
-}
-
-func GetUserAvatar(c echo.Context) error {
-	var (
-		err    error
-		avatar = new(models.UserAvatar)
-	)
-
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	avatar.UserID = session.Get(general.SessionUserID).(uint64)
-
-	avatar, err = models.UserService.GetUserAvatar(avatar.UserID)
-	if err != nil {
-		if strings.Contains(err.Error(), "not found") {
-			log.Logger.Error("[ERROR] GetUserAvatar GetUserAvatar: User Avatar Not Dound", err)
-
-			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
-		}
-
-		log.Logger.Error("[ERROR] GetUserAvatar GetUserAvatar: Mongo Error", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMongo, err.Error())
-	}
-
-	log.Logger.Info("[SUCCEED] GetUserAvatar: User ID %d", avatar.UserID)
-
-	return c.JSON(errcode.ErrSucceed, avatar)
+	return c.JSON(errcode.GetUserInfoSucceed, output)
 }
 
 func ChangeUserInfo(c echo.Context) error {
@@ -232,7 +205,7 @@ func ChangeUserInfo(c echo.Context) error {
 	if err = c.Bind(&info); err != nil {
 		log.Logger.Error("[ERROR] ChangeUserInfo Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangeUserInfoInvalidParams, err.Error())
 	}
 
 	fmt.Println(info.Sex)
@@ -249,7 +222,7 @@ func ChangeUserInfo(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] ChangeUserInfo: User ID %d", userID)
 
-	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
+	return c.JSON(errcode.ChangeUserInfoSucceed, general.NewMessage(errcode.ChangeUserInfoSucceed))
 }
 
 func ChangeUserAvatar(c echo.Context) error {
@@ -261,13 +234,13 @@ func ChangeUserAvatar(c echo.Context) error {
 	if err = c.Bind(&avatar); err != nil {
 		log.Logger.Error("[ERROR] ChangeUserAvatar Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangeUserAvatarInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(&avatar); err != nil {
 		log.Logger.Error("[ERROR] ChangeUserAvatar Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangeUserAvatarInvalidParams, err.Error())
 	}
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	avatar.UserID = session.Get(general.SessionUserID).(uint64)
@@ -281,7 +254,7 @@ func ChangeUserAvatar(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] ChangeUserAvatar: User ID %d", avatar.UserID)
 
-	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
+	return c.JSON(errcode.ChangeUserAvatarSucceed, general.NewMessage(errcode.ChangeUserAvatarSucceed))
 }
 
 func ChangePhone(c echo.Context) error {
@@ -292,20 +265,20 @@ func ChangePhone(c echo.Context) error {
 	if err = c.Bind(&changePhone); err != nil {
 		log.Logger.Error("[ERROR] ChangePhone Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangePhoneInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(changePhone); err != nil {
 		log.Logger.Error("[ERROR] ChangePhone Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangePhoneInvalidParams, err.Error())
 	}
 
 	match := utility.IsValidPhone(changePhone.Phone)
 	if !match {
 		log.Logger.Error("[ERROR] ChangePhone IsValidPhone: Invalid Phone", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangePhoneInvalidParams, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -316,7 +289,7 @@ func ChangePhone(c echo.Context) error {
 		if strings.Contains(err.Error(), general.DuplicateEntry) {
 			log.Logger.Error("[ERROR] ChangePhone ChangePhone: Mobile Duplicate", err)
 
-			return general.NewErrorWithMessage(errcode.ErrDuplicate, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrChangePhoneDuplicate, err.Error())
 		}
 
 		log.Logger.Error("[ERROR] ChangePhone ChangePhone: Mysql Error", err)
@@ -333,7 +306,7 @@ func ChangePhone(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] ChangePhone: User ID %d", userID)
 
-	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
+	return c.JSON(errcode.ChangePhoneSucceed, general.NewMessage(errcode.ChangePhoneSucceed))
 }
 
 func ChangePassword(c echo.Context) error {
@@ -346,13 +319,13 @@ func ChangePassword(c echo.Context) error {
 	if err = c.Bind(&changePassword); err != nil {
 		log.Logger.Error("[ERROR] ChangePassword Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangePasswordInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(changePassword); err != nil {
 		log.Logger.Error("[ERROR] ChangePassword Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangePasswordInvalidParams, err.Error())
 	}
 
 	if *changePassword.Password == *changePassword.NewPass {
@@ -360,7 +333,7 @@ func ChangePassword(c echo.Context) error {
 
 		log.Logger.Error("[ERROR] ChangePassword:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangePasswordInvalidParams, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -378,10 +351,17 @@ func ChangePassword(c echo.Context) error {
 
 		log.Logger.Error("[ERROR]", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidPassword, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangePasswordInvalidParams, err.Error())
+	}
+
+	err = session.Delete(general.SessionUserID)
+	if err != nil {
+		log.Logger.Error("[ERROR] ChangePhone Delete:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrLogout, err.Error())
 	}
 
 	log.Logger.Info("[SUCCEED] ChangePassword: User ID %d", userID)
 
-	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
+	return c.JSON(errcode.ChangePasswordSucceed, general.NewMessage(errcode.ChangePasswordSucceed))
 }

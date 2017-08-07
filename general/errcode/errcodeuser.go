@@ -42,5 +42,27 @@ const (
 	ErrLoginInvalidPassword = 0x3
 
 	// Logout
-	
+	LogoutSucceed = 0x0
+	ErrLogout     = 0x1
+
+	// GetUserInfo
+	GetUserInfoSucceed          = 0x0
+	ErrGetUserInfoInvalidParams = 0x1
+
+	// ChangeUserInfo
+	ChangeUserInfoSucceed          = 0x0
+	ErrChangeUserInfoInvalidParams = 0x1
+
+	// ChangeUserAvatar
+	ChangeUserAvatarSucceed          = 0x0
+	ErrChangeUserAvatarInvalidParams = 0x1
+
+	// ChangePhone
+	ChangePhoneSucceed          = 0x0
+	ErrChangePhoneInvalidParams = 0x1
+	ErrChangePhoneDuplicate     = 0x2
+
+	// ChangePassword
+	ChangePasswordSucceed          = 0x0
+	ErrChangePasswordInvalidParams = 0x1
 )

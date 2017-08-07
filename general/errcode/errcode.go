@@ -41,7 +41,6 @@ const (
 	//User
 	ErrUserNotFound    = 0x2
 	ErrInvalidPassword = 0x3
-	ErrLogout          = 0x12
 
 	ErrInvalidOrdersStatus = 0x7
 	ErrOrdersNotFound      = 0x8

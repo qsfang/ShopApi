@@ -179,7 +179,7 @@ func (us *UserServiceProvider) Login(name, pass *string) (bool, uint64, error) {
 	return true, u.UserID, nil
 }
 
-func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserGet, error) {
+func (us *UserServiceProvider) GetUserInfo(UserID uint64) (*UserGet, error) {
 	var (
 		err error
 		ui  UserInfo
