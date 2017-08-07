@@ -52,6 +52,8 @@ var (
 func startServer() {
 	server = echo.New()
 	server.Use(middleware.CORS())
+	server.Use(middleware.Recover())
+	server.Use(middleware.Logger())
 
 	server.HTTPErrorHandler = general.EchoRestfulErrorHandler
 	server.Validator = general.NewEchoValidator()

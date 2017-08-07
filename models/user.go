@@ -71,12 +71,11 @@ type UserAvatar struct {
 }
 
 type UserGet struct {
-	UserID   uint64 `json:"userid"`
 	Phone    string `json:"phone"`
 	Avatar   string `json:"avatar"`
-	Nickname string `json:"nickname"`
+	Nickname string `json:"name"`
 	Email    string `json:"email"`
-	Sex      bool  `json:"sex"`
+	Sex      uint8   `json:"sex"`
 }
 
 type Register struct {
@@ -92,7 +91,7 @@ type Login struct {
 type ChangeUserInfo struct {
 	Nickname string `json:"name"`
 	Email    string `json:"email"`
-	Sex      bool   `json:"sex"`
+	Sex      uint8  `json:"sex"`
 }
 
 type ChangePhone struct {
@@ -194,11 +193,10 @@ func (us *UserServiceProvider) GetInfo(UserID uint64) (*UserGet, error) {
 	}
 
 	ug = UserGet{
-		UserID: ui.UserID,
 		Phone: ui.Phone,
 		Nickname: ui.Nickname,
 		Email: ui.Email,
-		Sex: utility.Uint8ToBool(ui.Sex),
+		Sex: ui.Sex,
 	}
 
 	return &ug, nil
@@ -220,19 +218,19 @@ func (us *UserServiceProvider) GetUserAvatar(userID uint64) (*UserAvatar, error)
 func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint64) error {
 	var (
 		con   UserInfo
-		empty int8
+		updater = make(map[string]interface{})
 	)
 
-	updater := map[string]interface{}{
-		"nickname": info.Nickname,
-		"email":    info.Email,
-		"sex":      utility.BoolToUint8(info.Sex),
+	if info.Nickname != "" {
+		updater["nickname"] = info.Nickname
 	}
 
-	for key, value := range updater {
-		if value == "" || value == empty {
-			delete(updater, key)
-		}
+	if info.Email != "" {
+		updater["email"] = info.Email
+	}
+
+	if info.Sex != general.Sex {
+		updater["sex"] = info.Sex
 	}
 
 	db := orm.Conn

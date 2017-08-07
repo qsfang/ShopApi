@@ -46,6 +46,7 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
+	"fmt"
 )
 
 func Register(c echo.Context) error {
@@ -182,13 +183,7 @@ func GetInfo(c echo.Context) error {
 	}
 
 	avatar, err = models.UserService.GetUserAvatar(userID)
-	if err != nil {
-		if strings.Contains(err.Error(), "not found") {
-			log.Logger.Error("[ERROR] GetInfo GetUserAvatar: User Avatar Not Dound", err)
-
-			return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
-		}
-
+	if err != nil && !strings.Contains(err.Error(), "not found") {
 		log.Logger.Error("[ERROR] GetInfo GetUserAvatar: Mongo Error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMongo, err.Error())
@@ -240,6 +235,8 @@ func ChangeUserInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
+	fmt.Println(info.Sex)
+
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
@@ -253,7 +250,6 @@ func ChangeUserInfo(c echo.Context) error {
 	log.Logger.Info("[SUCCEED] ChangeUserInfo: User ID %d", userID)
 
 	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ErrSucceed))
-
 }
 
 func ChangeUserAvatar(c echo.Context) error {
