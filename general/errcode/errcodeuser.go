@@ -40,4 +40,7 @@ const (
 	ErrLoginInvalidParams   = 0x1
 	ErrLoginUserNotFound    = 0x2
 	ErrLoginInvalidPassword = 0x3
+
+	// Logout
+	
 )

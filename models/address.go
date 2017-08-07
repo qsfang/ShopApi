@@ -37,6 +37,7 @@ import (
 
 	"ShopApi/general"
 	"ShopApi/orm"
+	"ShopApi/utility"
 )
 
 type AddressServiceProvider struct {
@@ -45,13 +46,11 @@ type AddressServiceProvider struct {
 var AddressService *AddressServiceProvider = &AddressServiceProvider{}
 
 type Address struct {
-	ID        uint64    `sql:"auto_increment; primary_key;" json:"id"`
+	ID        string    `sql:"primary_key;" json:"id"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Name      string    `json:"name"`
 	Phone     string    `json:"phone"`
-	Province  string    `json:"province"`
-	City      string    `json:"city"`
-	Street    string    `json:"street"`
+	Area      string    `json:"area"`
 	Address   string    `json:"address"`
 	Created   time.Time `json:"created"`
 	Updated   time.Time `json:"updated"`
@@ -59,37 +58,26 @@ type Address struct {
 }
 
 type AddAddress struct {
+	ID        string `json:"id"`
 	UserID    uint64 `json:"userid"`
-	Name      string `json:"name" validate:"required,alphanumunicode"`
+	Name      string `json:"receiver" validate:"required,alphanumunicode"`
 	Phone     string `json:"phone" validate:"required,numeric,len=11"`
-	Province  string `json:"province" validate:"required,alphanumunicode"`
-	City      string `json:"city" validate:"required,alphanumunicode"`
-	Street    string `json:"street" validate:"required,alphanumunicode"`
-	Address   string `json:"address" validate:"required,alphanumunicode"`
-	IsDefault uint8  `json:"isdefault" validate:"max=1,min=0"`
+	Area      string `json:"area" validate:"required"`
+	Address   string `json:"detailAdress" validate:"required,alphanumunicode"`
+	IsDefault bool   `json:"default"`
 }
 
 type ChangeAddress struct {
-	ID       uint64 `json:"id" validate:"required"`
-	Name     string `json:"name" validate:"required,alphanumunicode"`
-	Phone    string `json:"phone" validate:"required,numeric,len=11"`
-	Province string `json:"province" validate:"required,alphanumunicode"`
-	City     string `json:"city" validate:"required,alphanumunicode"`
-	Street   string `json:"street" validate:"required,alphanumunicode"`
-	Address  string `json:"address" validate:"required,alphanumunicode"`
-}
-
-type GetAddress struct {
-	UserID   uint64 `json:"userid"`
-	Page     uint64 `json:"page" validate:"required"`
-	PageSize uint64 `json:"pagesize" validate:"required"`
+	ID      uint64 `json:"id" validate:"required"`
+	Name    string `json:"name" validate:"required,alphanumunicode"`
+	Phone   string `json:"phone" validate:"required,numeric,len=11"`
+	Area    string `json:"area" validate:"required"`
+	Address string `json:"address" validate:"required,alphanumunicode"`
 }
 
 type AddressGet struct {
-	Province string `json:"province"`
-	City     string `json:"city"`
-	Street   string `json:"street"`
-	Address  string `json:"address"`
+	Area    string `json:"area" validate:"required"`
+	Address string `json:"address"`
 }
 
 type AlterAddress struct {
@@ -103,25 +91,40 @@ func (Address) TableName() string {
 
 func (asp *AddressServiceProvider) AddAddress(addAddress *AddAddress) error {
 	var (
-		address *Address
+		err     error
+		address = new(Address)
 	)
 
+	tx := orm.Conn.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	if addAddress.IsDefault {
+		updateToNotDefault := map[string]uint8{"isdefault": general.AddressNotDefault}
+
+		err = tx.Model(&address).Where("userid = ?", addAddress.UserID).Update(updateToNotDefault).Limit(1).Error
+	}
+
 	address = &Address{
+		ID:        addAddress.ID,
 		UserID:    addAddress.UserID,
 		Name:      addAddress.Name,
 		Phone:     addAddress.Phone,
-		Province:  addAddress.Province,
-		City:      addAddress.City,
-		Street:    addAddress.Street,
+		Area:      address.Area,
 		Address:   addAddress.Address,
 		Created:   time.Now(),
 		Updated:   time.Now(),
-		IsDefault: addAddress.IsDefault,
+		IsDefault: utility.BoolToUint8(addAddress.IsDefault),
 	}
 
-	db := orm.Conn
+	err = tx.Create(address).Error
 
-	return db.Create(address).Error
+	return err
 }
 
 func (asp *AddressServiceProvider) AlterAddressToNotDefault(userID uint64) error {
@@ -142,12 +145,10 @@ func (asp *AddressServiceProvider) ChangeAddress(changeAddress *ChangeAddress) e
 	)
 
 	updater := map[string]interface{}{
-		"name":     changeAddress.Name,
-		"phone":    changeAddress.Phone,
-		"province": changeAddress.Province,
-		"city":     changeAddress.City,
-		"street":   changeAddress.Street,
-		"address":  changeAddress.Address,
+		"name":    changeAddress.Name,
+		"phone":   changeAddress.Phone,
+		"area":    changeAddress.Area,
+		"address": changeAddress.Address,
 	}
 
 	db := orm.Conn
@@ -181,10 +182,8 @@ func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]Address
 
 	for _, addr := range address {
 		addressGet := AddressGet{
-			Province: addr.Province,
-			City:     addr.City,
-			Street:   addr.Street,
-			Address:  addr.Address,
+			Area:    addr.Area,
+			Address: addr.Address,
 		}
 		addressList = append(addressList, addressGet)
 	}

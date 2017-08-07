@@ -38,13 +38,11 @@ CREATE TABLE IF NOT EXISTS `userinfo` (
 
 
 CREATE TABLE IF NOT EXISTS `address` (
-  `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) NOT NULL DEFAULT '' COMMENT '收货人姓名',
+  `id` varchar(256) NOT NULL DEFAULT '',
+  `name` varchar(64) NOT NULL,
   `userid` int(16) NOT NULL,
   `phone` varchar(16) NOT NULL,
-  `province` varchar(64) NOT NULL,
-  `city` varchar(64) NOT NULL,
-  `street` varchar(64) NOT NULL,
+  `area` varchar(256) NOT NULL,
   `address` varchar(256) NOT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp,
   `updated` datetime DEFAULT NULL,

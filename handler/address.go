@@ -57,6 +57,8 @@ func AddAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrAddAddressInvalidParams, err.Error())
 	}
 
+	log.Logger.Info("%#v", addAddress)
+
 	if err = c.Validate(addAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
@@ -65,14 +67,6 @@ func AddAddress(c echo.Context) error {
 
 	addAddress.UserID = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request()).Get(general.SessionUserID).(uint64)
 
-	if addAddress.IsDefault == uint8(general.AddressDefault) {
-		if err = models.AddressService.AlterAddressToNotDefault(addAddress.UserID); err != nil {
-			log.Logger.Error("[ERROR AddAddress AlterAddressToNotDefault]:", err)
-
-			return general.NewErrorWithMessage(errcode.ErrAlterAddressToNotDefault, err.Error())
-		}
-	}
-
 	err = models.AddressService.AddAddress(&addAddress)
 	if err != nil {
 		log.Logger.Error("[ERROR] AddAddress AddAddress:", err)
@@ -80,8 +74,8 @@ func AddAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
+	log.Logger.Info("[SUCCEED] AddAddress: UserID %d", addAddress.UserID)
 
-	log.Logger.Info("[SUCCEED] Add address by userId: %d", addAddress.UserID)
 	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.AddAddressSucceed))
 }
 

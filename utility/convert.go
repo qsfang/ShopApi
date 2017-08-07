@@ -32,14 +32,15 @@ package utility
 func Uint8ToBool(n uint8) bool {
 	if n == 0 {
 		return false
-	} else {
-		return true
 	}
+
+	return true
 }
 
 func BoolToUint8(b bool) uint8 {
 	if b {
 		return 1
 	}
+
 	return 0
 }
