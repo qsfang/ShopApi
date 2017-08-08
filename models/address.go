@@ -67,11 +67,6 @@ type AddressJSON struct {
 	IsDefault bool   `json:"default"`
 }
 
-type AddressGet struct {
-	Area    string `json:"area" validate:"required"`
-	Address string `json:"address"`
-}
-
 type AlterAddress struct {
 	ID     string `json:"id" validate:"required"`
 	UserID uint64 `json:"userid"`
@@ -84,7 +79,7 @@ func (Address) TableName() string {
 func (asp *AddressServiceProvider) AddAddress(addAddress *AddressJSON) error {
 	var (
 		err     error
-		address = new(Address)
+		address Address
 	)
 
 	tx := orm.Conn.Begin()
@@ -102,19 +97,19 @@ func (asp *AddressServiceProvider) AddAddress(addAddress *AddressJSON) error {
 		err = tx.Model(&address).Where("userid = ?", addAddress.UserID).Update(updateToNotDefault).Limit(1).Error
 	}
 
-	address = &Address{
+	address = Address{
 		ID:        addAddress.ID,
 		UserID:    addAddress.UserID,
 		Name:      addAddress.Name,
 		Phone:     addAddress.Phone,
-		Area:      address.Area,
+		Area:      addAddress.Area,
 		Address:   addAddress.Address,
 		Created:   time.Now(),
 		Updated:   time.Now(),
 		IsDefault: utility.BoolToUint8(addAddress.IsDefault),
 	}
 
-	err = tx.Create(address).Error
+	err = tx.Create(&address).Error
 
 	return err
 }
@@ -138,21 +133,11 @@ func (asp *AddressServiceProvider) ChangeAddress(changeAddress *AddressJSON) err
 	return db.Model(&address).Where("id = ?", changeAddress.ID).Update(updater).Limit(1).Error
 }
 
-func (asp *AddressServiceProvider) FindAddressByAddressID(ID string) error {
-	var (
-		address Address
-	)
-
-	db := orm.Conn
-
-	return db.Where("id = ?", ID).First(&address).Error
-}
-
-func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]AddAddress, error) {
+func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]AddressJSON, error) {
 	var (
 		err         error
 		address     []Address
-		addressList []AddAddress
+		addressList []AddressJSON
 	)
 
 	db := orm.Conn
@@ -163,7 +148,7 @@ func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]AddAddr
 	}
 
 	for _, addr := range address {
-		addressGet := AddAddress{
+		addressGet := AddressJSON{
 			ID:        addr.ID,
 			Name:      addr.Name,
 			Phone:     addr.Phone,
@@ -206,4 +191,14 @@ func (asp *AddressServiceProvider) AlterAddress(alterAddress *AlterAddress) (err
 	}
 
 	return nil
+}
+
+func (asp *AddressServiceProvider) FindAddressByAddressID(ID string) error {
+	var (
+		address Address
+	)
+
+	db := orm.Conn
+
+	return db.Where("id = ?", ID).First(&address).Error
 }

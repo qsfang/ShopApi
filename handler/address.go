@@ -57,15 +57,14 @@ func AddAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrAddAddressInvalidParams, err.Error())
 	}
 
-	log.Logger.Info("%#v", addAddress)
-
 	if err = c.Validate(addAddress); err != nil {
 		log.Logger.Error("[ERROR] AddAddress Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrAddAddressInvalidParams, err.Error())
 	}
 
-	addAddress.UserID = utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request()).Get(general.SessionUserID).(uint64)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	addAddress.UserID = session.Get(general.SessionUserID).(uint64)
 
 	err = models.AddressService.AddAddress(&addAddress)
 	if err != nil {
@@ -126,7 +125,7 @@ func GetAddress(c echo.Context) error {
 	var (
 		err         error
 		userID      uint64
-		addressList *[]models.AddAddress
+		addressList *[]models.AddressJSON
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -140,16 +139,16 @@ func GetAddress(c echo.Context) error {
 	}
 
 	if len(*addressList) == 0 {
-		err = errors.New("[ERROR] Address Not Found")
+		err = errors.New("Address Not Found")
 
 		log.Logger.Error("[ERROR] GetAddress GetAddressByUserID:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrGetAddressNotFound, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] Get address by userId: %d", userID)
+	log.Logger.Info("[SUCCEED] GetAddress: User %d", userID)
 
-	return c.JSON(errcode.ErrSucceed, addressList)
+	return c.JSON(errcode.GetAddressSucceed, addressList)
 }
 
 func AlterDefault(c echo.Context) error {
@@ -169,6 +168,8 @@ func AlterDefault(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrAlterDefaultInvalidParams, err.Error())
 	}
+
+	log.Logger.Info("%s", alterAddress.ID)
 
 	err = models.AddressService.FindAddressByAddressID(alterAddress.ID)
 	if err != nil {
