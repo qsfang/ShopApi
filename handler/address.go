@@ -48,7 +48,7 @@ import (
 func AddAddress(c echo.Context) error {
 	var (
 		err        error
-		addAddress models.AddAddress
+		addAddress models.AddressJSON
 	)
 
 	if err = c.Bind(&addAddress); err != nil {
@@ -82,7 +82,7 @@ func AddAddress(c echo.Context) error {
 func ChangeAddress(c echo.Context) error {
 	var (
 		err           error
-		changeAddress models.ChangeAddress
+		changeAddress models.AddressJSON
 	)
 
 	if err = c.Bind(&changeAddress); err != nil {
@@ -102,7 +102,7 @@ func ChangeAddress(c echo.Context) error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] ChangeAddress FindAddressByAddressID: Not Found", err)
 
-			return general.NewErrorWithMessage(errcode.ErrAddressIdNotFound, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrChangeAddressNotFound, err.Error())
 		}
 
 		log.Logger.Error("[ERROR] ChangeAddress FindAddressByAddressID: MySQL ERROR", err)
@@ -117,9 +117,9 @@ func ChangeAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] Change address by address id: %d", changeAddress.ID)
+	log.Logger.Info("[SUCCEED] ChangeAddress: UserID %d", changeAddress.ID)
 
-	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.ChangeAddressSucceed))
+	return c.JSON(errcode.ChangeAddressSucceed, general.NewMessage(errcode.ChangeAddressSucceed))
 }
 
 func GetAddress(c echo.Context) error {
@@ -175,7 +175,7 @@ func AlterDefault(c echo.Context) error {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] AlterDefault FindAddressByAddressID: Not Found", err)
 
-			return general.NewErrorWithMessage(errcode.ErrAddressIdNotFound, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrAlterDefaultNotFound, err.Error())
 		}
 
 		log.Logger.Error("[ERROR] AlterDefault FindAddressByAddressID: MySQL ERROR", err)
@@ -195,5 +195,5 @@ func AlterDefault(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] AlterDefault by userId:", alterAddress.UserID)
 
-	return c.JSON(errcode.ErrSucceed, general.NewMessage(errcode.AlterDefaultSucceed))
+	return c.JSON(errcode.AlterDefaultSucceed, general.NewMessage(errcode.AlterDefaultSucceed))
 }

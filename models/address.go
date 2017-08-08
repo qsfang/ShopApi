@@ -57,8 +57,8 @@ type Address struct {
 	IsDefault uint8     `gorm:"column:isdefault" json:"isdefault" `
 }
 
-type AddAddress struct {
-	ID        string `json:"id"`
+type AddressJSON struct {
+	ID        string `json:"id" validate:"required"`
 	UserID    uint64 `json:"userid"`
 	Name      string `json:"receiver" validate:"required,alphanumunicode"`
 	Phone     string `json:"phone" validate:"required,numeric,len=11"`
@@ -67,21 +67,13 @@ type AddAddress struct {
 	IsDefault bool   `json:"default"`
 }
 
-type ChangeAddress struct {
-	ID      uint64 `json:"id" validate:"required"`
-	Name    string `json:"name" validate:"required,alphanumunicode"`
-	Phone   string `json:"phone" validate:"required,numeric,len=11"`
-	Area    string `json:"area" validate:"required"`
-	Address string `json:"address" validate:"required,alphanumunicode"`
-}
-
 type AddressGet struct {
 	Area    string `json:"area" validate:"required"`
 	Address string `json:"address"`
 }
 
 type AlterAddress struct {
-	ID     uint64 `json:"id" validate:"required"`
+	ID     string `json:"id" validate:"required"`
 	UserID uint64 `json:"userid"`
 }
 
@@ -89,7 +81,7 @@ func (Address) TableName() string {
 	return "address"
 }
 
-func (asp *AddressServiceProvider) AddAddress(addAddress *AddAddress) error {
+func (asp *AddressServiceProvider) AddAddress(addAddress *AddressJSON) error {
 	var (
 		err     error
 		address = new(Address)
@@ -127,28 +119,18 @@ func (asp *AddressServiceProvider) AddAddress(addAddress *AddAddress) error {
 	return err
 }
 
-func (asp *AddressServiceProvider) AlterAddressToNotDefault(userID uint64) error {
-	var (
-		address Address
-	)
-
-	db := orm.Conn
-
-	updateToNotDefault := map[string]uint8{"isdefault": general.AddressNotDefault}
-
-	return db.Model(&address).Where("userid = ?", userID).Update(updateToNotDefault).Limit(1).Error
-}
-
-func (asp *AddressServiceProvider) ChangeAddress(changeAddress *ChangeAddress) error {
+func (asp *AddressServiceProvider) ChangeAddress(changeAddress *AddressJSON) error {
 	var (
 		address Address
 	)
 
 	updater := map[string]interface{}{
-		"name":    changeAddress.Name,
-		"phone":   changeAddress.Phone,
-		"area":    changeAddress.Area,
-		"address": changeAddress.Address,
+		"name":      changeAddress.Name,
+		"phone":     changeAddress.Phone,
+		"area":      changeAddress.Area,
+		"address":   changeAddress.Address,
+		"updated":   time.Now(),
+		"isdefault": utility.BoolToUint8(changeAddress.IsDefault),
 	}
 
 	db := orm.Conn
@@ -156,7 +138,7 @@ func (asp *AddressServiceProvider) ChangeAddress(changeAddress *ChangeAddress) e
 	return db.Model(&address).Where("id = ?", changeAddress.ID).Update(updater).Limit(1).Error
 }
 
-func (asp *AddressServiceProvider) FindAddressByAddressID(ID uint64) error {
+func (asp *AddressServiceProvider) FindAddressByAddressID(ID string) error {
 	var (
 		address Address
 	)
