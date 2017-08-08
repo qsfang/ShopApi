@@ -24,26 +24,27 @@
 
 /*
  * Revision History:
- *     Initial: 2017/05/14        Feng Yifei
+ *     Initial: 2017/08/07       Zhang Zizhao
  */
 
 package errcode
 
-const (
-	// General
-	ErrSucceed       = 0x0
-	ErrInvalidParams = 0x1
+const(
+	//Createorder
+	ErrCreateOrderSucceed			= 0x0
+	ErrCreateOrderInvalidParams		= 0x1
+	ErrAddressNotFound				= 0x2
 
-	ErrDuplicate = 0x3
-	ErrMustLogin = 0x4
-	ErrMysql     = 0xff
-	ErrMongo     = 0xfe
-	//User
-	ErrUserNotFound    = 0x2
-	ErrInvalidPassword = 0x3
+	//GetOrders
+	ErrGetOrdersSucceed				= 0x0
+	ErrGetOrdersInvalidParams		= 0x1
+	ErrInvalidOrdersStatus			= 0x2
 
-	ErrNotFound            = 0xa
-	ErrBind                = 0xe
-	ErrInformation         = 0xf
-	ErrAddressIdNotFound   = 0x9
+	//GetOrder
+	ErrGetOrderSucceed				= 0x0
+	ErrGetOrderInvalidParams		= 0x1
+
+	//ChangeStatus
+	ErrChangeOrderSucceed			= 0x0
+	ErrChangeOrderInvalidParams		= 0x1
 )

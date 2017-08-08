@@ -111,7 +111,14 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) e
 	var (
 		err error
 		car Cart
+		address  Address
 	)
+	db := orm.Conn
+
+	err = db.First(&address,ord.AddressID).Error
+	if err !=nil{
+		return err
+	}
 
 	order := Orders{
 		UserID:     numberID,
@@ -124,8 +131,6 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) e
 		Created:    time.Now(),
 		Updated:    time.Now(),
 	}
-
-	db := orm.Conn
 
 	tx := db.Begin()
 	defer func() {

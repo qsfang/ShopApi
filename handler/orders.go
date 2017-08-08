@@ -42,6 +42,7 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
+	"github.com/jinzhu/gorm"
 )
 
 func CreateOrder(c echo.Context) error {
@@ -53,13 +54,13 @@ func CreateOrder(c echo.Context) error {
 	if err = c.Bind(&order); err != nil {
 		log.Logger.Error("[ERROR] Create crash with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrCreateOrderInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(order); err != nil {
 		log.Logger.Error("[ERROR] CreateOrder Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrCreateOrderInvalidParams, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -67,12 +68,18 @@ func CreateOrder(c echo.Context) error {
 
 	err = models.OrderService.CreateOrder(numberID, order)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("[ERROR] Create orders: Address doesn't exist", err)
+
+			return general.NewErrorWithMessage(errcode.ErrAddressNotFound, err.Error())
+		}
+
 		log.Logger.Error("[ERROR] Mysql error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, nil)
+	return c.JSON(errcode.ErrCreateOrderSucceed,general.NewMessage(errcode.ErrCreateOrderSucceed))
 }
 
 func GetOrders(c echo.Context) error {
@@ -85,13 +92,13 @@ func GetOrders(c echo.Context) error {
 	if err = c.Bind(&getOrders); err != nil {
 		log.Logger.Error("[ERROR] Bind with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrGetOrdersInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(getOrders); err != nil  {
 		log.Logger.Error("[ERROR] GetOrders Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrGetOrdersInvalidParams, err.Error())
 	}
 
 	if getOrders.Status != general.OrderUnfinished && getOrders.Status != general.OrderFinished && getOrders.Status != general.OrderGetAll && getOrders.Status != general.OrderCanceled {
@@ -122,7 +129,7 @@ func GetOrders(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, orders)
+	return c.JSON(errcode.ErrGetOrdersSucceed, orders)
 }
 
 func GetOneOrder(c echo.Context) error {
@@ -135,7 +142,7 @@ func GetOneOrder(c echo.Context) error {
 	if err = c.Bind(&order); err != nil {
 		log.Logger.Error("[ERROR] Bind with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrGetOrderInvalidParams, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -145,10 +152,10 @@ func GetOneOrder(c echo.Context) error {
 	if err != nil {
 		log.Logger.Error("[ERROR] GetOneOrder with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, OutPut)
+	return c.JSON(errcode.ErrGetOrderSucceed, OutPut)
 }
 
 func ChangeStatus(c echo.Context) error {
@@ -160,14 +167,14 @@ func ChangeStatus(c echo.Context) error {
 	if err = c.Bind(&st); err != nil {
 		log.Logger.Error("[ERROR] Input order status with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangeOrderInvalidParams, err.Error())
 	}
 
 	if st.Status != general.OrderFinished && st.Status != general.OrderUnfinished && st.Status != general.OrderCanceled && st.Status != general.OrderPaid && st.Status != general.OrderUnpaid {
 		err = errors.New("[ERROR] Status InExistent")
 		log.Logger.Error("", err)
 
-		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangeOrderInvalidParams, err.Error())
 	}
 	err = models.OrderService.ChangeStatus(st.ID, st.Status)
 	if err != nil {
@@ -176,5 +183,5 @@ func ChangeStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrSucceed, nil)
+	return c.JSON(errcode.ErrChangeOrderSucceed,general.NewMessage(errcode.ErrChangeOrderSucceed))
 }

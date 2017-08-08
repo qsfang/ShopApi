@@ -152,7 +152,7 @@ func BrowseCart(c echo.Context) error {
 
 		log.Logger.Error("[ERROR] Get Order with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrOrdersNotFound, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
 	return c.JSON(errcode.ErrSucceed, output)
