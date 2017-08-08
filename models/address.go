@@ -148,11 +148,11 @@ func (asp *AddressServiceProvider) FindAddressByAddressID(ID string) error {
 	return db.Where("id = ?", ID).First(&address).Error
 }
 
-func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]AddressGet, error) {
+func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]AddAddress, error) {
 	var (
 		err         error
 		address     []Address
-		addressList []AddressGet
+		addressList []AddAddress
 	)
 
 	db := orm.Conn
@@ -163,9 +163,13 @@ func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]Address
 	}
 
 	for _, addr := range address {
-		addressGet := AddressGet{
-			Area:    addr.Area,
-			Address: addr.Address,
+		addressGet := AddAddress{
+			ID:        addr.ID,
+			Name:      addr.Name,
+			Phone:     addr.Phone,
+			Area:      addr.Area,
+			Address:   addr.Address,
+			IsDefault: utility.Uint8ToBool(addr.IsDefault),
 		}
 		addressList = append(addressList, addressGet)
 	}

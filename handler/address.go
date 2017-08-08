@@ -126,7 +126,7 @@ func GetAddress(c echo.Context) error {
 	var (
 		err         error
 		userID      uint64
-		addressList *[]models.AddressGet
+		addressList *[]models.AddAddress
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
