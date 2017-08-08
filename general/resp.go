@@ -42,8 +42,9 @@ type Resp struct {
 	Code int `json:"status"`
 }
 
-type UserData struct {
-	UserID uint64 `json:"userid"`
+type AddressResp struct {
+	Code int         `json:"status"`
+	Data interface{} `json:"data"`
 }
 
 func NewErrorWithMessage(code int, msg string) *ErrorResp {
@@ -64,5 +65,12 @@ func (this *ErrorResp) Error() string {
 func NewMessage(code int) *Resp {
 	return &Resp{
 		Code: code,
+	}
+}
+
+func NewMessageWithData(code int, data interface{}) *AddressResp {
+	return &AddressResp{
+		Code: code,
+		Data: data,
 	}
 }

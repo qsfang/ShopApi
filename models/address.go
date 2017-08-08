@@ -63,7 +63,7 @@ type AddressJSON struct {
 	Name      string `json:"receiver" validate:"required,alphanumunicode"`
 	Phone     string `json:"phone" validate:"required,numeric,len=11"`
 	Area      string `json:"area" validate:"required"`
-	Address   string `json:"detailAdress" validate:"required,alphanumunicode"`
+	Address   string `json:"detailAdress" validate:"required"`
 	IsDefault bool   `json:"default"`
 }
 
@@ -113,7 +113,7 @@ func (asp *AddressServiceProvider) AddAddress(addAddress *AddressJSON) error {
 	return err
 }
 
-func (asp *AddressServiceProvider) ChangeAddress(changeAddress *AddressJSON) error {
+func (asp *AddressServiceProvider) ChangeAddress(changeAddress *AddressJSON, userID uint64) error {
 	var (
 		err     error
 		address Address
@@ -140,7 +140,7 @@ func (asp *AddressServiceProvider) ChangeAddress(changeAddress *AddressJSON) err
 	if changeAddress.IsDefault {
 		updateToNotDefault := map[string]uint8{"isdefault": general.AddressNotDefault}
 
-		err = tx.Model(&address).Where("userid = ?", changeAddress.UserID).Update(updateToNotDefault).Limit(1).Error
+		err = tx.Model(&address).Where("userid = ?", userID).Update(updateToNotDefault).Limit(1).Error
 	}
 
 	err = tx.Model(&address).Where("id = ?", changeAddress.ID).Update(updater).Limit(1).Error
