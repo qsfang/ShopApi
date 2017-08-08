@@ -47,4 +47,9 @@ const (
 	AlterDefaultSucceed          = 0x0
 	ErrAlterDefaultInvalidParams = 0x1
 	ErrAlterDefaultNotFound      = 0x2
+
+	// DeleteAddress
+	DeleteAddressSucceed          = 0x0
+	ErrDeleteAddressInvalidParams = 0x1
+	ErrDeleteAddressNotFound      = 0x2
 )

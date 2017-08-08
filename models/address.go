@@ -67,9 +67,8 @@ type AddressJSON struct {
 	IsDefault bool   `json:"default"`
 }
 
-type AlterAddress struct {
+type AddressID struct {
 	ID     string `json:"id" validate:"required"`
-	UserID uint64 `json:"userid"`
 }
 
 func (Address) TableName() string {
@@ -116,6 +115,7 @@ func (asp *AddressServiceProvider) AddAddress(addAddress *AddressJSON) error {
 
 func (asp *AddressServiceProvider) ChangeAddress(changeAddress *AddressJSON) error {
 	var (
+		err     error
 		address Address
 	)
 
@@ -128,9 +128,24 @@ func (asp *AddressServiceProvider) ChangeAddress(changeAddress *AddressJSON) err
 		"isdefault": utility.BoolToUint8(changeAddress.IsDefault),
 	}
 
-	db := orm.Conn
+	tx := orm.Conn.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
 
-	return db.Model(&address).Where("id = ?", changeAddress.ID).Update(updater).Limit(1).Error
+	if changeAddress.IsDefault {
+		updateToNotDefault := map[string]uint8{"isdefault": general.AddressNotDefault}
+
+		err = tx.Model(&address).Where("userid = ?", changeAddress.UserID).Update(updateToNotDefault).Limit(1).Error
+	}
+
+	err = tx.Model(&address).Where("id = ?", changeAddress.ID).Update(updater).Limit(1).Error
+
+	return err
 }
 
 func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]AddressJSON, error) {
@@ -162,7 +177,7 @@ func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]Address
 	return &addressList, nil
 }
 
-func (asp *AddressServiceProvider) AlterAddress(alterAddress *AlterAddress) (err error) {
+func (asp *AddressServiceProvider) AlterAddress(alterAddress *AddressID, userID uint64) (err error) {
 	var (
 		address Address
 	)
@@ -178,7 +193,7 @@ func (asp *AddressServiceProvider) AlterAddress(alterAddress *AlterAddress) (err
 
 	updateToNotDefault := map[string]interface{}{"isdefault": general.AddressNotDefault}
 
-	err = tx.Model(&address).Where("userid = ?", alterAddress.UserID).Update(updateToNotDefault).Limit(1).Error
+	err = tx.Model(&address).Where("userid = ?", userID).Update(updateToNotDefault).Limit(1).Error
 	if err != nil {
 		return err
 	}
@@ -193,12 +208,24 @@ func (asp *AddressServiceProvider) AlterAddress(alterAddress *AlterAddress) (err
 	return nil
 }
 
-func (asp *AddressServiceProvider) FindAddressByAddressID(ID string) error {
+func (asp *AddressServiceProvider) DeleteAddress(deleteAddress *AddressID) error {
+	var (
+		address Address
+	)
+
+	address.ID = deleteAddress.ID
+
+	db := orm.Conn
+
+	return db.Delete(&address).Error
+}
+
+func (asp *AddressServiceProvider) FindAddress(ID string, userID uint64) error {
 	var (
 		address Address
 	)
 
 	db := orm.Conn
 
-	return db.Where("id = ?", ID).First(&address).Error
+	return db.Where("id = ? And userid = ?", ID, userID).First(&address).Error
 }

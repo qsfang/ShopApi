@@ -96,7 +96,10 @@ func ChangeAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrChangeAddressInvalidParams, err.Error())
 	}
 
-	err = models.AddressService.FindAddressByAddressID(changeAddress.ID)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID).(uint64)
+
+	err = models.AddressService.FindAddress(changeAddress.ID, userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] ChangeAddress FindAddressByAddressID: Not Found", err)
@@ -146,7 +149,7 @@ func GetAddress(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrGetAddressNotFound, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] GetAddress: User %d", userID)
+	log.Logger.Info("[SUCCEED] GetAddress: UserID %d", userID)
 
 	return c.JSON(errcode.GetAddressSucceed, addressList)
 }
@@ -154,7 +157,8 @@ func GetAddress(c echo.Context) error {
 func AlterDefault(c echo.Context) error {
 	var (
 		err          error
-		alterAddress *models.AlterAddress
+		alterAddress *models.AddressID
+		userID       uint64
 	)
 
 	if err = c.Bind(&alterAddress); err != nil {
@@ -169,9 +173,10 @@ func AlterDefault(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrAlterDefaultInvalidParams, err.Error())
 	}
 
-	log.Logger.Info("%s", alterAddress.ID)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID = session.Get(general.SessionUserID).(uint64)
 
-	err = models.AddressService.FindAddressByAddressID(alterAddress.ID)
+	err = models.AddressService.FindAddress(alterAddress.ID, userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] AlterDefault FindAddressByAddressID: Not Found", err)
@@ -184,17 +189,60 @@ func AlterDefault(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	alterAddress.UserID = session.Get(general.SessionUserID).(uint64)
 
-	err = models.AddressService.AlterAddress(alterAddress)
+	err = models.AddressService.AlterAddress(alterAddress, userID)
 	if err != nil {
 		log.Logger.Error("[ERROR] AlterDefault AlterAddress:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] AlterDefault by userId:", alterAddress.UserID)
+	log.Logger.Info("[SUCCEED] AlterDefault: UserID %d", userID)
 
 	return c.JSON(errcode.AlterDefaultSucceed, general.NewMessage(errcode.AlterDefaultSucceed))
+}
+
+func DeleteAddress(c echo.Context) error {
+	var (
+		err          error
+		deleteAddress *models.AddressID
+		userID       uint64
+	)
+
+	if err = c.Bind(&deleteAddress); err != nil {
+		log.Logger.Error("[ERROR] DeleteAddress Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrDeleteAddressNotFound, err.Error())
+	}
+
+	if err = c.Validate(deleteAddress); err != nil {
+		log.Logger.Error("[ERROR] DeleteAddress Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrDeleteAddressNotFound, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID = session.Get(general.SessionUserID).(uint64)
+
+	err = models.AddressService.FindAddress(deleteAddress.ID, userID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("[ERROR] DeleteAddress FindAddressByAddressID: Not Found", err)
+
+			return general.NewErrorWithMessage(errcode.ErrDeleteAddressNotFound, err.Error())
+		}
+
+		log.Logger.Error("[ERROR] DeleteAddress FindAddressByAddressID: MySQL ERROR", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	err = models.AddressService.DeleteAddress(deleteAddress)
+	if err != nil {
+		log.Logger.Debug(err.Error())
+	}
+
+	log.Logger.Info("[SUCCEED] DeleteAddress: UserID %d", userID)
+
+	return c.JSON(errcode.DeleteAddressSucceed, general.NewMessage(errcode.DeleteAddressSucceed))
 }
