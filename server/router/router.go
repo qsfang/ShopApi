@@ -49,35 +49,36 @@ func InitRouter(server *echo.Echo) {
 	server.GET("/api/v1/user/getinfo", handler.GetUserInfo, handler.MustLogin)
 	server.POST("/api/v1/user/changeavatar", handler.ChangeUserAvatar, handler.MustLogin)
 	server.POST("/api/v1/user/changeinfo", handler.ChangeUserInfo, handler.MustLogin)
-	server.POST("/api/vl/user/changephone",handler.ChangePhone, handler.MustLogin)
-	server.POST("/api/v1/user/changepass",handler.ChangePassword, handler.MustLogin)
+	server.POST("/api/v1/user/changephone", handler.ChangePhone, handler.MustLogin)
+	server.POST("/api/v1/user/changepass", handler.ChangePassword, handler.MustLogin)
 
 	// address
 	server.POST("/api/v1/address/add", handler.AddAddress, handler.MustLogin)
 	server.POST("/api/v1/address/change", handler.ChangeAddress, handler.MustLogin)
 	server.GET("/api/v1/address/get", handler.GetAddress, handler.MustLogin)
-	server.POST("/api/vl/address/alter", handler.AlterDefault, handler.MustLogin)
+	server.POST("/api/v1/address/alter", handler.AlterDefault, handler.MustLogin)
+	server.POST("/api/v1/address/delete", handler.DeleteAddress, handler.MustLogin)
 
 	// products
-	server.POST("/api/v1/products/create",handler.CreateProduct)
-	server.POST("/api/v1/product/getinfo",handler.GetProInfo,handler.MustLogin)
+	server.POST("/api/v1/products/create", handler.CreateProduct)
+	server.POST("/api/v1/product/getinfo", handler.GetProInfo, handler.MustLogin)
 	server.POST("/api/v1/products/changestatus", handler.ChangeProStatus)
 	server.POST("/api/v1/products/getlist", handler.GetProductList)
-	server.POST("/api/v1/products/changecate",handler.ChangeCategories)
+	server.POST("/api/v1/products/changecate", handler.ChangeCategories)
 
 	// orders
 	server.POST("/api/v1/orders/create", handler.CreateOrder, handler.MustLogin)
 	server.POST("/api/v1/orders/getone", handler.GetOneOrder)
-	server.POST("/api/v1/orders/changestatus",handler.ChangeStatus)
+	server.POST("/api/v1/orders/changestatus", handler.ChangeStatus)
 	server.POST("/api/v1/orders/get", handler.GetOrders, handler.MustLogin)
 
 	// category
 	server.POST("/api/v1/category/create", handler.CreateCategory)
-	server.GET("/api/vl/category/get", handler.GetCategory)
+	server.GET("/api/v1/category/get", handler.GetCategory)
 
 	// carts
 	server.POST("/api/v1/carts/delete", handler.CartsDelete, handler.MustLogin)
-	server.POST("/api/vl/carts/altercartpro",handler.AlterCartPro)
-	server.POST("/api/vl/carts/cartsput",handler.CartsPutIn, handler.MustLogin)
+	server.POST("/api/v1/carts/altercartpro", handler.AlterCartPro)
+	server.POST("/api/v1/carts/cartsput", handler.CartsPutIn, handler.MustLogin)
 	server.GET("/api/v1/carts/browse", handler.BrowseCart, handler.MustLogin)
 }

@@ -46,7 +46,7 @@ const (
 	Woman = 0x2
 
 	// Address
-	//Address  Default
+	// Address  Default
 	AddressNotDefault = 0x0
 	AddressDefault    = 0x1
 

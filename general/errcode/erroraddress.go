@@ -30,21 +30,26 @@
 package errcode
 
 const (
-	//AddAddress
-	AddAddressSucceed           = 0x0
-	ErrAddAddressInvalidParams  = 0x1
-	ErrAlterAddressToNotDefault = 0x2
+	// AddAddress
+	AddAddressSucceed          = 0x0
+	ErrAddAddressInvalidParams = 0x1
 
-	//ChangeAddress
+	// ChangeAddress
 	ChangeAddressSucceed          = 0x0
 	ErrChangeAddressInvalidParams = 0x1
+	ErrChangeAddressNotFound      = 0x2
 
-	//GetAddress
-	GetAddressSucceed            = 0x0
-	ErrGetAddressNotFound        = 0x1
+	// GetAddress
+	GetAddressSucceed     = 0x0
+	ErrGetAddressNotFound = 0x1
 
-	//AlterDefault
+	// AlterDefault
 	AlterDefaultSucceed          = 0x0
 	ErrAlterDefaultInvalidParams = 0x1
+	ErrAlterDefaultNotFound      = 0x2
 
+	// DeleteAddress
+	DeleteAddressSucceed          = 0x0
+	ErrDeleteAddressInvalidParams = 0x1
+	ErrDeleteAddressNotFound      = 0x2
 )
