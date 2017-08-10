@@ -79,7 +79,7 @@ func CreateProduct(c echo.Context) error {
 func GetProductList(c echo.Context) error {
 	var (
 		err    error
-		header *[]string 
+		header *[]models.ProductList
 		list   *[]models.ProductList
 	)
 
@@ -99,7 +99,7 @@ func GetProductList(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] GetProductList")
 
-	return c.JSON(errcode.GetListSucceed, general.NewMessageWithData(errcode.GetListSucceed, header, list))
+	return c.JSON(errcode.GetListSucceed, general.NewMessageForProductList(errcode.GetListSucceed, header, list))
 }
 
 func GetProductListByCategory(c echo.Context) error {

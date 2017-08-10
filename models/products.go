@@ -80,9 +80,9 @@ type CreateProduct struct {
 
 type ProductList struct {
 	ID       uint64  `json:"id"`
-	Name     string  `json:"name"`
-	Avatar   string  `json:"avatar"`
-	Category uint64  `json:"categories"`
+	Name     string  `json:"title"`
+	Avatar   string  `json:"img"`
+	Category uint64  `json:"category"`
 	Price    float64 `json:"price"`
 }
 
@@ -209,12 +209,12 @@ func AddProductImage(productID uint64, create *CreateProduct) error {
 	return err
 }
 
-func (ps *ProductServiceProvider) GetProductHeader() (*[]string, error) {
+func (ps *ProductServiceProvider) GetProductHeader() (*[]ProductList, error) {
 	var (
 		err     error
-		product Product
+		product ProductList
 		image   ProductImages
-		header  []string
+		header  []ProductList
 	)
 
 	db := orm.Conn
@@ -235,7 +235,8 @@ func (ps *ProductServiceProvider) GetProductHeader() (*[]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		header = append(header, image.Image)
+		product.Avatar = image.Image
+		header = append(header, product)
 	}
 
 	return &header, nil
@@ -339,8 +340,6 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(images)
 
 	for _, image := range images {
 		switch image.Class {

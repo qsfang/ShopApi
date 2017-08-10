@@ -30,7 +30,7 @@
 package errcode
 
 const (
-	//Register
+	// Register
 	RegisterSucceed          = 0x0
 	ErrRegisterInvalidParams = 0x1
 	ErrRegisterUserDuplicate = 0x2
