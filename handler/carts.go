@@ -56,7 +56,7 @@ func CartsPutIn(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrInvalidParams, err.Error())
 	}
 
-	ProInfo, err = models.ProductService.GetProInfo(carts.ProductID)
+	//ProInfo, err = models.ProductService.GetProInfo(carts.ProductID)
 
 	if err != nil {
 		log.Logger.Error("[ERROR] Get Information with error:", err)
@@ -65,7 +65,7 @@ func CartsPutIn(c echo.Context) error {
 	}
 
 	carts.Name = ProInfo.Name
-	carts.ImageID = ProInfo.ImageID
+	carts.ImageID = 0
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)

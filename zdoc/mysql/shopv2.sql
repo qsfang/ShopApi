@@ -93,31 +93,16 @@ CREATE TABLE IF NOT EXISTS `category` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
-CREATE TABLE IF NOT EXISTS `images` (
-  `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
-  `url` varchar(256) NOT NULL DEFAULT '',
-  `image` varchar(256) NOT NULL,
-  `type` int(16) NOT NULL,
-  `title` varchar(128) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-
 CREATE TABLE IF NOT EXISTS `product` (
   `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(256) NOT NULL DEFAULT '',
   `totalsale` int(16) NOT NULL DEFAULT '0' COMMENT'销售量',
   `category` int(16) NOT NULL,
   `price` double NOT NULL,
-  `originalprice` double NOT NULL,
+  `size`  varchar(64),
+  `color` varchar(64),
+  `detail` varchar(1024) DEFAULT '',
   `status` int(8) NOT NULL,
-  `size`  varchar(256),
-  `color` varchar(256),
-  `imageid` int(16) unsigned NOT NULL COMMENT '商品封面图片',
-  `imageids` varchar(256) NOT NULL DEFAULT '' COMMENT '商品图片集',
-  `remark` varchar(1024) DEFAULT '',
-  `detail` longtext NOT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp,
-  `inventory` int(16) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
