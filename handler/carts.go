@@ -187,9 +187,6 @@ func BrowseCart(c echo.Context) error {
 
 	output, err = models.CartsService.BrowseCart(userID)
 	if err != nil {
-		//if strings.Contains(err.Error(), "not found") {
-		//
-		//}
 		log.Logger.Error("[ERROR] Get Order with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrBrowseCartNotFound, err.Error())
