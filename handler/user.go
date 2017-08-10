@@ -208,7 +208,11 @@ func ChangeUserInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrChangeUserInfoInvalidParams, err.Error())
 	}
 
-	fmt.Println(info.Sex)
+	if err = c.Validate(info); err != nil {
+		log.Logger.Error("[ERROR] ChangeUserInfo Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrChangeUserInfoInvalidParams, err.Error())
+	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)

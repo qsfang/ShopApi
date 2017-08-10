@@ -66,7 +66,6 @@ type ProductImages struct {
 	Image     string        `bson:"image" json:"image"`
 }
 
-// todo: 检验
 type CreateProduct struct {
 	Name         string   `json:"name" validate:"required"`
 	Avatar       string   `json:"avatar"`
@@ -89,12 +88,12 @@ type ProductList struct {
 
 type ProductCategory struct {
 	Category uint64 `json:"category"`
-	Page     uint64 `json:"page"`
-	PageSize uint64 `json:"pagesize"`
+	Page     uint64 `json:"page" validate:"required, numeric"`
+	PageSize uint64 `json:"pagesize" validate:"required, numeric"`
 }
 
 type ProductID struct {
-	ID uint64 `json:"id" validate:""`
+	ID uint64 `json:"id" validate:"required"`
 }
 
 type ProductInfo struct {
@@ -115,8 +114,8 @@ type ChangeProStatus struct {
 }
 
 type ChangeCategory struct {
-	ID       uint64 `json:"id"`
-	Category uint64 `json:"category"validate:"required"`
+	ID       uint64 `json:"id" validate:"required"`
+	Category uint64 `json:"category" validate:"required"`
 }
 
 func (Product) TableName() string {

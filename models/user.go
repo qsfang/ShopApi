@@ -89,9 +89,9 @@ type Login struct {
 }
 
 type ChangeUserInfo struct {
-	Nickname string `json:"name"`
-	Email    string `json:"email"`
-	Sex      uint8  `json:"sex"`
+	Nickname string `json:"name" validate:"required"`
+	Email    string `json:"email" validate:"required,email"`
+	Sex      uint8  `json:"sex" validate:"required,max=2,min=1"`
 }
 
 type ChangePhone struct {
