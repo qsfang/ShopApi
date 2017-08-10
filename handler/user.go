@@ -46,7 +46,6 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-	"fmt"
 )
 
 func Register(c echo.Context) error {

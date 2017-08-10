@@ -68,7 +68,7 @@ func NewMessage(code int) *Resp {
 	}
 }
 
-func NewMessageWithData(code int, data interface{}) *AddressResp {
+func NewMessageWithData(code int, data... interface{}) *AddressResp {
 	return &AddressResp{
 		Code: code,
 		Data: data,

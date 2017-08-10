@@ -209,6 +209,38 @@ func AddProductImage(productID uint64, create *CreateProduct) error {
 	return err
 }
 
+func (ps *ProductServiceProvider) GetProductHeader() (*[]string, error) {
+	var (
+		err     error
+		product Product
+		image   ProductImages
+		header  []string
+	)
+
+	db := orm.Conn
+	
+	sql := "SELECT * FROM product WHERE status = ? LIMIT 5 LOCK IN SHARE MODE"
+	rows, err := db.Raw(sql, general.ProductOnSale).Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	collection := orm.MDSession.DB(orm.MD).C("productimage")
+	orm.MDSession.Refresh()
+
+	for rows.Next() {
+		db.ScanRows(rows, &product)
+		err = collection.Find(bson.M{"productid": product.ID, "class": general.ProductImage}).One(&image)
+		if err != nil {
+			return nil, err
+		}
+		header = append(header, image.Image)
+	}
+
+	return &header, nil
+}
+
 func (ps *ProductServiceProvider) GetProductList() (*[]ProductList, error) {
 	var (
 		err     error
@@ -219,7 +251,7 @@ func (ps *ProductServiceProvider) GetProductList() (*[]ProductList, error) {
 
 	db := orm.Conn
 
-	sql := "SELECT * FROM product WHERE status = ? LIMIT 6 LOCK IN SHARE MODE"
+	sql := "SELECT * FROM product WHERE status = ? LIMIT 5, 6 LOCK IN SHARE MODE"
 	rows, err := db.Raw(sql, general.ProductOnSale).Rows()
 	if err != nil {
 		return nil, err
