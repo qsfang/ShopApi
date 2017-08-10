@@ -54,6 +54,7 @@ const (
 	//CartPro status
 	ProInCart    = 0xea //233
 	ProNotInCart = 0xeb //234
+	
 	//Pay status
 	Buy    = 0xec //235
 	NotBuy = 0xed //236
@@ -74,6 +75,11 @@ const (
 
 	// Products
 	//Products Status
-	ProductOnsale = 0xe0 // 224
-	ProductUnsale = 0xe1 // 225
+	ProductOnSale = 0x0
+	ProductUnSale = 0x1
+	
+	// Product Image Class
+	ProductAvatar      = 0x0
+	ProductImage       = 0x1
+	ProductDetailImage = 0x2
 )

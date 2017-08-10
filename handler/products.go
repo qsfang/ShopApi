@@ -43,152 +43,190 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
+	"strings"
 )
 
 func CreateProduct(c echo.Context) error {
 	var (
-		err       error
-		product   models.CreateProduct
+		err     error
+		product models.CreateProduct
 	)
 
 	if err = c.Bind(&product); err != nil {
-		log.Logger.Error("[ERROR] CreateProduct Bind:", err)
+		log.Logger.Error("[ERROR] CreateProduct Bind", err)
 
-		return general.NewErrorWithMessage(errcode.ErrCreateInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrCreateProductInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(product); err != nil {
-		log.Logger.Error("[ERROR] CreateProduct Validate:", err)
+		log.Logger.Error("[ERROR] CreateProduct Validate", err)
 
-		return general.NewErrorWithMessage(errcode.ErrCreateInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrCreateProductInvalidParams, err.Error())
 	}
 
 	err = models.ProductService.CreateProduct(&product)
 	if err != nil {
 		log.Logger.Error("[ERROR] CreateProduct CreateProduct:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrCreateProductDatabase, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] Create Product: Name %s", product.Name)
+	log.Logger.Info("[SUCCEED] CreateProduct: Name %s", product.Name)
 
-	return c.JSON(errcode.CreateProductSucceed , general.NewMessage(errcode.CreateProductSucceed ))
+	return c.JSON(errcode.CreateProductSucceed, general.NewMessage(errcode.CreateProductSucceed))
 }
 
 func GetProductList(c echo.Context) error {
 	var (
 		err  error
-		cate models.ConProduct
-		list *[]models.ConProduct
+		list *[]models.ProductList
 	)
 
-	if err = c.Bind(&cate); err != nil {
-		log.Logger.Error("[ERROR] GetProductList Bind:", err)
+	list, err = models.ProductService.GetProductList()
+	if err != nil {
+		log.Logger.Error("[ERROR] GetProductList GetProductList", err)
 
-		return general.NewErrorWithMessage(errcode.ErrGetInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrGetListDatabase, err.Error())
 	}
 
-	pageStart := utility.Paging(cate.Page, cate.PageSize)
-	list, err = models.ProductService.GetProduct(cate.Category, pageStart, cate.PageSize)
+	log.Logger.Info("[SUCCEED] GetProductList")
+
+	return c.JSON(errcode.GetListSucceed, general.NewMessageWithData(errcode.GetListSucceed, list))
+}
+
+func GetProductListByCategory(c echo.Context) error {
+	var (
+		err      error
+		category models.ProductCategory
+		list     *[]models.ProductList
+	)
+
+	if err = c.Bind(&category); err != nil {
+		log.Logger.Error("[ERROR] GetProductList Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrGetProductListByCategoryInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(category); err != nil {
+		log.Logger.Error("[ERROR] GetProductList Validate", err)
+
+		return general.NewErrorWithMessage(errcode.ErrGetProductListByCategoryInvalidParams, err.Error())
+	}
+
+	pageStart := utility.Paging(category.Page, category.PageSize)
+	list, err = models.ProductService.GetProductByCategory(category.Category, pageStart, category.PageSize)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] Categories not exist", err)
+			log.Logger.Error("[ERROR] GetProductByCategory GetProductByCategory:", err)
 
-			return general.NewErrorWithMessage(errcode.ErrCategoryNotFound, err.Error())
+			return general.NewErrorWithMessage(errcode.ErrGetProductListByCategoryNotFound, err.Error())
 		}
 
-		log.Logger.Error("[ERROR] Get categories with error", err)
+		log.Logger.Error("[ERROR] GetProductByCategory GetProductByCategory:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] Get Product List")
+	log.Logger.Info("[SUCCEED] GetProductByCategory")
 
-	return c.JSON(errcode.GetListSucceed, list)
+	return c.JSON(errcode.GetProductListByCategorySucceed, list)
+}
+
+func GetProInfo(c echo.Context) error {
+	var (
+		err         error
+		productID   *models.ProductID
+		productInfo *models.ProductInfo
+	)
+
+	if err = c.Bind(&productID); err != nil {
+		log.Logger.Error("[ERROR] GetProInfo Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrGetProInfoInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(productID); err != nil {
+		log.Logger.Error("[ERROR] GetProInfo Validate", err)
+
+		return general.NewErrorWithMessage(errcode.ErrGetProductListByCategoryInvalidParams, err.Error())
+	}
+
+	productInfo, err = models.ProductService.GetProInfo(productID.ID)
+
+	if err != nil {
+		if err != nil && !strings.Contains(err.Error(), "not found") {
+			log.Logger.Error("[ERROR] GetUserInfo GetUserAvatar:", err)
+
+			return general.NewErrorWithMessage(errcode.ErrGetProInfoNotFound, err.Error())
+		}
+
+		log.Logger.Error("[ERROR] GetProInfo GetProInfo:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	log.Logger.Info("[SUCCEED] GetProInfo:")
+
+	return c.JSON(errcode.GetProInfoSucceed, general.NewMessageWithData(errcode.GetProInfoSucceed, productInfo))
 }
 
 func ChangeProStatus(c echo.Context) error {
 	var (
 		err error
-		pro models.ChangeProStatus
+		cps models.ChangeProStatus
 	)
 
-	if err = c.Bind(&pro); err != nil {
-		log.Logger.Error("[ERROR] Change Product Status Bind:", err)
+	if err = c.Bind(&cps); err != nil {
+		log.Logger.Error("[ERROR] ChangeProStatus Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrChangeInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangeProStatusInvalidParams, err.Error())
 	}
 
-	if err = c.Validate(pro); err != nil {
+	if err = c.Validate(cps); err != nil {
 		log.Logger.Error("[ERROR] Product Status Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrChangeInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrChangeProStatusInvalidParams, err.Error())
 	}
 
-	if pro.Status != general.ProductOnsale && pro.Status != general.ProductUnsale {
-		err = errors.New("[ERROR] Product Status InExistent")
-		log.Logger.Error("[ERROR] status transformed with error :",err)
+	if cps.Status != general.ProductOnSale && cps.Status != general.ProductUnSale {
+		err = errors.New("Invalid Product Status")
 
-		return general.NewErrorWithMessage(errcode.ErrStatusNotFound, err.Error())
+		log.Logger.Error("[ERROR] ChangeProStatus:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrChangeProStatusInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.ChangeProStatus(&pro)
+	err = models.ProductService.ChangeProStatus(&cps)
 	if err != nil {
-		log.Logger.Error("[ERROR] status transformed with error:", err)
+		log.Logger.Error("[ERROR] ChangeProStatus ChangeProStatus:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] Change Product Status: Status %d", pro.Status)
+	log.Logger.Info("[SUCCEED] ChangeProStatus")
 
 	return c.JSON(errcode.ChangeStatusSucceed, general.NewMessage(errcode.ChangeStatusSucceed))
 }
 
-func GetProInfo(c echo.Context) error {
-	var (
-		err           error
-		ProInfo       *models.ConProduct
-		ProInfoReturn *models.Product
-	)
-
-	if err = c.Bind(&ProInfo); err != nil {
-		log.Logger.Error("[ERROR] GetProInfo Bind:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrInfoInvalidParams, err.Error())
-	}
-
-	ProInfoReturn, err = models.ProductService.GetProInfo(ProInfo.ID)
-
-	if err != nil {
-		log.Logger.Error("[ERROR] Get info with error:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	log.Logger.Info("[SUCCEED] Get Product Info: Product ID: %d", ProInfo.ID)
-
-	return c.JSON(errcode.GetInfoSucceed , ProInfoReturn)
-}
-
-func ChangeCategories(c echo.Context) error {
+func ChangeCategory(c echo.Context) error {
 	var (
 		err error
-		m   *models.ChangeCategories
+		cc  *models.ChangeCategory
 	)
 
-	if err = c.Bind(&m); err != nil {
+	if err = c.Bind(&cc); err != nil {
 		log.Logger.Error("[ERROR] ChangeCategories Bind with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrCategoryInvalidParams, err.Error())
 	}
 
-	if err = c.Validate(m); err != nil {
+	if err = c.Validate(cc); err != nil {
 		log.Logger.Error("[ERROR] Categories Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrCategoryInvalidParams, err.Error())
 	}
 
-	err = models.ProductService.ChangeCategories(m)
+	err = models.ProductService.ChangeCategory(cc)
 	if err != nil {
 
 		log.Logger.Error("[ERROR] Categories change with error:", err)
@@ -196,7 +234,7 @@ func ChangeCategories(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] Change Categories: Category %s", m.Category)
+	log.Logger.Info("[SUCCEED] Change Categories: Category %s", cc.Category)
 
 	return c.JSON(errcode.ChangeCategorySucceed, general.NewMessage(errcode.ChangeCategorySucceed))
 }

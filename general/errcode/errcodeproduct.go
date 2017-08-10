@@ -30,25 +30,30 @@
 package errcode
 
 const (
-	//Create
-	CreateProductSucceed      = 0x0
-	ErrCreateInvalidParams    = 0x1
+	// Create
+	CreateProductSucceed          = 0x0
+	ErrCreateProductInvalidParams = 0x1
+	ErrCreateProductDatabase      = 0x2
 
 	// GetList
-	GetListSucceed            = 0x0
-	ErrGetInvalidParams       = 0x1
-	ErrCategoryNotFound       = 0x2
+	GetListSucceed     = 0x0
+	ErrGetListDatabase = 0x1
 
-	//ChangeStatus
-	ErrChangeInvalidParams    = 0x0
-	ErrStatusNotFound         = 0x1
-	ChangeStatusSucceed       = 0x2
+	// GetProductListByCategory
+	GetProductListByCategorySucceed          = 0x0
+	ErrGetProductListByCategoryInvalidParams = 0x1
+	ErrGetProductListByCategoryNotFound      = 0x2
 
-	//GetInfo
-	ErrInfoInvalidParams      = 0x0
-	GetInfoSucceed            = 0x1
+	// ChangeStatus
+	ChangeStatusSucceed             = 0x0
+	ErrChangeProStatusInvalidParams = 0x1
 
-	//ChangeCategory
-	ErrCategoryInvalidParams  = 0x0
-	ChangeCategorySucceed     = 0x1
+	// GetProInfo
+	GetProInfoSucceed          = 0x0
+	ErrGetProInfoInvalidParams = 0x1
+	ErrGetProInfoNotFound      = 0x2
+
+	// ChangeCategory
+	ChangeCategorySucceed    = 0x0
+	ErrCategoryInvalidParams = 0x1
 )

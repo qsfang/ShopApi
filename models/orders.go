@@ -150,6 +150,7 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) e
 		"status":  general.ProNotInCart,
 		"orderid": order.ID,
 	}
+
 	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", numberID, general.ProInCart, general.Buy).Update(changeMap).Limit(1).Error
 
 	return err
