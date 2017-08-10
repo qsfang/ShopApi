@@ -68,7 +68,7 @@ type AddressJSON struct {
 }
 
 type AddressID struct {
-	ID     string `json:"id" validate:"required"`
+	ID string `json:"id" validate:"required"`
 }
 
 func (Address) TableName() string {

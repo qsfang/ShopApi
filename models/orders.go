@@ -109,14 +109,14 @@ func (Orders) TableName() string {
 
 func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) error {
 	var (
-		err error
-		car Cart
-		address  Address
+		err     error
+		car     Cart
+		address Address
 	)
 	db := orm.Conn
 
-	err = db.First(&address,ord.AddressID).Error
-	if err !=nil{
+	err = db.First(&address, ord.AddressID).Error
+	if err != nil {
 		return err
 	}
 
@@ -235,11 +235,11 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrd
 
 	for _, v := range carts {
 		add1 := OrmOrders{
-			Name:    v.Name,
-			Count:   v.Count,
-			Size:    v.Size,
-			Color:   v.Color,
-			ImageID: v.ImageID,
+			Name:  v.Name,
+			Count: v.Count,
+			Size:  v.Size,
+			Color: v.Color,
+			//ImageID: v.ImageID,
 		}
 		getOrder = append(getOrder, add1)
 	}

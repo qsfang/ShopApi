@@ -29,22 +29,22 @@
 
 package errcode
 
-const(
+const (
 	//Createorder
-	ErrCreateOrderSucceed			= 0x0
-	ErrCreateOrderInvalidParams		= 0x1
-	ErrAddressNotFound				= 0x2
+	ErrCreateOrderSucceed       = 0x0
+	ErrCreateOrderInvalidParams = 0x1
+	ErrAddressNotFound          = 0x2
 
 	//GetOrders
-	ErrGetOrdersSucceed				= 0x0
-	ErrGetOrdersInvalidParams		= 0x1
-	ErrInvalidOrdersStatus			= 0x2
+	ErrGetOrdersSucceed       = 0x0
+	ErrGetOrdersInvalidParams = 0x1
+	ErrInvalidOrdersStatus    = 0x2
 
 	//GetOrder
-	ErrGetOrderSucceed				= 0x0
-	ErrGetOrderInvalidParams		= 0x1
+	ErrGetOrderSucceed       = 0x0
+	ErrGetOrderInvalidParams = 0x1
 
 	//ChangeStatus
-	ErrChangeOrderSucceed			= 0x0
-	ErrChangeOrderInvalidParams		= 0x1
+	ErrChangeOrderSucceed       = 0x0
+	ErrChangeOrderInvalidParams = 0x1
 )

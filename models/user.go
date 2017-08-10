@@ -75,7 +75,7 @@ type UserGet struct {
 	Avatar   string `json:"avatar"`
 	Nickname string `json:"name"`
 	Email    string `json:"email"`
-	Sex      uint8   `json:"sex"`
+	Sex      uint8  `json:"sex"`
 }
 
 type Register struct {
@@ -193,10 +193,10 @@ func (us *UserServiceProvider) GetUserInfo(UserID uint64) (*UserGet, error) {
 	}
 
 	ug = UserGet{
-		Phone: ui.Phone,
+		Phone:    ui.Phone,
 		Nickname: ui.Nickname,
-		Email: ui.Email,
-		Sex: ui.Sex,
+		Email:    ui.Email,
+		Sex:      ui.Sex,
 	}
 
 	return &ug, nil
@@ -217,7 +217,7 @@ func (us *UserServiceProvider) GetUserAvatar(userID uint64) (*UserAvatar, error)
 
 func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint64) error {
 	var (
-		con   UserInfo
+		con     UserInfo
 		updater = make(map[string]interface{})
 	)
 

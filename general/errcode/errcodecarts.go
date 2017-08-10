@@ -24,52 +24,29 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/18        Yusan Kurban
+ *     Initial: 2017/08/09       Zhang Zizhao
  */
 
-package main
+package errcode
 
-import (
-	"github.com/spf13/viper"
+const (
+	//PutIn
+	ErrCartPutInSucceed          = 0x0
+	ErrCartPutInErrInvalidParams = 0x1
+	ErrCartPutInProductNotFound  = 0x2
+	ErrCartPutInDatabase         = 0x3
+
+	//Delete
+	ErrCartDeleteSucceed          = 0x0
+	ErrCartDeleteErrInvalidParams = 0x1
+	ErrCartDeleteProductNotFound  = 0x3
+
+	//Alter
+	ErrAlterCartSucceed         = 0x0
+	ErrAlterCartInvalidParams   = 0x1
+	ErrAlterCartProductNotFound = 0x2
+
+	//Browse
+	ErrBrowseCartSucceed  = 0x0
+	ErrBrowseCartNotFound = 0x0
 )
-
-type shopServerConfig struct {
-	address   string
-	isDebug   bool
-	corsHosts []string
-	tokenKey  string
-	mysqlHost string
-	mysqlPort string
-	mysqlUser string
-	mysqlPass string
-	mysqlDb   string
-	mysqlSize int
-	MgoUrl    string
-}
-
-var (
-	configuration *shopServerConfig
-)
-
-func readConfiguration() {
-	viper.AddConfigPath("./")
-	viper.SetConfigName("config")
-
-	if err := viper.ReadInConfig(); err != nil {
-		panic(err)
-	}
-
-	configuration = &shopServerConfig{
-		address:   viper.GetString("server.address"),
-		isDebug:   viper.GetBool("server.debug"),
-		corsHosts: viper.GetStringSlice("middleware.cors.hosts"),
-		tokenKey:  viper.GetString("middleware.jwt.tokenkey"),
-		mysqlHost: viper.GetString("mysql.host"),
-		mysqlPort: viper.GetString("mysql.port"),
-		mysqlUser: viper.GetString("mysql.user"),
-		mysqlPass: viper.GetString("mysql.pass"),
-		mysqlDb:   viper.GetString("mysql.db"),
-		mysqlSize: viper.GetInt("mysql.size"),
-		MgoUrl:    viper.GetString("mongodb.url"),
-	}
-}

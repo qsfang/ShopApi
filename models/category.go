@@ -101,10 +101,10 @@ func (csp *CategoryServiceProvider) GetCategory() (*[]CategoryGet, error) {
 
 	err = db.Where("status = ?", general.CategoryOnUse).Find(&categories).Error
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
-	for _, category := range categories{
+	for _, category := range categories {
 		categoryGet := CategoryGet{Name: category.Name}
 		categoryList = append(categoryList, categoryGet)
 	}

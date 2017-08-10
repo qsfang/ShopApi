@@ -79,7 +79,7 @@ func CreateOrder(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrCreateOrderSucceed,general.NewMessage(errcode.ErrCreateOrderSucceed))
+	return c.JSON(errcode.ErrCreateOrderSucceed, general.NewMessage(errcode.ErrCreateOrderSucceed))
 }
 
 func GetOrders(c echo.Context) error {
@@ -95,7 +95,7 @@ func GetOrders(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrGetOrdersInvalidParams, err.Error())
 	}
 
-	if err = c.Validate(getOrders); err != nil  {
+	if err = c.Validate(getOrders); err != nil {
 		log.Logger.Error("[ERROR] GetOrders Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrGetOrdersInvalidParams, err.Error())
@@ -183,5 +183,5 @@ func ChangeStatus(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	return c.JSON(errcode.ErrChangeOrderSucceed,general.NewMessage(errcode.ErrChangeOrderSucceed))
+	return c.JSON(errcode.ErrChangeOrderSucceed, general.NewMessage(errcode.ErrChangeOrderSucceed))
 }

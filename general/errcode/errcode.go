@@ -42,8 +42,8 @@ const (
 	ErrUserNotFound    = 0x2
 	ErrInvalidPassword = 0x3
 
-	ErrNotFound            = 0xa
-	ErrBind                = 0xe
-	ErrInformation         = 0xf
-	ErrAddressIdNotFound   = 0x9
+	ErrNotFound          = 0xa
+	ErrBind              = 0xe
+	ErrInformation       = 0xf
+	ErrAddressIdNotFound = 0x9
 )

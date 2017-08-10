@@ -41,7 +41,7 @@ var (
 
 const (
 	sql = "mysql"
-	MD = "shop"
+	MD  = "shop"
 )
 
 var (

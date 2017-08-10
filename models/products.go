@@ -347,3 +347,20 @@ func (ps *ProductServiceProvider) ChangeCategory(cate *ChangeCategory) error {
 
 	return err
 }
+
+func (ps *ProductServiceProvider) GetPrdouctAvatar(proID uint64) (*string, error) {
+	var (
+		err   error
+		image ProductImages
+	)
+
+	collection := orm.MDSession.DB(orm.MD).C("productimage")
+	orm.MDSession.Refresh()
+
+	err = collection.Find(bson.M{"productid": proID, "class": general.ProductAvatar}).One(&image)
+	if err != nil {
+		return nil, err
+	}
+
+	return &image.Image, nil
+}

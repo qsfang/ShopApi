@@ -52,12 +52,12 @@ const (
 
 	// Carts
 	//CartPro status
-	ProInCart    = 0xea //233
-	ProNotInCart = 0xeb //234
-	
+	ProInCart    = 0xea //234
+	ProNotInCart = 0xeb //235
+
 	//Pay status
-	Buy    = 0xec //235
-	NotBuy = 0xed //236
+	Buy    = 0xec //236
+	NotBuy = 0xed //237
 
 	// Category
 	//Category Status
@@ -77,7 +77,7 @@ const (
 	//Products Status
 	ProductOnSale = 0x0
 	ProductUnSale = 0x1
-	
+
 	// Product Image Class
 	ProductAvatar      = 0x0
 	ProductImage       = 0x1

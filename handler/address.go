@@ -189,7 +189,6 @@ func AlterDefault(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-
 	err = models.AddressService.AlterAddress(alterAddress, userID)
 	if err != nil {
 		log.Logger.Error("[ERROR] AlterDefault AlterAddress:", err)
@@ -204,9 +203,9 @@ func AlterDefault(c echo.Context) error {
 
 func DeleteAddress(c echo.Context) error {
 	var (
-		err          error
+		err           error
 		deleteAddress *models.AddressID
-		userID       uint64
+		userID        uint64
 	)
 
 	if err = c.Bind(&deleteAddress); err != nil {
