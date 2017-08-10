@@ -48,3 +48,10 @@ func IsValidPhone(phone string) bool {
 	match := rgx.MatchString(phone)
 	return match
 }
+
+// 邮箱是否合法
+func IsValidEmail(email string) bool {
+	reg := `\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}`
+	rgx := regexp.MustCompile(reg)
+	return rgx.MatchString(email)
+}

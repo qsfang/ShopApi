@@ -56,5 +56,5 @@ func InitOrm(url string) {
 		panic(err)
 	}
 
-	log.Logger.Debug("DB Connected to %s", sql)
+	log.Logger.Info("DB Connected to %s", sql)
 }

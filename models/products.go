@@ -66,7 +66,6 @@ type ProductImages struct {
 	Image     string        `bson:"image" json:"image"`
 }
 
-// todo: 检验
 type CreateProduct struct {
 	Name         string   `json:"name" validate:"required"`
 	Avatar       string   `json:"avatar"`
@@ -81,20 +80,20 @@ type CreateProduct struct {
 
 type ProductList struct {
 	ID       uint64  `json:"id"`
-	Name     string  `json:"name"`
-	Avatar   string  `json:"avatar"`
-	Category uint64  `json:"categories"`
+	Name     string  `json:"title"`
+	Avatar   string  `json:"img"`
+	Category uint64  `json:"category"`
 	Price    float64 `json:"price"`
 }
 
 type ProductCategory struct {
 	Category uint64 `json:"category"`
-	Page     uint64 `json:"page"`
-	PageSize uint64 `json:"pagesize"`
+	Page     uint64 `json:"page" validate:"required, numeric"`
+	PageSize uint64 `json:"pagesize" validate:"required, numeric"`
 }
 
 type ProductID struct {
-	ID uint64 `json:"id" validate:""`
+	ID uint64 `json:"id" validate:"required"`
 }
 
 type ProductInfo struct {
@@ -115,8 +114,8 @@ type ChangeProStatus struct {
 }
 
 type ChangeCategory struct {
-	ID       uint64 `json:"id"`
-	Category uint64 `json:"category"validate:"required"`
+	ID       uint64 `json:"id" validate:"required"`
+	Category uint64 `json:"category" validate:"required"`
 }
 
 func (Product) TableName() string {
@@ -210,6 +209,39 @@ func AddProductImage(productID uint64, create *CreateProduct) error {
 	return err
 }
 
+func (ps *ProductServiceProvider) GetProductHeader() (*[]ProductList, error) {
+	var (
+		err     error
+		product ProductList
+		image   ProductImages
+		header  []ProductList
+	)
+
+	db := orm.Conn
+	
+	sql := "SELECT * FROM product WHERE status = ? LIMIT 5 LOCK IN SHARE MODE"
+	rows, err := db.Raw(sql, general.ProductOnSale).Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	collection := orm.MDSession.DB(orm.MD).C("productimage")
+	orm.MDSession.Refresh()
+
+	for rows.Next() {
+		db.ScanRows(rows, &product)
+		err = collection.Find(bson.M{"productid": product.ID, "class": general.ProductImage}).One(&image)
+		if err != nil {
+			return nil, err
+		}
+		product.Avatar = image.Image
+		header = append(header, product)
+	}
+
+	return &header, nil
+}
+
 func (ps *ProductServiceProvider) GetProductList() (*[]ProductList, error) {
 	var (
 		err     error
@@ -220,7 +252,7 @@ func (ps *ProductServiceProvider) GetProductList() (*[]ProductList, error) {
 
 	db := orm.Conn
 
-	sql := "SELECT * FROM product WHERE status = ? LIMIT 6 LOCK IN SHARE MODE"
+	sql := "SELECT * FROM product WHERE status = ? LIMIT 5, 6 LOCK IN SHARE MODE"
 	rows, err := db.Raw(sql, general.ProductOnSale).Rows()
 	if err != nil {
 		return nil, err
@@ -308,8 +340,6 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(images)
 
 	for _, image := range images {
 		switch image.Class {

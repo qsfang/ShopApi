@@ -46,7 +46,6 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-	"fmt"
 )
 
 func Register(c echo.Context) error {
@@ -208,8 +207,13 @@ func ChangeUserInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrChangeUserInfoInvalidParams, err.Error())
 	}
 
-	fmt.Println(info.Sex)
+	if !utility.IsValidEmail(info.Email) {
+		err = errors.New("Invalid Email")
 
+		log.Logger.Error("[ERROR] ChangeUserInfo Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrChangeUserInfoInvalidParams, err.Error())
+	}
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 

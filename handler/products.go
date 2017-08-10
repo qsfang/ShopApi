@@ -34,6 +34,7 @@ package handler
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
@@ -43,7 +44,6 @@ import (
 	"ShopApi/log"
 	"ShopApi/models"
 	"ShopApi/utility"
-	"strings"
 )
 
 func CreateProduct(c echo.Context) error {
@@ -78,9 +78,17 @@ func CreateProduct(c echo.Context) error {
 
 func GetProductList(c echo.Context) error {
 	var (
-		err  error
-		list *[]models.ProductList
+		err    error
+		header *[]models.ProductList
+		list   *[]models.ProductList
 	)
+
+	header, err = models.ProductService.GetProductHeader()
+	if err != nil {
+		log.Logger.Error("[ERROR] GetProductList GetProductHeader", err)
+
+		return general.NewErrorWithMessage(errcode.ErrGetListDatabase, err.Error())
+	}
 
 	list, err = models.ProductService.GetProductList()
 	if err != nil {
@@ -91,7 +99,7 @@ func GetProductList(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] GetProductList")
 
-	return c.JSON(errcode.GetListSucceed, general.NewMessageWithData(errcode.GetListSucceed, list))
+	return c.JSON(errcode.GetListSucceed, general.NewMessageForProductList(errcode.GetListSucceed, header, list))
 }
 
 func GetProductListByCategory(c echo.Context) error {

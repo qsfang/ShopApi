@@ -59,7 +59,7 @@ func startServer() {
 	server.Validator = general.NewEchoValidator()
 
 	router.InitRouter(server)
-	log.Logger.Debug("Router already init")
+	log.Logger.Info("Router already init %v")
 	log.Logger.Fatal(server.Start(configuration.address))
 }
 
@@ -92,7 +92,7 @@ func InitMetal() {
 		panic(err)
 	}
 
-	log.Logger.Debug("the MongoDB of %s connected!", orm.MD)
+	log.Logger.Info("the MongoDB of %s connected!", orm.MD)
 
 	orm.MDSession.SetMode(mgo.Monotonic, true)
 }

@@ -42,9 +42,19 @@ type Resp struct {
 	Code int `json:"status"`
 }
 
-type AddressResp struct {
+type DataResp struct {
 	Code int         `json:"status"`
 	Data interface{} `json:"data"`
+}
+
+type ProductListResp struct {
+	Code int `json:"code"`
+	ProductList `json:"data"`
+}
+
+type ProductList struct {
+	Header interface{} `json:"adPics"`
+	Image  interface{} `json:"wares"`
 }
 
 func NewErrorWithMessage(code int, msg string) *ErrorResp {
@@ -68,9 +78,19 @@ func NewMessage(code int) *Resp {
 	}
 }
 
-func NewMessageWithData(code int, data interface{}) *AddressResp {
-	return &AddressResp{
+func NewMessageWithData(code int, data interface{}) *DataResp {
+	return &DataResp{
 		Code: code,
 		Data: data,
+	}
+}
+
+func NewMessageForProductList(code int, header, image interface{}) *ProductListResp {
+	return &ProductListResp{
+		Code: code,
+		ProductList: ProductList{
+			Header: header,
+			Image: image,
+		},
 	}
 }

@@ -211,13 +211,13 @@ func DeleteAddress(c echo.Context) error {
 	if err = c.Bind(&deleteAddress); err != nil {
 		log.Logger.Error("[ERROR] DeleteAddress Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrDeleteAddressNotFound, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrDeleteAddressInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(deleteAddress); err != nil {
 		log.Logger.Error("[ERROR] DeleteAddress Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrDeleteAddressNotFound, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrDeleteAddressInvalidParams, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
