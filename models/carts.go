@@ -61,6 +61,7 @@ type Cart struct {
 	Created   time.Time `json:"created"`
 }
 
+
 type CartAlter struct {
 	ID    uint64 `sql:"primary_key;" validate:"required" json:"id"`
 	Count uint64 `json:"count" validate:"required"`
