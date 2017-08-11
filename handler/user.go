@@ -192,7 +192,7 @@ func GetUserInfo(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] GetUserInfo: User ID %d", userID)
 
-	return c.JSON(errcode.GetUserInfoSucceed, output)
+	return c.JSON(errcode.GetUserInfoSucceed, general.NewMessageWithData(errcode.GetUserInfoSucceed, *output))
 }
 
 func ChangeUserInfo(c echo.Context) error {

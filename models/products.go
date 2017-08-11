@@ -52,8 +52,6 @@ type Product struct {
 	TotalSale uint64    `gorm:"column:totalsale" json:"totalsale"`
 	Category  uint64    `json:"categories"`
 	Price     float64   `json:"price"`
-	Size      string    `json:"size"`
-	Color     string    `json:"color"`
 	Detail    string    `json:"detail"`
 	Status    uint8     `json:"status"`
 	Created   time.Time `json:"created"`
@@ -66,6 +64,18 @@ type ProductImages struct {
 	Image     string        `bson:"image" json:"image"`
 }
 
+type ProductSize struct {
+	ID        bson.ObjectId `bson:"_id,omitempty" json:"id"`
+	ProductID uint64        `bson:"productid" json:"productid"`
+	Size      string        `bson:"size" json:"size"`
+}
+
+type ProductColor struct {
+	ID        bson.ObjectId `bson:"_id,omitempty" json:"id"`
+	ProductID uint64        `bson:"productid" json:"productid"`
+	Color     string        `bson:"color" json:"color"`
+}
+
 type CreateProduct struct {
 	Name         string   `json:"name" validate:"required"`
 	Avatar       string   `json:"avatar"`
@@ -73,8 +83,8 @@ type CreateProduct struct {
 	DetailImages []string `json:"detailimages"`
 	Category     uint64   `json:"category" validate:"required"`
 	Price        float64  `json:"price" validate:"required"`
-	Size         string   `json:"size" validate:"required,alphanumunicode"`
-	Color        string   `json:"color" validate:"required,alphanumunicode"`
+	Size         []string `json:"size" validate:"required"`
+	Color        []string `json:"color" validate:"required"`
 	Detail       string   `json:"detail" validate:"required"`
 }
 
@@ -103,8 +113,8 @@ type ProductInfo struct {
 	TotalSale    uint64   `json:"totalsale"`
 	Category     uint64   `json:"category"`
 	Price        float64  `json:"price"`
-	Size         string   `json:"size"`
-	Color        string   `json:"color"`
+	Size         []string   `json:"size"`
+	Color        []string   `json:"color"`
 	Detail       string   `json:"detail"`
 }
 
@@ -132,8 +142,6 @@ func (ps *ProductServiceProvider) CreateProduct(create *CreateProduct) error {
 		Name:     create.Name,
 		Category: create.Category,
 		Price:    create.Price,
-		Size:     create.Size,
-		Color:    create.Color,
 		Detail:   create.Detail,
 		Status:   general.ProductOnSale,
 		Created:  time.Now(),
@@ -159,6 +167,19 @@ func (ps *ProductServiceProvider) CreateProduct(create *CreateProduct) error {
 	}
 
 	err = AddProductImage(product.ID, create)
+	if err != nil {
+		return err
+	}
+
+	err = AddProductSize(product.ID, create)
+	if err != nil {
+		return err
+	}
+
+	err = AddProductColor(product.ID, create)
+	if err!= nil{
+		return  err
+	}
 
 	return err
 }
@@ -209,6 +230,62 @@ func AddProductImage(productID uint64, create *CreateProduct) error {
 	return err
 }
 
+func AddProductSize(productID uint64, create *CreateProduct) error {
+	var (
+		err    error
+		size  ProductSize
+		sizes []ProductSize
+	)
+
+	for _, si := range create.Size {
+		size = ProductSize{
+			ProductID: productID,
+			Size:     si,
+		}
+		sizes = append(sizes, size)
+	}
+
+	collection := orm.MDSession.DB(orm.MD).C("productsize")
+	orm.MDSession.Refresh()
+
+	for _, si := range sizes {
+		err = collection.Insert(si)
+		if err != nil {
+			break
+		}
+	}
+
+	return err
+}
+
+func AddProductColor(productID uint64, create *CreateProduct) error {
+	var (
+		err    error
+		color  ProductColor
+		colors []ProductColor
+	)
+
+	for _, co := range create.Color {
+		color = ProductColor{
+			ProductID: productID,
+			Color:     co,
+		}
+		colors = append(colors, color)
+	}
+
+	collection := orm.MDSession.DB(orm.MD).C("productcolors")
+	orm.MDSession.Refresh()
+
+	for _, co := range colors {
+		err = collection.Insert(co)
+		if err != nil {
+			break
+		}
+	}
+
+	return err
+}
+
 func (ps *ProductServiceProvider) GetProductHeader() (*[]ProductList, error) {
 	var (
 		err     error
@@ -218,7 +295,7 @@ func (ps *ProductServiceProvider) GetProductHeader() (*[]ProductList, error) {
 	)
 
 	db := orm.Conn
-	
+
 	sql := "SELECT * FROM product WHERE status = ? LIMIT 5 LOCK IN SHARE MODE"
 	rows, err := db.Raw(sql, general.ProductOnSale).Rows()
 	if err != nil {
@@ -314,6 +391,8 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 		product Product
 		info    ProductInfo
 		images  []ProductImages
+		sizes   []ProductSize
+		colors  []ProductColor
 	)
 
 	db := orm.Conn
@@ -328,15 +407,13 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 		TotalSale: product.TotalSale,
 		Category:  product.Category,
 		Price:     product.Price,
-		Size:      product.Size,
-		Color:     product.Color,
 		Detail:    product.Detail,
 	}
 
-	collection := orm.MDSession.DB(orm.MD).C("productimage")
+	collection1 := orm.MDSession.DB(orm.MD).C("productimage")
 	orm.MDSession.Refresh()
 
-	err = collection.Find(bson.M{"productid": id}).All(&images)
+	err = collection1.Find(bson.M{"productid": id}).All(&images)
 	if err != nil {
 		return nil, err
 	}
@@ -350,6 +427,30 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 		case general.ProductDetailImage:
 			info.DetailImages = append(info.DetailImages, image.Image)
 		}
+	}
+
+	collection2 := orm.MDSession.DB(orm.MD).C("productsize")
+	orm.MDSession.Refresh()
+
+	err = collection2.Find(bson.M{"productid": id}).All(&sizes)
+	if err != nil {
+		return nil ,err
+	}
+
+	for _, size := range sizes{
+		info.Size = append(info.Size, size.Size)
+	}
+
+	collection3 := orm.MDSession.DB(orm.MD).C("productcolors")
+	orm.MDSession.Refresh()
+
+	err = collection3.Find(bson.M{"productid": id}).All(&colors)
+	if err != nil {
+		return nil ,err
+	}
+
+	for _, color := range colors{
+		info.Color = append(info.Color, color.Color)
 	}
 
 	return &info, nil

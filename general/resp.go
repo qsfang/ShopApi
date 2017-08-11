@@ -48,7 +48,7 @@ type DataResp struct {
 }
 
 type ProductListResp struct {
-	Code int `json:"code"`
+	Code  int   `json:"status"`
 	ProductList `json:"data"`
 }
 

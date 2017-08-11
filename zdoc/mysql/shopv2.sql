@@ -98,8 +98,6 @@ CREATE TABLE IF NOT EXISTS `product` (
   `totalsale` int(16) NOT NULL DEFAULT '0' COMMENT'销售量',
   `category` int(16) NOT NULL,
   `price` double NOT NULL,
-  `size`  varchar(64),
-  `color` varchar(64),
   `detail` varchar(1024) DEFAULT '',
   `status` int(8) NOT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp,

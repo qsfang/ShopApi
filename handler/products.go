@@ -97,7 +97,7 @@ func GetProductList(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrGetListDatabase, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] GetProductList")
+	log.Logger.Info("[SUCCEED] GetProductList %v")
 
 	return c.JSON(errcode.GetListSucceed, general.NewMessageForProductList(errcode.GetListSucceed, header, list))
 }
@@ -135,7 +135,7 @@ func GetProductListByCategory(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] GetProductByCategory")
+	log.Logger.Info("[SUCCEED] GetProductByCategory %v")
 
 	return c.JSON(errcode.GetProductListByCategorySucceed, list)
 }
@@ -173,7 +173,7 @@ func GetProInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] GetProInfo:")
+	log.Logger.Info("[SUCCEED] GetProInfo %v")
 
 	return c.JSON(errcode.GetProInfoSucceed, general.NewMessageWithData(errcode.GetProInfoSucceed, productInfo))
 }
