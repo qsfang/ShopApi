@@ -38,6 +38,7 @@ import (
 
 	"ShopApi/general"
 	"ShopApi/orm"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type OrderServiceProvider struct {
@@ -74,10 +75,12 @@ type OrmOrders struct {
 	Page       uint64    `json:"page" validate:"required,numeric"`
 	PageSize   uint64    `json:"pagesize" validate:"required,numeric"`
 	AddressID  uint64    `json:"addressid" validate:"required,numeric"`
-	ImageID    uint64    `json:"imageid"`
+	ProductID  uint64    `json:"productid" validate:"required, numeric"`
+	ImageID    string    `json:"imageid"`
 	Remark     string    `json:"remark"`
 	Created    time.Time `json:"created"`
 	Updated    time.Time `json:"updated"`
+	Avatar     string    `json:"avatar"`
 }
 
 type CreateOrder struct {
@@ -199,6 +202,7 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrd
 		order    Orders
 		carts    []Cart
 		getOrder []OrmOrders
+		productAvatar ProductImages
 	)
 
 	db := orm.Conn
@@ -235,12 +239,23 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrd
 
 	for _, v := range carts {
 		add1 := OrmOrders{
-			Name:  v.Name,
-			Count: v.Count,
-			Size:  v.Size,
-			Color: v.Color,
-			//ImageID: v.ImageID,
+			Name:      v.Name,
+			Count:     v.Count,
+			Size:      v.Size,
+			Color:     v.Color,
+			ProductID: v.ProductID,
 		}
+		getOrder = append(getOrder, add1)
+
+		collection := orm.MDSession.DB(orm.MD).C("productimage")
+		orm.MDSession.Refresh()
+
+		err = collection.Find(bson.M{"productid": add1.ProductID, "class": general.ProductAvatar}).One(&productAvatar)
+		if err != nil {
+			return nil, err
+		}
+
+		add1.Avatar = productAvatar.Image
 		getOrder = append(getOrder, add1)
 	}
 

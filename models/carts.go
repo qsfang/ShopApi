@@ -36,7 +36,7 @@ package models
 import (
 	"time"
 
-	"src/gopkg.in/mgo.v2/bson"
+	"gopkg.in/mgo.v2/bson"
 
 	"ShopApi/general"
 	"ShopApi/orm"
