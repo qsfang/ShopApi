@@ -52,8 +52,8 @@ const (
 
 	// Carts
 	//CartPro status
-	ProInCart    = 0xea //234
-	ProNotInCart = 0xeb //235
+	ProInCart    = 0x0
+	ProNotInCart = 0x1
 
 	//Pay status
 	Buy    = 0xec //236

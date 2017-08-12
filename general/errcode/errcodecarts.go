@@ -31,22 +31,23 @@ package errcode
 
 const (
 	//PutIn
-	ErrCartPutInSucceed          = 0x0
+	CreateSucceed                = 0x0
 	ErrCartPutInErrInvalidParams = 0x1
 	ErrCartPutInProductNotFound  = 0x2
 	ErrCartPutInDatabase         = 0x3
 
 	//Delete
-	ErrCartDeleteSucceed          = 0x0
+	CartDeleteSucceed             = 0x0
 	ErrCartDeleteErrInvalidParams = 0x1
 	ErrCartDeleteProductNotFound  = 0x3
 
 	//Alter
-	ErrAlterCartSucceed         = 0x0
+	AlterCartSucceed            = 0x0
 	ErrAlterCartInvalidParams   = 0x1
 	ErrAlterCartProductNotFound = 0x2
 
 	//Browse
-	ErrBrowseCartSucceed  = 0x0
-	ErrBrowseCartNotFound = 0x0
+	BrowseCartSucceed      = 0x0
+	ErrBrowseInvalidParams = 0x1
+	ErrBrowseCartNotFound  = 0x2
 )

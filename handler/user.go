@@ -171,12 +171,12 @@ func GetUserInfo(c echo.Context) error {
 	output, err = models.UserService.GetUserInfo(userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] GetUserInfo GetUserInfo: User Information Not Found", err)
+			log.Logger.Error("[ERROR] GetUserInfo : User Information Not Found", err)
 
 			return general.NewErrorWithMessage(errcode.ErrGetUserInfoInvalidParams, err.Error())
 		}
 
-		log.Logger.Error("[ERROR] GetUserInfo GetUserInfo: Mysql Error", err)
+		log.Logger.Error("[ERROR] GetUserInfo : Mysql Error", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
@@ -214,6 +214,7 @@ func ChangeUserInfo(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrChangeUserInfoInvalidParams, err.Error())
 	}
+
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
@@ -246,6 +247,7 @@ func ChangeUserAvatar(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrChangeUserAvatarInvalidParams, err.Error())
 	}
+
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	avatar.UserID = session.Get(general.SessionUserID).(uint64)
 

@@ -113,8 +113,8 @@ type ProductInfo struct {
 	TotalSale    uint64   `json:"totalsale"`
 	Category     uint64   `json:"category"`
 	Price        float64  `json:"price"`
-	Size         []string   `json:"size"`
-	Color        []string   `json:"color"`
+	Size         []string `json:"size"`
+	Color        []string `json:"color"`
 	Detail       string   `json:"detail"`
 }
 
@@ -177,8 +177,13 @@ func (ps *ProductServiceProvider) CreateProduct(create *CreateProduct) error {
 	}
 
 	err = AddProductColor(product.ID, create)
-	if err!= nil{
-		return  err
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		return err
 	}
 
 	return err
@@ -232,7 +237,7 @@ func AddProductImage(productID uint64, create *CreateProduct) error {
 
 func AddProductSize(productID uint64, create *CreateProduct) error {
 	var (
-		err    error
+		err   error
 		size  ProductSize
 		sizes []ProductSize
 	)
@@ -240,7 +245,7 @@ func AddProductSize(productID uint64, create *CreateProduct) error {
 	for _, si := range create.Size {
 		size = ProductSize{
 			ProductID: productID,
-			Size:     si,
+			Size:      si,
 		}
 		sizes = append(sizes, size)
 	}
@@ -354,6 +359,7 @@ func (ps *ProductServiceProvider) GetProductList() (*[]ProductList, error) {
 
 func (ps *ProductServiceProvider) GetProductByCategory(cate, pageStart, pageSize uint64) (*[]ProductList, error) {
 	var (
+		err     error
 		product ProductList
 		image   ProductImages
 		list    []ProductList
@@ -434,10 +440,10 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 
 	err = collection2.Find(bson.M{"productid": id}).All(&sizes)
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
 
-	for _, size := range sizes{
+	for _, size := range sizes {
 		info.Size = append(info.Size, size.Size)
 	}
 
@@ -446,10 +452,10 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 
 	err = collection3.Find(bson.M{"productid": id}).All(&colors)
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
 
-	for _, color := range colors{
+	for _, color := range colors {
 		info.Color = append(info.Color, color.Color)
 	}
 

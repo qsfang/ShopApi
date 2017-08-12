@@ -44,12 +44,11 @@ import (
 	"ShopApi/utility"
 )
 
-func CartsPutIn(c echo.Context) error {
+func CreateCarts(c echo.Context) error {
 	var (
 		err            error
 		carts          models.CartPutIn
 		ProInfo        *models.ProductInfo
-		prodouctAvatar *string
 	)
 
 	if err = c.Bind(&carts); err != nil {
@@ -59,7 +58,7 @@ func CartsPutIn(c echo.Context) error {
 	}
 
 	if err = c.Validate(&carts); err != nil {
-		log.Logger.Error("[ERROR] AlterCartPro Validate:", err)
+		log.Logger.Error("[ERROR] Create Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrCartPutInErrInvalidParams, err.Error())
 	}
@@ -67,7 +66,7 @@ func CartsPutIn(c echo.Context) error {
 	ProInfo, err = models.ProductService.GetProInfo(carts.ProductID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] CartsPutIn: Product doesn't exist", err)
+			log.Logger.Error("[ERROR] CartsCreate: Product doesn't exist", err)
 
 			return general.NewErrorWithMessage(errcode.ErrCartPutInProductNotFound, err.Error())
 		}
@@ -77,67 +76,61 @@ func CartsPutIn(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	prodouctAvatar, err = models.ProductService.GetPrdouctAvatar(carts.ProductID)
 	if err != nil {
 		log.Logger.Error("[ERROR] Get Information with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMongo, err.Error())
 	}
 
-	carts.Avatar = *prodouctAvatar
-
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	err = models.CartsService.CreateInCarts(&carts, userID, ProInfo.Name)
+	err = models.CartsService.CreateCarts(&carts, userID, ProInfo.Name)
 	if err != nil {
-		log.Logger.Error("[ERROR] Mysql error with CartPutIn:", err)
+		log.Logger.Error("[ERROR] Mysql error with CartCreate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrCartPutInDatabase, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] CartsPutIn name:s%", ProInfo.Name)
+	log.Logger.Info("[SUCCEED] CartsPutIn name:%s", ProInfo.Name)
 
-	return c.JSON(errcode.ErrCartPutInSucceed, general.NewMessage(errcode.ErrCartPutInSucceed))
+	return c.JSON(errcode.CreateSucceed, general.NewMessage(errcode.CreateSucceed))
 }
 
-func CartsDelete(c echo.Context) error {
+func CartDelete(c echo.Context) error {
 	var (
 		err  error
-		cart models.CartDelete
+		cart *models.CartDelete
 	)
 
 	if err = c.Bind(&cart); err != nil {
-		log.Logger.Error("[ERROR] CarDelete Bind:", err)
+		log.Logger.Error("[ERROR] CartDelete Bind:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrCartDeleteErrInvalidParams, err.Error())
 	}
 
-	if err = c.Validate(&cart); err != nil {
-		log.Logger.Error("[ERROR] AlterCartPro Validate:", err)
+	if err = c.Validate(cart); err != nil {
+		log.Logger.Error("[ERROR] CartDelete Validate:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrCartDeleteErrInvalidParams, err.Error())
 	}
 
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	UserID := session.Get(general.SessionUserID).(uint64)
-
-	err = models.CartsService.CartsDelete(UserID, cart)
+	err = models.CartsService.CartDelete(cart)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] CarDelete: Product doesn't exist!", err)
+			log.Logger.Error("[ERROR] CartDelete: Product doesn't exist!", err)
 
 			return general.NewErrorWithMessage(errcode.ErrCartDeleteProductNotFound, err.Error())
 		}
 
-		log.Logger.Error("[ERROR] CarDelete Mysql:", err)
+		log.Logger.Error("[ERROR] CartDelete Mysql:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] CartsDelete ")
+	log.Logger.Info("[SUCCEED] CartDelete %v")
 
-	return c.JSON(errcode.ErrCartDeleteSucceed, general.NewMessage(errcode.ErrCartDeleteSucceed))
+	return c.JSON(errcode.CartDeleteSucceed, general.NewMessage(errcode.CartDeleteSucceed))
 }
 
 func AlterCartPro(c echo.Context) error {
@@ -158,41 +151,41 @@ func AlterCartPro(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrAlterCartInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.AlterCartPro(cartProduct.ID, cartProduct.Count, cartProduct.Color, cartProduct.Size)
+	err = models.CartsService.AlterCartPro(cartProduct.ID, cartProduct.Count)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] AlterCartspro: Product doesn't exist!", err)
+			log.Logger.Error("[ERROR] AlterCartPro: Product doesn't exist!", err)
 
 			return general.NewErrorWithMessage(errcode.ErrAlterCartProductNotFound, err.Error())
 		}
 
-		log.Logger.Error("[ERROR] Alter product with error:", err)
+		log.Logger.Error("[ERROR] AlterCartPro with error:", err)
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] AlterCartProduct :")
+	log.Logger.Info("[SUCCEED] AlterCartPro %v")
 
-	return c.JSON(errcode.ErrAlterCartSucceed, general.NewMessage(errcode.ErrAlterCartSucceed))
+	return c.JSON(errcode.AlterCartSucceed, general.NewMessage(errcode.AlterCartSucceed))
 }
 
-func BrowseCart(c echo.Context) error {
+func CartsBrowse(c echo.Context) error {
 	var (
 		err    error
-		output []models.ConCarts
+		output *[]models.ConCarts
 	)
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	output, err = models.CartsService.BrowseCart(userID)
+	output, err = models.CartsService.CartsBrowse(userID)
 	if err != nil {
-		log.Logger.Error("[ERROR] Get Order with error:", err)
+		log.Logger.Error("[ERROR] CartsBrowse", err)
 
 		return general.NewErrorWithMessage(errcode.ErrBrowseCartNotFound, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] BrowseCart")
+	log.Logger.Info("[SUCCEED] CartsBrowse %v")
 
-	return c.JSON(errcode.ErrBrowseCartSucceed, output)
+	return c.JSON(errcode.BrowseCartSucceed, general.NewMessageWithData(errcode.BrowseCartSucceed, output))
 }
