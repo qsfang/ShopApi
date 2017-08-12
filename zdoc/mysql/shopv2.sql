@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS `cart` (
   `count` int(16) unsigned NOT NULL,  
   `size`    varchar(64) DEFAULT '',
   `color`   varchar(64) DEFAULT '',
+  `price`   double NOT NULL,
   `status`  int(8) NOT NULL DEFAULT '233' COMMENT'是否在购物车  233: 在, 234: 不在',
   `paystatus`  int(8) NOT NULL DEFAULT '236' COMMENT'是否购买  236: 不购买, 235: 购买',
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

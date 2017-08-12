@@ -239,6 +239,7 @@ func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint6
 	return err
 }
 
+// Todo: 修改头像存在问题
 func (us *UserServiceProvider) ChangeUserAvatar(avatar *UserAvatar) error {
 	collection := orm.MDSession.DB(orm.MD).C("useravatar")
 	orm.MDSession.Refresh()
