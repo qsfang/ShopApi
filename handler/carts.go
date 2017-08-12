@@ -85,7 +85,7 @@ func CreateCarts(c echo.Context) error {
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
-	err = models.CartsService.CreateCarts(&carts, userID, ProInfo.Name)
+	err = models.CartsService.CreateCarts(&carts, userID, ProInfo.Name, ProInfo.Price)
 	if err != nil {
 		log.Logger.Error("[ERROR] Mysql error with CartCreate:", err)
 
@@ -115,7 +115,10 @@ func CartDelete(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrCartDeleteErrInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.CartDelete(cart)
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID).(uint64)
+
+	err = models.CartsService.CartDelete(cart, userID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] CartDelete: Product doesn't exist!", err)
