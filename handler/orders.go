@@ -49,6 +49,7 @@ func CreateOrder(c echo.Context) error {
 	var (
 		order models.CreateOrder
 		err   error
+
 	)
 
 	if err = c.Bind(&order); err != nil {
@@ -64,9 +65,9 @@ func CreateOrder(c echo.Context) error {
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	numberID := session.Get(general.SessionUserID).(uint64)
+	UserID := session.Get(general.SessionUserID).(uint64)
 
-	err = models.OrderService.CreateOrder(numberID, order)
+	err = models.OrderService.CreateOrder(UserID, order)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] Create orders: Address doesn't exist", err)
@@ -78,6 +79,8 @@ func CreateOrder(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
+
+	log.Logger.Info("[SUCCEED] Create Order %v")
 
 	return c.JSON(errcode.ErrCreateOrderSucceed, general.NewMessage(errcode.ErrCreateOrderSucceed))
 }
@@ -161,7 +164,7 @@ func GetOneOrder(c echo.Context) error {
 func ChangeStatus(c echo.Context) error {
 	var (
 		err error
-		st  models.OrmOrders
+		st  models.ChangeStatus
 	)
 
 	if err = c.Bind(&st); err != nil {
@@ -176,7 +179,7 @@ func ChangeStatus(c echo.Context) error {
 
 		return general.NewErrorWithMessage(errcode.ErrChangeOrderInvalidParams, err.Error())
 	}
-	err = models.OrderService.ChangeStatus(st.ID, st.Status)
+	err = models.OrderService.ChangeStatus(st.OrderID, st.Status)
 	if err != nil {
 		log.Logger.Error("[ERROR] Change status with error:", err)
 

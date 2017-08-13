@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `orderproduct` (
 CREATE TABLE IF NOT EXISTS `orders` (
   `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
   `userid` int(16) NOT NULL,
-  `addressid` int(16) NOT NULL,
+  `addressid` varchar(64) NOT NULL,
   `totalprice` double NOT NULL COMMENT '商品总价',
   `freight` double DEFAULT '0' COMMENT '运费',
   `remark` text COMMENT '备注',
@@ -87,8 +87,8 @@ CREATE TABLE IF NOT EXISTS `cart` (
   `size`    varchar(64) DEFAULT '',
   `color`   varchar(64) DEFAULT '',
   `price`   double NOT NULL,
-  `status`  int(8) NOT NULL DEFAULT '233' COMMENT'是否在购物车  233: 在, 234: 不在',
-  `paystatus`  int(8) NOT NULL DEFAULT '236' COMMENT'是否购买  236: 不购买, 235: 购买',
+  `status`  int(8) NOT NULL DEFAULT '233' COMMENT'是否在购物车  0: 在, 1: 不在',
+  `paystatus`  int(8) NOT NULL DEFAULT '236' COMMENT'是否购买  0: 购买, 1: 不购买',
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

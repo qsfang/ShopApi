@@ -26,8 +26,9 @@
  * Revision History:
  *     Initial: 2017/07/21         Ai Hao
  *     Modify : 2017/07/21         Zhu Yaqiang
- *     Modify : 2017/07/21         Yu Yi
- *     Modify : 2017/07/21         Machao
+ *     Modify : 2017/08/10         Yu Yi
+ *     Modify : 2017/07/21         Ma chao
+ *     Modify : 2017/08/10         Li Zebang
  */
 
 package models
@@ -304,7 +305,7 @@ func (ps *ProductServiceProvider) GetProductHeader() (*[]ProductList, error) {
 	sql := "SELECT * FROM product WHERE status = ? LIMIT 5 LOCK IN SHARE MODE"
 	rows, err := db.Raw(sql, general.ProductOnSale).Rows()
 	if err != nil {
-		return nil, err
+		return &header, err
 	}
 	defer rows.Close()
 
@@ -315,7 +316,7 @@ func (ps *ProductServiceProvider) GetProductHeader() (*[]ProductList, error) {
 		db.ScanRows(rows, &product)
 		err = collection.Find(bson.M{"productid": product.ID, "class": general.ProductImage}).One(&image)
 		if err != nil {
-			return nil, err
+			return &header, err
 		}
 		product.Avatar = image.Image
 		header = append(header, product)
@@ -337,7 +338,7 @@ func (ps *ProductServiceProvider) GetProductList() (*[]ProductList, error) {
 	sql := "SELECT * FROM product WHERE status = ? LIMIT 5, 6 LOCK IN SHARE MODE"
 	rows, err := db.Raw(sql, general.ProductOnSale).Rows()
 	if err != nil {
-		return nil, err
+		return &list, err
 	}
 	defer rows.Close()
 
@@ -348,7 +349,7 @@ func (ps *ProductServiceProvider) GetProductList() (*[]ProductList, error) {
 		db.ScanRows(rows, &product)
 		err = collection.Find(bson.M{"productid": product.ID, "class": general.ProductAvatar}).One(&image)
 		if err != nil {
-			return nil, err
+			return &list, err
 		}
 		product.Avatar = image.Image
 		list = append(list, product)
@@ -372,7 +373,7 @@ func (ps *ProductServiceProvider) GetProductByCategory(cate, pageStart, pageSize
 	rows, err := db.Raw(sql, cate, general.ProductOnSale).Rows()
 	defer rows.Close()
 	if err != nil {
-		return nil, err
+		return &list, err
 	}
 
 	collection := orm.MDSession.DB(orm.MD).C("productimage")
@@ -382,7 +383,7 @@ func (ps *ProductServiceProvider) GetProductByCategory(cate, pageStart, pageSize
 		db.ScanRows(rows, &product)
 		err = collection.Find(bson.M{"productid": product.ID, "class": general.ProductAvatar}).One(&image)
 		if err != nil {
-			return nil, err
+			return &list, err
 		}
 		product.Avatar = image.Image
 		list = append(list, product)
@@ -405,7 +406,7 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 
 	err = db.Where("id = ?", id).First(&product).Error
 	if err != nil {
-		return nil, err
+		return &info, err
 	}
 
 	info = ProductInfo{
@@ -421,7 +422,7 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 
 	err = collection1.Find(bson.M{"productid": id}).All(&images)
 	if err != nil {
-		return nil, err
+		return &info, err
 	}
 
 	for _, image := range images {
@@ -440,7 +441,7 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 
 	err = collection2.Find(bson.M{"productid": id}).All(&sizes)
 	if err != nil {
-		return nil, err
+		return &info, err
 	}
 
 	for _, size := range sizes {
@@ -452,7 +453,7 @@ func (ps *ProductServiceProvider) GetProInfo(id uint64) (*ProductInfo, error) {
 
 	err = collection3.Find(bson.M{"productid": id}).All(&colors)
 	if err != nil {
-		return nil, err
+		return &info, err
 	}
 
 	for _, color := range colors {
@@ -471,7 +472,7 @@ func (ps *ProductServiceProvider) ChangeProStatus(sta *ChangeProStatus) error {
 
 	db := orm.Conn
 
-	return db.Model(&pro).Where("id = ?", sta.ID).Updates(updater).Limit(1).Error
+	return db.Model(&pro).Where("id = ?", sta.ID).Update(updater).Limit(1).Error
 }
 
 func (ps *ProductServiceProvider) ChangeCategory(cate *ChangeCategory) error {
@@ -483,21 +484,4 @@ func (ps *ProductServiceProvider) ChangeCategory(cate *ChangeCategory) error {
 	err := db.Model(&pro).Where("id = ?", cate.ID).Update("category", cate.Category).Limit(1).Error
 
 	return err
-}
-
-func (ps *ProductServiceProvider) GetPrdouctAvatar(proID uint64) (*string, error) {
-	var (
-		err   error
-		image ProductImages
-	)
-
-	collection := orm.MDSession.DB(orm.MD).C("productimage")
-	orm.MDSession.Refresh()
-
-	err = collection.Find(bson.M{"productid": proID, "class": general.ProductAvatar}).One(&image)
-	if err != nil {
-		return nil, err
-	}
-
-	return &image.Image, nil
 }
