@@ -52,16 +52,22 @@ type Orders struct {
 	AddressID  uint64    `gorm:"column:addressid" json:"addressid"`
 	TotalPrice float64   `gorm:"column:totalprice" json:"totalprice"`
 	PayWay     uint8     `gorm:"column:payway" json:"payway"`
-	ProductID  uint64    `gorm:"column:productid" json:"productid"`
-	Name       string    `json:"name"`
-	Size       string    `json:"size"`
-	Count      uint64    `json:"count"`
-	Color      string    `json:"color"`
 	Freight    float64   `json:"freight"`
 	Remark     string    `json:"remark"`
 	Status     uint8     `json:"status"`
 	Created    time.Time `json:"created"`
 	Updated    time.Time `json:"updated"`
+}
+
+type OrderProduct struct {
+	ID         uint64    `sql:"auto_increment;primary_key;"json:"id"`
+	OrderID   uint64     `gorm:"column:orderid" json:"orderid"`
+	ProductID uint64     `gorm:"column:productid" json:"productid"`
+	Discount   uint8     `json:"discount"`
+	Name       string    `json:"name"`
+	Size       string    `json:"size"`
+	Count      uint64    `json:"count"`
+	Color      string    `json:"color"`
 }
 
 type OrmOrders struct {
@@ -95,6 +101,17 @@ type CreateOrder struct {
 	Payment    float64 `json:"payment" validate:"required"`
 	Remark     string  `json:"remark"`
 	PayWay     uint8   `json:"payway" validate:"required"`
+	OrderProduct []OrderPro
+}
+
+type OrderPro struct {
+	ProductID  uint64    `json:"productid" validate:"required"`
+	OrderID    uint64    `json:"orderid" validate:"required"`
+	Discount   uint8     `json:"discount" validate:"numeric"`
+	Name       string    `json:"name"validate:"required, alphaunicode,min=2,max=18"`
+	Size       string    `json:"size" validate:"required,alphanum"`
+	Count      uint64    `json:"count"validate:"required,numeric"`
+	Color      string    `json:"color" validate:"required,alphanum"`
 }
 
 type GetOrders struct {
@@ -102,6 +119,10 @@ type GetOrders struct {
 	Status   uint8  `json:"status" validate:"required,max=239,min=236"`
 	Page     uint64 `json:"page" validate:"required"`
 	PageSize uint64 `json:"pagesize" validate:"required"`
+}
+
+type GetOne struct {
+	ID  uint64 `json:"orderid"  validate:"numeric"`
 }
 
 type OrdersGet struct {
@@ -115,10 +136,15 @@ func (Orders) TableName() string {
 	return "orders"
 }
 
+func (OrderProduct) TableName() string {
+	return  "orderproduct"
+}
+
 func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) error {
 	var (
 		err     error
 		car     Cart
+		orders  Orders
 		address Address
 	)
 	db := orm.Conn
@@ -154,9 +180,28 @@ func (osp *OrderServiceProvider) CreateOrder(numberID uint64, ord CreateOrder) e
 		return err
 	}
 
+	err = tx.Where("userid = ? AND addressid = ? AND payway = ?", numberID, ord.AddressID, ord.PayWay).First(&orders).Error
+
+	for _, value := range ord.OrderProduct {
+		OrderProduct := OrderProduct{
+			OrderID:    orders.ID,
+			ProductID:  value.ProductID,
+			Discount:   value.Discount,
+			Name:       value.Name,
+			Size:       value.Size,
+			Count:      value.Count,
+			Color:      value.Color,
+		}
+
+		err = tx.Create(&OrderProduct).Error
+		if err!= nil {
+			return err
+		}
+	}
+
 	changeMap := map[string]interface{}{
 		"status":  general.ProNotInCart,
-		"orderid": order.ID,
+		//"orderid": order.ID,
 	}
 
 	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", numberID, general.ProInCart, general.Buy).Update(changeMap).Limit(1).Error
@@ -205,7 +250,7 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrd
 	var (
 		err           error
 		order         Orders
-		carts         []Cart
+		OrderProduct         []OrderProduct
 		getOrder      []OrmOrders
 		productAvatar ProductImages
 	)
@@ -237,12 +282,12 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrd
 	}
 	getOrder = append(getOrder, add1)
 
-	err = tx.Where("orderid = ?", order.ID).Find(&carts).Error
+	err = tx.Where("orderid = ?", order.ID).Find(&OrderProduct).Error
 	if err != nil {
 		return getOrder, err
 	}
 
-	for _, v := range carts {
+	for _, v := range OrderProduct {
 		add1 := OrmOrders{
 			Name:      v.Name,
 			Count:     v.Count,

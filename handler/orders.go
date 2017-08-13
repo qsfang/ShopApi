@@ -135,7 +135,7 @@ func GetOrders(c echo.Context) error {
 func GetOneOrder(c echo.Context) error {
 	var (
 		err    error
-		order  models.Orders
+		order  models.GetOne
 		OutPut []models.OrmOrders
 	)
 

@@ -50,16 +50,22 @@ CREATE TABLE IF NOT EXISTS `address` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+CREATE TABLE IF NOT EXISTS `orderproduct` (
+  `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
+  `productid` int(16) NOT NULL,
+  `orderid` int(16) DEFAULT '0',
+  `discount`  int(8)  NOT NULL ,
+  `name`  varchar(64) NOT NULL COMMENT '商品名称',
+  `size`  varchar(64) NOT NULL ,
+  `count` int(64) NOT NULL ,
+  `color` varchar(64)NOT NULL ,
+  PRIMARY KEY (`id`)
+)ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE IF NOT EXISTS `orders` (
   `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
   `userid` int(16) NOT NULL,
   `addressid` int(16) NOT NULL,
-  `productid` int(16) NOT NULL,
-  `name`  varchar(64) NOT NULL COMMENT '商品名称',
-  `size`  varchar(64) NOT NULL ,
-  `count` int(64) NOT NULL ,
-  `color` varchar(64)NOT NULL ,
   `totalprice` double NOT NULL COMMENT '商品总价',
   `freight` double DEFAULT '0' COMMENT '运费',
   `remark` text COMMENT '备注',
