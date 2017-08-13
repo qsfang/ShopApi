@@ -41,6 +41,10 @@ const (
 	ErrCartDeleteErrInvalidParams = 0x1
 	ErrCartDeleteProductNotFound  = 0x3
 
+	// CartsDelete
+	CartsDeleteSucceed = 0x0
+	ErrCartsDeleteErrInvalidParams = 0x1
+
 	//Alter
 	AlterCartSucceed            = 0x0
 	ErrAlterCartInvalidParams   = 0x1

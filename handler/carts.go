@@ -34,6 +34,8 @@
 package handler
 
 import (
+	"io"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
@@ -134,6 +136,39 @@ func CartDelete(c echo.Context) error {
 	log.Logger.Info("[SUCCEED] CartDelete %v")
 
 	return c.JSON(errcode.CartDeleteSucceed, general.NewMessage(errcode.CartDeleteSucceed))
+}
+
+func CartsDelete(c echo.Context) error {
+	var (
+		err  error
+		Data models.CartsDelete
+	)
+
+	if err = c.Bind(&Data); err != nil && err != io.EOF {
+		log.Logger.Error("[ERROR] CartsDelete Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrCartsDeleteErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(Data); err != nil {
+		log.Logger.Error("[ERROR] CartDelete Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrCartsDeleteErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID).(uint64)
+
+	err = models.CartsService.CartsDelete(&Data, userID)
+	if err != nil {
+		log.Logger.Error("[ERROR] CartsDelete CartsDelete:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	log.Logger.Info("[SUCCEED] CartsDelete: UserID %d", userID)
+
+	return c.JSON(errcode.CartsDeleteSucceed, general.NewMessage(errcode.CartsDeleteSucceed))
 }
 
 func AlterCartPro(c echo.Context) error {

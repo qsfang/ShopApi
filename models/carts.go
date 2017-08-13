@@ -63,6 +63,7 @@ type Cart struct {
 }
 
 type CartAlter struct {
+	CartsDelete
 	ID    uint64 `sql:"primary_key;" validate:"required" json:"id"`
 	Count uint64 `json:"count" validate:"required"`
 	Color string `json:"color" validate:"required,alphanumunicode"`
@@ -110,6 +111,10 @@ type CartDelete struct {
 	Color     string `json:"color" validate:"required"`
 }
 
+type CartsDelete struct {
+	Data []CartDelete `json:"data"`
+}
+
 func (Cart) TableName() string {
 	return "cart"
 }
@@ -135,7 +140,7 @@ func (cs *CartsServiceProvider) CreateCarts(carts *CartPutIn, userID uint64, nam
 		Created:   time.Now(),
 	}
 
-	err = db.Where("productid = ? AND size = ? AND color = ? AND status = ?", carts.ProductID, carts.Size, carts.Color, general.ProInCart).First(&cart).Error
+	err = db.Where("productid = ? AND userid = ? AND size = ? AND color = ? AND status = ?", carts.ProductID, userID, carts.Size, carts.Color, general.ProInCart).First(&cart).Error
 	if err != nil {
 		tx := db.Begin()
 		defer func() {
@@ -173,7 +178,32 @@ func (cs *CartsServiceProvider) CartDelete(cart *CartDelete, userID uint64) erro
 
 	ca.ProductID = cart.ProductID
 	db := orm.Conn
-	err = db.Where("userid = ? AND productid = ? AND size = ? AND color = ?",userID, cart.ProductID, cart.Size, cart.Color).Delete(&ca).Error
+	err = db.Where("userid = ? AND productid = ? AND size = ? AND color = ? AND status = ?", userID, cart.ProductID, cart.Size, cart.Color, general.ProInCart).Delete(&ca).Error
+
+	return err
+}
+
+func (cs *CartsServiceProvider) CartsDelete(data *CartsDelete, userID uint64) error {
+	var (
+		cart Cart
+		err  error
+	)
+
+	tx := orm.Conn.Begin()
+	defer func() {
+		if err != nil {
+			err = tx.Rollback().Error
+		} else {
+			err = tx.Commit().Error
+		}
+	}()
+
+	for _, delete := range data.Data {
+		err = tx.Where("userid = ? AND productid = ? AND size = ? AND color = ? AND status = ?", userID, delete.ProductID, delete.Size, delete.Color, general.ProInCart).Delete(&cart).Error
+		if err != nil {
+			return err
+		}
+	}
 
 	return err
 }
