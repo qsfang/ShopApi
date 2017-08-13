@@ -38,8 +38,8 @@ const (
 
 	//User
 	// User Status
-	UserActive   = 0xf0
-	UserInactive = 0xf1
+	UserActive   = 0x0
+	UserInactive = 0x1
 
 	// sex
 	Sex   = 0x0
@@ -63,12 +63,12 @@ const (
 
 	// Orders
 	// Order Status
-	OrderUnfinished = 0xef // 239
-	OrderFinished   = 0xee // 238
-	OrderCanceled   = 0xed // 237
-	OrderGetAll     = 0xec // 236, Not order status
-	OrderPaid       = 0xf1 // 241
-	OrderUnpaid     = 0xf2 // 240
+	OrderUnfinished = 0x0
+	OrderFinished   = 0x1
+	OrderCanceled   = 0x2
+	OrderGetAll     = 0x3
+	OrderPaid       = 0x4
+	OrderUnpaid     = 0x5
 
 	// Products
 	//Products Status
@@ -87,7 +87,7 @@ const (
 	PayCompany = 0x2
 
 	//Pay status
-	Buy    = 0xec //236
-	NotBuy = 0xed //237
+	Buy    = 0x0
+	NotBuy = 0x1
 
 )
