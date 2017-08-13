@@ -52,6 +52,11 @@ type Orders struct {
 	AddressID  uint64    `gorm:"column:addressid" json:"addressid"`
 	TotalPrice float64   `gorm:"column:totalprice" json:"totalprice"`
 	PayWay     uint8     `gorm:"column:payway" json:"payway"`
+	ProductID  uint64    `gorm:"column:productid" json:"productid"`
+	Name       string    `json:"name"`
+	Size       string    `json:"size"`
+	Count      uint64    `json:"count"`
+	Color      string    `json:"color"`
 	Freight    float64   `json:"freight"`
 	Remark     string    `json:"remark"`
 	Status     uint8     `json:"status"`
@@ -198,10 +203,10 @@ func (osp *OrderServiceProvider) GetOrders(getOrders *GetOrders, pageStart uint6
 
 func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrders, error) {
 	var (
-		err      error
-		order    Orders
-		carts    []Cart
-		getOrder []OrmOrders
+		err           error
+		order         Orders
+		carts         []Cart
+		getOrder      []OrmOrders
 		productAvatar ProductImages
 	)
 

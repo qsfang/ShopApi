@@ -48,7 +48,7 @@ type DataResp struct {
 }
 
 type ProductListResp struct {
-	Code  int   `json:"status"`
+	Code        int `json:"status"`
 	ProductList `json:"data"`
 }
 
@@ -90,7 +90,7 @@ func NewMessageForProductList(code int, header, image interface{}) *ProductListR
 		Code: code,
 		ProductList: ProductList{
 			Header: header,
-			Image: image,
+			Image:  image,
 		},
 	}
 }

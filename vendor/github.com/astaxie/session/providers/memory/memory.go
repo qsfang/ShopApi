@@ -10,8 +10,8 @@ import (
 var pder = &Provider{list: list.New()}
 
 type SessionStore struct {
-	sid          string                      //session id唯一标示	  	
-	timeAccessed time.Time                   //最后访问时间	  	
+	sid          string                      //session id唯一标示
+	timeAccessed time.Time                   //最后访问时间
 	value        map[interface{}]interface{} //session里面存储的值
 }
 

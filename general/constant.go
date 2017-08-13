@@ -40,6 +40,7 @@ const (
 	// User Status
 	UserActive   = 0xf0
 	UserInactive = 0xf1
+
 	// sex
 	Sex   = 0x0
 	Man   = 0x1
@@ -54,10 +55,6 @@ const (
 	//CartPro status
 	ProInCart    = 0x0
 	ProNotInCart = 0x1
-
-	//Pay status
-	Buy    = 0xec //236
-	NotBuy = 0xed //237
 
 	// Category
 	//Category Status
@@ -82,4 +79,15 @@ const (
 	ProductAvatar      = 0x0
 	ProductImage       = 0x1
 	ProductDetailImage = 0x2
+
+	//Pay
+	//Pay Way
+	PayOnline  = 0x0
+	PayArrive  = 0x1
+	PayCompany = 0x2
+
+	//Pay status
+	Buy    = 0xec //236
+	NotBuy = 0xed //237
+
 )

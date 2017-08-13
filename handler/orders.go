@@ -155,7 +155,7 @@ func GetOneOrder(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrNotFound, err.Error())
 	}
 
-	return c.JSON(errcode.ErrGetOrderSucceed, OutPut)
+	return c.JSON(errcode.ErrGetOrderSucceed, general.NewMessageWithData(errcode.GetProInfoSucceed, OutPut))
 }
 
 func ChangeStatus(c echo.Context) error {
