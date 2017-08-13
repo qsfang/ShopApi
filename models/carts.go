@@ -29,6 +29,7 @@
  *     Modify : 2017/07/23       Wang Ke
  *     Modify : 2017/07/24       Ma Chao
  *     Modify : 2017/08/10       Zhang Zizhao
+ *     Modify : 2017/08/12       Yu Yi
  */
 
 package models
@@ -62,13 +63,6 @@ type Cart struct {
 	Created   time.Time `json:"created"`
 }
 
-type CartAlter struct {
-	ID    uint64 `sql:"primary_key;" validate:"required" json:"id"`
-	Count uint64 `json:"count" validate:"required"`
-	Color string `json:"color" validate:"required,alphanumunicode"`
-	Size  string `json:"size" validate:"required,alphanumunicode"`
-}
-
 type ConCarts struct {
 	ProductID uint64  `json:"id" validate:"numeric"`
 	Name      string  `json:"name" validate:"required,alphaunicode,min=2,max=18"`
@@ -79,35 +73,17 @@ type ConCarts struct {
 	Price     float64 `json:"price"`
 }
 
-type CartsImages struct {
-	ID        bson.ObjectId `bson:"_id,omitempty" json:"id"`
-	ProductID uint64        `bson:"productid" json:"productid"`
-	Avatar    string        `bson:"avatar" json:"avatar"`
-}
-
-type CartsSize struct {
-	ID        bson.ObjectId `bson:"_id,omitempty" json:"id"`
-	ProductID uint64        `bson:"productid" json:"productid"`
-	Size      string        `bson:"size" json:"size"`
-}
-
-type CartsColors struct {
-	ID        bson.ObjectId `bson:"_id,omitempty" json:"id"`
-	ProductID uint64        `bson:"productid" json:"productid"`
-	Color     string        `bson:"color" json:"color"`
-}
-
 type CartPutIn struct {
-	ProductID uint64 `json:"productid" validate:"required"`
-	Count     uint64 `json:"count" validate:"required"`
+	ProductID uint64 `json:"id" validate:"required"`
+	Count     uint64 `json:"num" validate:"required"`
 	Size      string `json:"size" validate:"required,alphanumunicode"`
 	Color     string `json:"color" validate:"required"`
 }
 
 type CartDelete struct {
-	ProductID uint64 `json:"productid" validate:"required"`
-	Size      string `json:"size" validate:"required"`
-	Color     string `json:"color" validate:"required"`
+	ProductID uint64 `json:"id"`
+	Size      string `json:"size"`
+	Color     string `json:"color"`
 }
 
 func (Cart) TableName() string {
@@ -171,26 +147,47 @@ func (cs *CartsServiceProvider) CartDelete(cart *CartDelete, userID uint64) erro
 		err error
 	)
 
-	ca.ProductID = cart.ProductID
 	db := orm.Conn
-	err = db.Where("userid = ? AND productid = ? AND size = ? AND color = ?",userID, cart.ProductID, cart.Size, cart.Color).Delete(&ca).Error
+	err = db.Model(&ca).Where("userid = ? AND productid = ? AND size = ? AND color = ?", userID, cart.ProductID, cart.Size, cart.Color).Update("status", general.ProNotInCart).Error
 
 	return err
 }
 
-func (cs *CartsServiceProvider) AlterCartPro(CartsID uint64, Count uint64) error {
+//func (cs *CartsServiceProvider) CartsDelete(carts []CartDelete, UserID uint64) error {
+//	var (
+//		err   error
+//		cart  Cart
+//	)
+//
+//	db := orm.Conn
+//
+//	for _, value := range carts{
+//		//add1 := Cart{
+//		//	ProductID:value.ProductID,
+//		//	Size:value.Size,
+//		//	Color:value.Color,
+//		//}
+//		//cart = append(cart, add1)
+//		err = db.Where("userid = ? AND productid = ? AND size = ? AND color = ?",UserID, value.ProductID, value.Size, value.Color).Delete(&cart).Error
+//
+//		return err
+//
+//	}
+//
+//	return err
+//
+//}
+
+func (cs *CartsServiceProvider) AlterCartPro(carts *CartPutIn) error {
 	var (
 		cart Cart
 		err  error
 	)
-	db := orm.Conn
-	err = db.Where("id = ?", CartsID).Find(&cart).Error
-	if err != nil {
-		return err
-	}
 
-	updater := map[string]interface{}{"count": Count}
-	err = db.Model(&cart).Where("id = ?", CartsID).Update(updater).Limit(1).Error
+	db := orm.Conn
+
+	updater := map[string]interface{}{"count": carts.Count}
+	err = db.Model(&cart).Where("productid = ? AND size = ? AND color = ?", carts.ProductID, carts.Size, carts.Color).Update(updater).Limit(1).Error
 
 	return err
 }
@@ -207,7 +204,7 @@ func (cs *CartsServiceProvider) CartsBrowse(userID uint64) (*[]ConCarts, error) 
 
 	err = db.Where("status = ? AND userid = ?", general.ProInCart, userID).Find(&cart).Error
 	if err != nil {
-		return nil, err
+		return &list, err
 	}
 
 	collection := orm.MDSession.DB(orm.MD).C("productimage")
@@ -216,7 +213,7 @@ func (cs *CartsServiceProvider) CartsBrowse(userID uint64) (*[]ConCarts, error) 
 	for _, value := range cart {
 		err = collection.Find(bson.M{"productid": value.ProductID, "class": general.ProductAvatar}).One(&image)
 		if err != nil {
-			return nil, err
+			return &list, err
 		}
 		lis := ConCarts{
 			ProductID: value.ProductID,

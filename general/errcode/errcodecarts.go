@@ -32,13 +32,13 @@ package errcode
 const (
 	//PutIn
 	CreateSucceed                = 0x0
-	ErrCartPutInErrInvalidParams = 0x1
+	ErrCartPutInInvalidParams = 0x1
 	ErrCartPutInProductNotFound  = 0x2
 	ErrCartPutInDatabase         = 0x3
 
 	//Delete
 	CartDeleteSucceed             = 0x0
-	ErrCartDeleteErrInvalidParams = 0x1
+	ErrCartDeleteInvalidParams = 0x1
 	ErrCartDeleteProductNotFound  = 0x3
 
 	//Alter

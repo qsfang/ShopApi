@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `orderproduct` (
 CREATE TABLE IF NOT EXISTS `orders` (
   `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
   `userid` int(16) NOT NULL,
-  `addressid` int(16) NOT NULL,
+  `addressid` varchar(64) NOT NULL,
   `totalprice` double NOT NULL COMMENT '商品总价',
   `freight` double DEFAULT '0' COMMENT '运费',
   `remark` text COMMENT '备注',

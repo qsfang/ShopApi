@@ -49,7 +49,7 @@ var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 type Orders struct {
 	ID         uint64    `sql:"auto_increment;primary_key;"json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
-	AddressID  uint64    `gorm:"column:addressid" json:"addressid"`
+	AddressID  string    `gorm:"column:addressid" json:"addressid"`
 	TotalPrice float64   `gorm:"column:totalprice" json:"totalprice"`
 	PayWay     uint8     `gorm:"column:payway" json:"payway"`
 	Freight    float64   `json:"freight"`
@@ -80,7 +80,7 @@ type OrmOrders struct {
 	Color      string    `json:"color" validate:"required,alphanum"`
 	Status     uint8     `json:"status" validate:"required,numeric"`
 	PayWay     uint8     `json:"payway" validate:"required,numeric"`
-	AddressID  uint64    `json:"addressid" validate:"required,numeric"`
+	AddressID  string    `json:"addressid" validate:"required,numeric"`
 	ProductID  uint64    `json:"productid" validate:"required, numeric"`
 	Remark     string    `json:"remark" validate:"required,alphanum"`
 	Created    time.Time `json:"created"`
@@ -88,20 +88,18 @@ type OrmOrders struct {
 }
 
 type CreateOrder struct {
-	AddressID    uint64  `json:"addressid" validate:"required"`
+	AddressID    string  `json:"addressid" validate:"required"`
 	TotalPrice   float64 `json:"totalprice" validate:"required"`
 	Freight      float64 `json:"freight" validate:"required"`
-	Payment      float64 `json:"payment" validate:"required"`
 	Remark       string  `json:"remark"`
-	PayWay       uint8   `json:"payway" validate:"required"`
+	PayWay       uint8   `json:"payway"`
 	OrderProduct []OrderPro
 }
 
 type OrderPro struct {
 	ProductID uint64 `json:"productid" validate:"required"`
-	OrderID   uint64 `json:"orderid" validate:"required"`
-	Discount  uint8  `json:"discount" validate:"numeric"`
-	Name      string `json:"name"validate:"required, alphaunicode,min=2,max=18"`
+	OrderID   uint64 `json:"orderid" `
+	Discount  uint8  `json:"discount"`
 	Size      string `json:"size" validate:"required,alphanum"`
 	Count     uint64 `json:"count"validate:"required,numeric"`
 	Color     string `json:"color" validate:"required,alphanum"`
@@ -140,17 +138,12 @@ func (OrderProduct) TableName() string {
 
 func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) error {
 	var (
-		err     error
-		car     Cart
-		orders  Orders
-		address Address
+		err    error
+		car    Cart
+		orders Orders
 	)
-	db := orm.Conn
 
-	err = db.First(&address, ord.AddressID).Error
-	if err != nil {
-		return err
-	}
+	db := orm.Conn
 
 	order := Orders{
 		UserID:     UserID,
@@ -178,14 +171,11 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) err
 		return err
 	}
 
-	//err = tx.Where("userid = ? AND addressid = ? AND payway = ?", numberID, ord.AddressID, ord.PayWay).First(&orders).Error
-
 	for _, value := range ord.OrderProduct {
 		OrderProduct := OrderProduct{
 			OrderID:   orders.ID,
 			ProductID: value.ProductID,
 			Discount:  value.Discount,
-			Name:      value.Name,
 			Size:      value.Size,
 			Count:     value.Count,
 			Color:     value.Color,
@@ -202,8 +192,8 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) err
 		OrderID: order.ID,
 	}
 
-	changeMap := map[string]interface{}{"status": general.ProNotInCart}
-	err = db.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", UserID, general.ProInCart, general.Buy).Update(changeMap).Limit(1).Error
+	changeMap := map[string]uint8{"status": general.ProNotInCart}
+	err = db.Model(&car).Where("userid = ? AND status = ? AND paystatus = ? AND orderid", UserID, general.ProInCart, general.Buy, order.ID).Update(changeMap).Limit(1).Error
 
 	return err
 }

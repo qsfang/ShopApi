@@ -25,10 +25,12 @@
 /*
  * Revision History:
  *     Initial: 2017/07/18        Yusan Kurban
- *     Modify: 2017/07/21         Xu Haosheng
- *     Modify: 2017/07/20	      Zhang Zizhao
- *     Modify: 2017/07/21         Yang Zhengtian
- *     Modify: 2017/07/19         Ma Chao
+ *     Modify : 2017/07/21        Xu Haosheng
+ *     Modify : 2017/07/20	      Zhang Zizhao
+ *     Modify : 2017/07/21        Yang Zhengtian
+ *     Modify : 2017/07/19        Ma Chao
+ *     Modify : 2017/08/10        Li Zebang
+ *     Modify : 2017/08/11        Yu Yi
  */
 
 package models
@@ -189,7 +191,7 @@ func (us *UserServiceProvider) GetUserInfo(UserID uint64) (*UserGet, error) {
 	db := orm.Conn
 	err = db.Where("userid = ?", UserID).First(&ui).Error
 	if err != nil {
-		return nil, err
+		return &ug, err
 	}
 
 	ug = UserGet{
@@ -239,7 +241,6 @@ func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint6
 	return err
 }
 
-// Todo: 修改头像存在问题
 func (us *UserServiceProvider) ChangeUserAvatar(avatar *UserAvatar) error {
 	collection := orm.MDSession.DB(orm.MD).C("useravatar")
 	orm.MDSession.Refresh()
