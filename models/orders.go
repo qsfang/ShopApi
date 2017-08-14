@@ -134,12 +134,13 @@ func (Orders) TableName() string {
 func (OrderProduct) TableName() string {
 	return "orderproduct"
 }
-
+var CartsDeleted CartsDelete
 func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (error) {
 	var (
 		err    error
-		car    Cart
+	//	car    Cart
 		orders Orders
+
 	)
 
 	db := orm.Conn
@@ -156,7 +157,6 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (er
 		Updated:    time.Now(),
 	}
 
-    println(1111111)
 	tx := db.Begin()
 
 	defer func() {
@@ -177,7 +177,6 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (er
 		return err
 	}
 
-	println(1111122)
 	for _, value := range ord.OrderProduct {
 		OrderProduct := OrderProduct{
 			OrderID:   orders.ID,
@@ -192,13 +191,14 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (er
 		if err != nil {
 			return err
 		}
+		add1 := CartDelete{
+			ProductID:  OrderProduct.ProductID,
+			Size:       OrderProduct.Size,
+			Color:      OrderProduct.Color,
+		}
+		CartsDeleted.Data = append(CartsDeleted.Data, add1)
 	}
-	println(113311111)
 
-	car = map[string]uint8{}{"status": general.ProNotInCart}
-
-	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ? ", UserID, general.ProInCart, general.OrderPaid, order.ID).Update("status": general.ProNotInCart).Error
-	println(1144111)
 	return err
 
 }

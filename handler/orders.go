@@ -70,7 +70,20 @@ func CreateOrder(c echo.Context) error {
 	err = models.OrderService.CreateOrder(UserID, order)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] Create orders: Address doesn't exist", err)
+			log.Logger.Error("[ERROR] CreateOrder: Address doesn't exist", err)
+
+			return general.NewErrorWithMessage(errcode.ErrAddressNotFound, err.Error())
+		}
+
+		log.Logger.Error("[ERROR] Mysql error:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	err = models.CartsService.CartsDelete(&models.CartsDeleted, UserID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Error("[ERROR] CreateOrder: Carts doesn't exist", err)
 
 			return general.NewErrorWithMessage(errcode.ErrAddressNotFound, err.Error())
 		}
