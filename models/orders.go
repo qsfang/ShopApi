@@ -91,17 +91,15 @@ type CreateOrder struct {
 	AddressID    uint64  `json:"addressid" validate:"required"`
 	TotalPrice   float64 `json:"totalprice" validate:"required"`
 	Freight      float64 `json:"freight" validate:"required"`
-	Payment      float64 `json:"payment" validate:"required"`
 	Remark       string  `json:"remark"`
 	PayWay       uint8   `json:"payway" validate:"required"`
-	OrderProduct []OrderPro
+	OrderProduct []OrderPro `json:"orderproduct"`
 }
 
 type OrderPro struct {
 	ProductID uint64 `json:"productid" validate:"required"`
 	OrderID   uint64 `json:"orderid" validate:"required"`
 	Discount  uint8  `json:"discount" validate:"numeric"`
-	Name      string `json:"name"validate:"required, alphaunicode,min=2,max=18"`
 	Size      string `json:"size" validate:"required,alphanum"`
 	Count     uint64 `json:"count"validate:"required,numeric"`
 	Color     string `json:"color" validate:"required,alphanum"`
@@ -138,7 +136,7 @@ func (OrderProduct) TableName() string {
 	return "orderproduct"
 }
 
-func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) error {
+func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (error) {
 	var (
 		err     error
 		car     Cart
@@ -185,7 +183,6 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) err
 			OrderID:   orders.ID,
 			ProductID: value.ProductID,
 			Discount:  value.Discount,
-			Name:      value.Name,
 			Size:      value.Size,
 			Count:     value.Count,
 			Color:     value.Color,
@@ -203,7 +200,10 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) err
 	}
 
 	changeMap := map[string]interface{}{"status": general.ProNotInCart}
-	err = db.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", UserID, general.ProInCart, general.Buy).Update(changeMap).Limit(1).Error
+	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ?", UserID, general.ProInCart, general.OrderPaid).Update(changeMap).Limit(1).Error
+	if err != nil {
+		return err
+	}
 
 	return err
 }
@@ -245,7 +245,7 @@ func (osp *OrderServiceProvider) GetOrders(getOrders *GetOrders, pageStart uint6
 	return &ordersList, nil
 }
 
-func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrders, error) {
+func (osp *OrderServiceProvider) GetOneOrder(userID uint64, ID uint64) ([]OrmOrders, error) {
 	var (
 		err           error
 		order         Orders
@@ -265,7 +265,7 @@ func (osp *OrderServiceProvider) GetOneOrder(UserID uint64, ID uint64) ([]OrmOrd
 		}
 	}()
 
-	err = tx.Where("id = ? AND userid = ?", ID, UserID).First(&order).Error
+	err = tx.Where("id = ? AND userid = ?", ID, userID).First(&order).Error
 	if err != nil {
 		return getOrder, err
 	}

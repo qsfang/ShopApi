@@ -67,8 +67,10 @@ const (
 	OrderFinished   = 0x1
 	OrderCanceled   = 0x2
 	OrderGetAll     = 0x3
-	OrderPaid       = 0x4
-	OrderUnpaid     = 0x5
+
+	//Order Payment
+	OrderPaid       = 0x1
+	OrderUnpaid     = 0x2
 
 	// Products
 	//Products Status
@@ -85,9 +87,4 @@ const (
 	PayOnline  = 0x0
 	PayArrive  = 0x1
 	PayCompany = 0x2
-
-	//Pay status
-	Buy    = 0x0
-	NotBuy = 0x1
-
 )
