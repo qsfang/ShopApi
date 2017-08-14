@@ -49,8 +49,8 @@ type CartsServiceProvider struct {
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 
 type Cart struct {
-	ID        uint64    `sql:"primary_key;" gorm:"column:id" json:"id"`
-	ProductID uint64    `gorm:"column:productid" json:"productid"`
+	ID        uint64    `sql:"primary_key;" gorm:"column:id"`
+	ProductID uint64    `gorm:"column:productid" json:"id"`
 	OrderID   uint64    `gorm:"column:orderid" json:"orderid"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Name      string    `json:"name"`
@@ -74,8 +74,8 @@ type ConCarts struct {
 }
 
 type CartPutIn struct {
-	ProductID uint64 `json:"id" validate:"required"`
-	Count     uint64 `json:"num" validate:"required"`
+	ProductID uint64 `json:"productid"`
+	Count     uint64 `json:"count"`
 	Size      string `json:"size" validate:"required,alphanumunicode"`
 	Color     string `json:"color" validate:"required"`
 }
@@ -145,19 +145,6 @@ func (cs *CartsServiceProvider) CreateCarts(carts *CartPutIn, userID uint64, nam
 	return err
 }
 
-func (cs *CartsServiceProvider) CartDelete(cart *CartDelete, userID uint64) error {
-	var (
-		ca  Cart
-		err error
-	)
-
-	db := orm.Conn
-
-	err = db.Model(&ca).Where("userid = ? AND productid = ? AND size = ? AND color = ?", userID, cart.ProductID, cart.Size, cart.Color).Update("status", general.ProNotInCart).Error
-
-	return err
-}
-
 func (cs *CartsServiceProvider) CartsDelete(data *CartsDelete, userID uint64) error {
 	var (
 		cart Cart
@@ -182,31 +169,6 @@ func (cs *CartsServiceProvider) CartsDelete(data *CartsDelete, userID uint64) er
 
 	return err
 }
-
-//func (cs *CartsServiceProvider) CartsDelete(carts []CartDelete, UserID uint64) error {
-//	var (
-//		err   error
-//		cart  Cart
-//	)
-//
-//	db := orm.Conn
-//
-//	for _, value := range carts{
-//		//add1 := Cart{
-//		//	ProductID:value.ProductID,
-//		//	Size:value.Size,
-//		//	Color:value.Color,
-//		//}
-//		//cart = append(cart, add1)
-//		err = db.Where("userid = ? AND productid = ? AND size = ? AND color = ?",UserID, value.ProductID, value.Size, value.Color).Delete(&cart).Error
-//
-//		return err
-//
-//	}
-//
-//	return err
-//
-//}
 
 func (cs *CartsServiceProvider) AlterCartPro(carts *CartPutIn) error {
 	var (

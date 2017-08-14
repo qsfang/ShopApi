@@ -63,7 +63,6 @@ type UserInfo struct {
 	UserID   uint64 `sql:"primary_key" gorm:"column:userid" json:"userid"`
 	Phone    string `json:"phone"`
 	Nickname string `json:"nickname"`
-	Email    string `json:"email"`
 	Sex      uint8  `json:"sex"`
 }
 
@@ -76,7 +75,6 @@ type UserGet struct {
 	Phone    string `json:"phone"`
 	Avatar   string `json:"avatar"`
 	Nickname string `json:"name"`
-	Email    string `json:"email"`
 	Sex      uint8  `json:"sex"`
 }
 
@@ -92,7 +90,6 @@ type Login struct {
 
 type ChangeUserInfo struct {
 	Nickname string `json:"name"`
-	Email    string `json:"email"`
 	Sex      uint8  `json:"sex"`
 }
 
@@ -197,7 +194,6 @@ func (us *UserServiceProvider) GetUserInfo(UserID uint64) (*UserGet, error) {
 	ug = UserGet{
 		Phone:    ui.Phone,
 		Nickname: ui.Nickname,
-		Email:    ui.Email,
 		Sex:      ui.Sex,
 	}
 
@@ -225,10 +221,6 @@ func (us *UserServiceProvider) ChangeUserInfo(info *ChangeUserInfo, userID uint6
 
 	if info.Nickname != "" {
 		updater["nickname"] = info.Nickname
-	}
-
-	if info.Email != "" {
-		updater["email"] = info.Email
 	}
 
 	if info.Sex != general.Sex {
