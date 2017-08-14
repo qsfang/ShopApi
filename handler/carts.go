@@ -60,6 +60,8 @@ func CreateCarts(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrCartPutInInvalidParams, err.Error())
 	}
 
+	log.Logger.Info("get", carts)
+
 	if err = c.Validate(&carts); err != nil {
 		log.Logger.Error("[ERROR] Create Validate:", err)
 
@@ -67,6 +69,9 @@ func CreateCarts(c echo.Context) error {
 	}
 
 	ProInfo, err = models.ProductService.GetProInfo(carts.ProductID)
+
+	log.Logger.Info("\n\n\n%d\n\n\n", carts.ProductID)
+
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] CartsCreate: Product doesn't exist", err)
@@ -98,45 +103,6 @@ func CreateCarts(c echo.Context) error {
 	log.Logger.Info("[SUCCEED] CartsPutIn name:%s", ProInfo.Name)
 
 	return c.JSON(errcode.CreateSucceed, general.NewMessage(errcode.CreateSucceed))
-}
-
-func CartDelete(c echo.Context) error {
-	var (
-		err  error
-		cart *models.CartDelete
-	)
-
-	if err = c.Bind(&cart); err != nil {
-		log.Logger.Error("[ERROR] CartDelete Bind:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrCartDeleteInvalidParams, err.Error())
-	}
-
-	if err = c.Validate(cart); err != nil {
-		log.Logger.Error("[ERROR] CartDelete Validate:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrCartDeleteInvalidParams, err.Error())
-	}
-
-	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
-	userID := session.Get(general.SessionUserID).(uint64)
-
-	err = models.CartsService.CartDelete(cart, userID)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Error("[ERROR] CartDelete: Product doesn't exist!", err)
-
-			return general.NewErrorWithMessage(errcode.ErrCartDeleteProductNotFound, err.Error())
-		}
-
-		log.Logger.Error("[ERROR] CartDelete Mysql:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
-	}
-
-	log.Logger.Info("[SUCCEED] CartDelete %v")
-
-	return c.JSON(errcode.CartDeleteSucceed, general.NewMessage(errcode.CartDeleteSucceed))
 }
 
 func CartsDelete(c echo.Context) error {

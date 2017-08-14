@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS `user` (
 CREATE TABLE IF NOT EXISTS `userinfo` (
   `userid`   int(16),
   `nickname` varchar(100) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
   `phone` varchar(20) UNIQUE NOT NULL DEFAULT '',
   `sex` TINYINT(1) DEFAULT NULL COMMENT '0:男;1:女',
   PRIMARY KEY (`userid`)

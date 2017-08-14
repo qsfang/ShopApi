@@ -207,14 +207,6 @@ func ChangeUserInfo(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrChangeUserInfoInvalidParams, err.Error())
 	}
 
-	if !utility.IsValidEmail(info.Email) {
-		err = errors.New("Invalid Email")
-
-		log.Logger.Error("[ERROR] ChangeUserInfo Validate:", err)
-
-		return general.NewErrorWithMessage(errcode.ErrChangeUserInfoInvalidParams, err.Error())
-	}
-
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
 	userID := session.Get(general.SessionUserID).(uint64)
 
