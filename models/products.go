@@ -100,11 +100,11 @@ type ProductList struct {
 type ProductCategory struct {
 	Category uint64 `json:"category"`
 	Page     uint64 `json:"page"`
-	PageSize uint64 `json:"pagesize" `
+	PageSize uint64 `json:"pagesize"`
 }
 
 type ProductID struct {
-	ID uint64 `json:"id" validate:"required"`
+	ID uint64 `json:"id"`
 }
 
 type ProductInfo struct {
@@ -484,4 +484,37 @@ func (ps *ProductServiceProvider) ChangeCategory(cate *ChangeCategory) error {
 	err := db.Model(&pro).Where("id = ?", cate.ID).Update("category", cate.Category).Limit(1).Error
 
 	return err
+}
+
+func (ps *ProductServiceProvider) GetMyPage() (*[]ProductList, error) {
+	var (
+		err        error
+		product    ProductList
+		image      ProductImages
+		list       []ProductList
+	)
+
+	db := orm.Conn
+
+	sql := "SELECT * FROM product WHERE status = ? LIMIT 6 LOCK IN SHARE MODE"
+	rows, err := db.Raw(sql, general.ProductOnSale).Rows()
+	if err != nil {
+		return &list, err
+	}
+	defer rows.Close()
+
+	collection := orm.MDSession.DB(orm.MD).C("productimage")
+	orm.MDSession.Refresh()
+
+	for rows.Next() {
+		db.ScanRows(rows, &product)
+		err = collection.Find(bson.M{"productid": product.ID, "class": general.ProductAvatar}).One(&image)
+		if err != nil {
+			return &list, err
+		}
+		product.Avatar = image.Image
+		list = append(list, product)
+	}
+
+	return &list, nil
 }
