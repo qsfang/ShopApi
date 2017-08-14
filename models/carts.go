@@ -81,7 +81,7 @@ type CartPutIn struct {
 }
 
 type CartDelete struct {
-	ProductID uint64 `json:"id"`
+	ProductID uint64 `json:"productid"`
 	Size      string `json:"size"`
 	Color     string `json:"color"`
 }

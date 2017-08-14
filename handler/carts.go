@@ -60,8 +60,6 @@ func CreateCarts(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrCartPutInInvalidParams, err.Error())
 	}
 
-	log.Logger.Info("get", carts)
-
 	if err = c.Validate(&carts); err != nil {
 		log.Logger.Error("[ERROR] Create Validate:", err)
 
@@ -69,8 +67,6 @@ func CreateCarts(c echo.Context) error {
 	}
 
 	ProInfo, err = models.ProductService.GetProInfo(carts.ProductID)
-
-	log.Logger.Info("\n\n\n%d\n\n\n", carts.ProductID)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

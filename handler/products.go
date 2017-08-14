@@ -138,7 +138,7 @@ func GetProductListByCategory(c echo.Context) error {
 
 	log.Logger.Info("[SUCCEED] GetProductByCategory %v")
 
-	return c.JSON(errcode.GetProductListByCategorySucceed, list)
+	return c.JSON(errcode.GetProductListByCategorySucceed, general.NewMessageWithData(errcode.GetProductListByCategorySucceed, list))
 }
 
 func GetProInfo(c echo.Context) error {
@@ -246,4 +246,22 @@ func ChangeCategory(c echo.Context) error {
 	log.Logger.Info("[SUCCEED] Change Categories: Category %s", cc.Category)
 
 	return c.JSON(errcode.ChangeCategorySucceed, general.NewMessage(errcode.ChangeCategorySucceed))
+}
+
+func GetMyPage(c echo.Context) error {
+	var (
+		err    error
+		list   *[]models.ProductList
+	)
+
+	list, err = models.ProductService.GetMyPage()
+	if err != nil {
+		log.Logger.Error("[ERROR] GetMyPage ", err)
+
+		return general.NewErrorWithMessage(errcode.ErrGetListDatabase, err.Error())
+	}
+
+	log.Logger.Info("[SUCCEED] GetMyPage %v")
+
+	return c.JSON(errcode.GetListSucceed, general.NewMessageWithData(errcode.GetListSucceed, list))
 }
