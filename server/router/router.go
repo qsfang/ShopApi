@@ -80,6 +80,7 @@ func InitRouter(server *echo.Echo) {
 	// carts
 	server.POST("/api/v1/carts/create", handler.CreateCarts, handler.MustLogin)
 	server.POST("/api/v1/carts/delete", handler.CartDelete, handler.MustLogin)
+	server.POST("/api/v1/carts/cartsdelete", handler.CartsDelete, handler.MustLogin)
 	server.POST("/api/v1/carts/alter", handler.AlterCartPro, handler.MustLogin)
 	server.GET("/api/v1/carts/getlist", handler.CartsBrowse, handler.MustLogin)
 }

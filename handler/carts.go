@@ -29,11 +29,14 @@
  *     Modify : 2017/07/23     Wang Ke
  *     Modify : 2017/07/24     Ma Chao
  *	   Modify : 2017/08/10     Zhang Zizhao
+ *     Modify : 2017/08/12     Yu Yi
  */
 
 package handler
 
 import (
+	"io"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 
@@ -54,13 +57,13 @@ func CreateCarts(c echo.Context) error {
 	if err = c.Bind(&carts); err != nil {
 		log.Logger.Error("[ERROR] Bind with error:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrCartPutInErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrCartPutInInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(&carts); err != nil {
 		log.Logger.Error("[ERROR] Create Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrCartPutInErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrCartPutInInvalidParams, err.Error())
 	}
 
 	ProInfo, err = models.ProductService.GetProInfo(carts.ProductID)
@@ -106,13 +109,13 @@ func CartDelete(c echo.Context) error {
 	if err = c.Bind(&cart); err != nil {
 		log.Logger.Error("[ERROR] CartDelete Bind:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrCartDeleteErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrCartDeleteInvalidParams, err.Error())
 	}
 
 	if err = c.Validate(cart); err != nil {
 		log.Logger.Error("[ERROR] CartDelete Validate:", err)
 
-		return general.NewErrorWithMessage(errcode.ErrCartDeleteErrInvalidParams, err.Error())
+		return general.NewErrorWithMessage(errcode.ErrCartDeleteInvalidParams, err.Error())
 	}
 
 	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
@@ -136,10 +139,43 @@ func CartDelete(c echo.Context) error {
 	return c.JSON(errcode.CartDeleteSucceed, general.NewMessage(errcode.CartDeleteSucceed))
 }
 
+func CartsDelete(c echo.Context) error {
+	var (
+		err  error
+		Data models.CartsDelete
+	)
+
+	if err = c.Bind(&Data); err != nil && err != io.EOF {
+		log.Logger.Error("[ERROR] CartsDelete Bind:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrCartsDeleteErrInvalidParams, err.Error())
+	}
+
+	if err = c.Validate(Data); err != nil {
+		log.Logger.Error("[ERROR] CartDelete Validate:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrCartsDeleteErrInvalidParams, err.Error())
+	}
+
+	session := utility.GlobalSessions.SessionStart(c.Response().Writer, c.Request())
+	userID := session.Get(general.SessionUserID).(uint64)
+
+	err = models.CartsService.CartsDelete(&Data, userID)
+	if err != nil {
+		log.Logger.Error("[ERROR] CartsDelete CartsDelete:", err)
+
+		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
+	}
+
+	log.Logger.Info("[SUCCEED] CartsDelete: UserID %d", userID)
+
+	return c.JSON(errcode.CartsDeleteSucceed, general.NewMessage(errcode.CartsDeleteSucceed))
+}
+
 func AlterCartPro(c echo.Context) error {
 	var (
 		err         error
-		cartProduct models.CartAlter
+		cartProduct *models.CartPutIn
 	)
 
 	if err = c.Bind(&cartProduct); err != nil {
@@ -154,7 +190,7 @@ func AlterCartPro(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrAlterCartInvalidParams, err.Error())
 	}
 
-	err = models.CartsService.AlterCartPro(cartProduct.ID, cartProduct.Count)
+	err = models.CartsService.AlterCartPro(cartProduct)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Error("[ERROR] AlterCartPro: Product doesn't exist!", err)

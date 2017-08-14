@@ -159,7 +159,7 @@ func (asp *AddressServiceProvider) GetAddressByUserID(userID uint64) (*[]Address
 
 	err = db.Where("userid = ?", userID).Find(&address).Error
 	if err != nil {
-		return nil, err
+		return &addressList, err
 	}
 
 	for _, addr := range address {
