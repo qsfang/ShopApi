@@ -93,7 +93,8 @@ func CreateOrder(c echo.Context) error {
 		return general.NewErrorWithMessage(errcode.ErrMysql, err.Error())
 	}
 
-	log.Logger.Info("[SUCCEED] Create Order %v")
+	log.Logger.Info("[SUCCEED] CartsDelete %v")
+	log.Logger.Info("[SUCCEED] CreateOrder %v")
 
 	return c.JSON(errcode.ErrCreateOrderSucceed, general.NewMessage(errcode.ErrCreateOrderSucceed))
 }

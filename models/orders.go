@@ -172,7 +172,7 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (er
 		return err
 	}
 
-	err = tx.Where("userid = ? AND totalprice = ?", UserID, order.TotalPrice).First(&orders).Error
+	err = tx.Where("userid = ? AND totalprice = ? AND addressid = ?", UserID, order.TotalPrice, order.AddressID).First(&orders).Error
 	if err != nil {
 		return err
 	}
