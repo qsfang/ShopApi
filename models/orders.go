@@ -64,7 +64,6 @@ type OrderProduct struct {
 	OrderID   uint64 `gorm:"column:orderid" json:"orderid"`
 	ProductID uint64 `gorm:"column:productid" json:"productid"`
 	Discount  uint8  `json:"discount"`
-	Name      string `json:"name"`
 	Size      string `json:"size"`
 	Count     uint64 `json:"count"`
 	Color     string `json:"color"`
@@ -93,14 +92,13 @@ type CreateOrder struct {
 	Freight      float64 `json:"freight" validate:"required"`
 	Remark       string  `json:"remark"`
 	PayWay       uint8   `json:"payway" validate:"required"`
-	OrderProduct []OrderPro `json:"orderproduct"`
+	OrderProduct []OrderPro
 }
 
 type OrderPro struct {
 	ProductID uint64 `json:"productid" validate:"required"`
 	OrderID   uint64 `json:"orderid" `
 	Discount  uint8  `json:"discount"`
-
 	Size      string `json:"size" validate:"required,alphanum"`
 	Count     uint64 `json:"count"validate:"required,numeric"`
 	Color     string `json:"color" validate:"required,alphanum"`
@@ -158,7 +156,9 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (er
 		Updated:    time.Now(),
 	}
 
+    println(1111111)
 	tx := db.Begin()
+
 	defer func() {
 		if err != nil {
 			err = tx.Rollback().Error
@@ -172,6 +172,12 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (er
 		return err
 	}
 
+	err = tx.Where("userid = ? AND created = ?", UserID, order.Created).First(&orders).Error
+	if err != nil {
+		return err
+	}
+
+	println(1111122)
 	for _, value := range ord.OrderProduct {
 		OrderProduct := OrderProduct{
 			OrderID:   orders.ID,
@@ -187,16 +193,14 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (er
 			return err
 		}
 	}
+	println(113311111)
 
-	car = Cart{
-		Status:  general.ProNotInCart,
-		OrderID: order.ID,
-	}
+	car = map[string]uint8{}{"status": general.ProNotInCart}
 
-	changeMap := map[string]uint8{"status": general.ProNotInCart}
-	err = db.Model(&car).Where("userid = ? AND status = ? AND paystatus = ? AND orderid", UserID, general.ProInCart, general.OrderPaid, order.ID).Update(changeMap).Limit(1).Error
-
+	err = tx.Model(&car).Where("userid = ? AND status = ? AND paystatus = ? ", UserID, general.ProInCart, general.OrderPaid, order.ID).Update("status": general.ProNotInCart).Error
+	println(1144111)
 	return err
+
 }
 
 func (osp *OrderServiceProvider) GetOrders(getOrders *GetOrders, pageStart uint64) (*[]OrdersGet, error) {
@@ -279,7 +283,7 @@ func (osp *OrderServiceProvider) GetOneOrder(userID uint64, ID uint64) ([]OrmOrd
 
 	for _, v := range OrderProduct {
 		add1 := OrmOrders{
-			Name:      v.Name,
+			Discount:  v.Discount,
 			Count:     v.Count,
 			Size:      v.Size,
 			Color:     v.Color,

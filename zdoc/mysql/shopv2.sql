@@ -55,7 +55,6 @@ CREATE TABLE IF NOT EXISTS `orderproduct` (
   `productid` int(16) NOT NULL,
   `orderid` int(16) DEFAULT '0',
   `discount`  int(8)  NOT NULL ,
-  `name`  varchar(64) NOT NULL COMMENT '商品名称',
   `size`  varchar(64) NOT NULL ,
   `count` int(64) NOT NULL ,
   `color` varchar(64)NOT NULL ,
