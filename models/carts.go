@@ -64,10 +64,10 @@ type Cart struct {
 }
 
 type ConCarts struct {
-	ProductID uint64  `json:"id" validate:"numeric"`
+	ProductID uint64  `json:"id"`
 	Name      string  `json:"name" validate:"required,alphaunicode,min=2,max=18"`
 	Avatar    string  `json:"avatar" validate:"required"`
-	Count     uint64  `json:"num" validate:"numeric"`
+	Count     uint64  `json:"num"`
 	Size      string  `json:"size"`
 	Color     string  `json:"color"`
 	Price     float64 `json:"price"`

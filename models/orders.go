@@ -70,17 +70,17 @@ type OrderProduct struct {
 }
 
 type OrmOrders struct {
-	TotalPrice float64   `json:"totalprice" validate:"required,numeric"`
-	Freight    float64   `json:"freight" validate:"required,numeric"`
-	Discount   uint8     `json:"discount" validate:"numeric"`
+	TotalPrice float64   `json:"totalprice" `
+	Freight    float64   `json:"freight" `
+	Discount   uint8     `json:"discount" `
 	Name       string    `json:"name"validate:"required, alphaunicode,min=2,max=18"`
 	Size       string    `json:"size" validate:"required,alphanum"`
-	Count      uint64    `json:"count"validate:"required,numeric"`
+	Count      uint64    `json:"count"`
 	Color      string    `json:"color" validate:"required,alphanum"`
-	Status     uint8     `json:"status" validate:"required,numeric"`
-	PayWay     uint8     `json:"payway" validate:"required,numeric"`
+	Status     uint8     `json:"status"`
+	PayWay     uint8     `json:"payway"`
 	AddressID  string    `json:"addressid" validate:"required,numeric"`
-	ProductID  uint64    `json:"productid" validate:"required, numeric"`
+	ProductID  uint64    `json:"productid"`
 	Remark     string    `json:"remark" validate:"required,alphanum"`
 	Created    time.Time `json:"created"`
 	Avatar     string    `json:"avatar"`
@@ -88,31 +88,31 @@ type OrmOrders struct {
 
 type CreateOrder struct {
 	AddressID    string  `json:"addressid" validate:"required"`
-	TotalPrice   float64 `json:"totalprice" validate:"required"`
-	Freight      float64 `json:"freight" validate:"required"`
+	TotalPrice   float64 `json:"totalprice"`
+	Freight      float64 `json:"freight"`
 	Remark       string  `json:"remark"`
-	PayWay       uint8   `json:"payway" validate:"required"`
+	PayWay       uint8   `json:"payway"`
 	OrderProduct []OrderPro
 }
 
 type OrderPro struct {
-	ProductID uint64 `json:"productid" validate:"required"`
+	ProductID uint64 `json:"productid"`
 	OrderID   uint64 `json:"orderid" `
 	Discount  uint8  `json:"discount"`
 	Size      string `json:"size" validate:"required,alphanum"`
-	Count     uint64 `json:"count"validate:"required,numeric"`
+	Count     uint64 `json:"count"`
 	Color     string `json:"color" validate:"required,alphanum"`
 }
 
 type GetOrders struct {
 	UserID   uint64 `json:"userid"`
-	Status   uint8  `json:"status" validate:"required,max=239,min=236"`
-	Page     uint64 `json:"page" validate:"required"`
-	PageSize uint64 `json:"pagesize" validate:"required"`
+	Status   uint8  `json:"status"`
+	Page     uint64 `json:"page"`
+	PageSize uint64 `json:"pagesize"`
 }
 
 type GetOne struct {
-	ID uint64 `json:"orderid"  validate:"numeric"`
+	ID uint64 `json:"orderid" `
 }
 
 type OrdersGet struct {
@@ -124,7 +124,7 @@ type OrdersGet struct {
 
 type ChangeStatus struct {
 	Status  uint8  `json:"status"`
-	OrderID uint64 `json:"orderid" validate:"required"`
+	OrderID uint64 `json:"orderid"`
 }
 
 func (Orders) TableName() string {
@@ -172,7 +172,7 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (er
 		return err
 	}
 
-	err = tx.Where("userid = ? AND created = ?", UserID, order.Created).First(&orders).Error
+	err = tx.Where("userid = ? AND totalprice = ?", UserID, order.TotalPrice).First(&orders).Error
 	if err != nil {
 		return err
 	}
@@ -191,6 +191,7 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (er
 		if err != nil {
 			return err
 		}
+
 		add1 := CartDelete{
 			ProductID:  OrderProduct.ProductID,
 			Size:       OrderProduct.Size,
