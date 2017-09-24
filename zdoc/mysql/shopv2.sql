@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `userinfo` (
 
 
 CREATE TABLE IF NOT EXISTS `address` (
-  `id` varchar(256) NOT NULL DEFAULT '',
+  `id` int(16) NOT NULL DEFAULT '',
   `name` varchar(64) NOT NULL,
   `userid` int(16) NOT NULL,
   `phone` varchar(16) NOT NULL,
