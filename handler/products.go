@@ -250,8 +250,8 @@ func ChangeCategory(c echo.Context) error {
 
 func GetMyPage(c echo.Context) error {
 	var (
-		err    error
-		list   *[]models.ProductList
+		err  error
+		list *[]models.ProductList
 	)
 
 	list, err = models.ProductService.GetMyPage()

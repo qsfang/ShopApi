@@ -49,7 +49,7 @@ type CartsServiceProvider struct {
 var CartsService *CartsServiceProvider = &CartsServiceProvider{}
 
 type Cart struct {
-	ID        uint64    `sql:"primary_key;" gorm:"column:id"`
+	ID        uint64    `sql:"primary_key" gorm:"column:id"`
 	ProductID uint64    `gorm:"column:productid" json:"id"`
 	OrderID   uint64    `gorm:"column:orderid" json:"orderid"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`

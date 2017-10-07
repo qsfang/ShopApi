@@ -49,9 +49,9 @@ import (
 
 func CreateCarts(c echo.Context) error {
 	var (
-		err            error
-		carts          models.CartPutIn
-		ProInfo        *models.ProductInfo
+		err     error
+		carts   models.CartPutIn
+		ProInfo *models.ProductInfo
 	)
 
 	if err = c.Bind(&carts); err != nil {

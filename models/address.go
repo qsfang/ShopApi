@@ -46,7 +46,7 @@ type AddressServiceProvider struct {
 var AddressService *AddressServiceProvider = &AddressServiceProvider{}
 
 type Address struct {
-	ID        string    `sql:"primary_key;" json:"id"`
+	ID        string    `sql:"primary_key" json:"id"`
 	UserID    uint64    `gorm:"column:userid" json:"userid"`
 	Name      string    `json:"name"`
 	Phone     string    `json:"phone"`

@@ -39,6 +39,7 @@ import (
 
 	"ShopApi/general"
 	"ShopApi/orm"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -48,7 +49,7 @@ type ProductServiceProvider struct {
 var ProductService *ProductServiceProvider = &ProductServiceProvider{}
 
 type Product struct {
-	ID        uint64    `sql:"auto_increment;primary_key;" gorm:"column:id" json:"id"`
+	ID        uint64    `sql:"auto_increment;primary_key" gorm:"column:id" json:"id"`
 	Name      string    `json:"name"`
 	TotalSale uint64    `gorm:"column:totalsale" json:"totalsale"`
 	Category  uint64    `json:"categories"`
@@ -488,10 +489,10 @@ func (ps *ProductServiceProvider) ChangeCategory(cate *ChangeCategory) error {
 
 func (ps *ProductServiceProvider) GetMyPage() (*[]ProductList, error) {
 	var (
-		err        error
-		product    ProductList
-		image      ProductImages
-		list       []ProductList
+		err     error
+		product ProductList
+		image   ProductImages
+		list    []ProductList
 	)
 
 	db := orm.Conn

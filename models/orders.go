@@ -38,6 +38,7 @@ import (
 
 	"ShopApi/general"
 	"ShopApi/orm"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -47,7 +48,7 @@ type OrderServiceProvider struct {
 var OrderService *OrderServiceProvider = &OrderServiceProvider{}
 
 type Orders struct {
-	ID         uint64    `sql:"auto_increment;primary_key;"json:"id"`
+	ID         uint64    `sql:"auto_increment;primary_key" json:"id"`
 	UserID     uint64    `gorm:"column:userid" json:"userid"`
 	AddressID  string    `gorm:"column:addressid" json:"addressid"`
 	TotalPrice float64   `gorm:"column:totalprice" json:"totalprice"`
@@ -60,7 +61,7 @@ type Orders struct {
 }
 
 type OrderProduct struct {
-	ID        uint64 `sql:"auto_increment;primary_key;"json:"id"`
+	ID        uint64 `sql:"auto_increment;primary_key" json:"id"`
 	OrderID   uint64 `gorm:"column:orderid" json:"orderid"`
 	ProductID uint64 `gorm:"column:productid" json:"productid"`
 	Discount  uint8  `json:"discount"`
@@ -73,7 +74,7 @@ type OrmOrders struct {
 	TotalPrice float64   `json:"totalprice" `
 	Freight    float64   `json:"freight" `
 	Discount   uint8     `json:"discount" `
-	Name       string    `json:"name"validate:"required, alphaunicode,min=2,max=18"`
+	Name       string    `json:"name" validate:"required,alphaunicode,min=2,max=18"`
 	Size       string    `json:"size" validate:"required,alphanum"`
 	Count      uint64    `json:"count"`
 	Color      string    `json:"color" validate:"required,alphanum"`
@@ -134,13 +135,13 @@ func (Orders) TableName() string {
 func (OrderProduct) TableName() string {
 	return "orderproduct"
 }
+
 var CartsDeleted CartsDelete
-func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (error) {
+
+func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) error {
 	var (
 		err    error
-	//	car    Cart
 		orders Orders
-
 	)
 
 	db := orm.Conn
@@ -193,9 +194,9 @@ func (osp *OrderServiceProvider) CreateOrder(UserID uint64, ord CreateOrder) (er
 		}
 
 		add1 := CartDelete{
-			ProductID:  OrderProduct.ProductID,
-			Size:       OrderProduct.Size,
-			Color:      OrderProduct.Color,
+			ProductID: OrderProduct.ProductID,
+			Size:      OrderProduct.Size,
+			Color:     OrderProduct.Color,
 		}
 		CartsDeleted.Data = append(CartsDeleted.Data, add1)
 	}

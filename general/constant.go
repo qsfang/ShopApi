@@ -69,8 +69,8 @@ const (
 	OrderGetAll     = 0x3
 
 	//Order Payment
-	OrderPaid       = 0x1
-	OrderUnpaid     = 0x2
+	OrderPaid   = 0x1
+	OrderUnpaid = 0x2
 
 	// Products
 	//Products Status

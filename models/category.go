@@ -43,7 +43,7 @@ type CategoryServiceProvider struct {
 var CategoryService *CategoryServiceProvider = &CategoryServiceProvider{}
 
 type Category struct {
-	ID      uint64    `sql:"auto_increment;primary_key;",json:"id"`
+	ID      uint64    `sql:"auto_increment;primary_key" json:"id"`
 	Name    string    `json:"name"`
 	PID     uint64    `gorm:"column:pid" json:"pid"`
 	Status  uint64    `json:"status"`

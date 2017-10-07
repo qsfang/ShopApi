@@ -49,7 +49,6 @@ func CreateOrder(c echo.Context) error {
 	var (
 		order models.CreateOrder
 		err   error
-
 	)
 
 	if err = c.Bind(&order); err != nil {
